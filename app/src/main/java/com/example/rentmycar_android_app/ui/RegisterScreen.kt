@@ -82,7 +82,7 @@ fun RegisterScreen(
                             loading = false
                             if (response.isSuccessful && response.body() != null) {
                                 val authResponse = response.body()!!
-                                // Token opslaan
+
                                 val sharedPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                                 sharedPrefs.edit().putString("jwt_token", authResponse.token).apply()
                                 sharedPrefs.edit().putString("username", authResponse.username).apply()

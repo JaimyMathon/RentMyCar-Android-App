@@ -21,7 +21,7 @@ import android.util.Log
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (String) -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
@@ -83,7 +83,7 @@ fun LoginScreen(
 
                                 // Optioneel: gebruikersnaam opslaan
                                 sharedPrefs.edit().putString("username", authResponse.username).apply()
-                                onLoginSuccess()
+                                onLoginSuccess(authResponse.username)
                             } else {
                                 errorMessage = "E-mail of wachtwoord onjuist"
                             }
