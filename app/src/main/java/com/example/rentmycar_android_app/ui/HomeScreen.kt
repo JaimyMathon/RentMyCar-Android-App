@@ -17,18 +17,16 @@ fun HomeScreen() {
     val context = LocalContext.current
     val sharedPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     val username = sharedPrefs.getString("username", "Onbekend")
-    val token = sharedPrefs.getString("jwt_token", "")
 
     Box(
         modifier = Modifier.fillMaxSize().background(Color(0xFFE3ECFF)),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(16.dp)
+        ) {
             Text("Welkom, $username!", fontSize = 28.sp)
-            Spacer(Modifier.height(20.dp))
-            Text("Je JWT token:", fontSize = 18.sp)
-            Spacer(Modifier.height(10.dp))
-            Text(token ?: "Geen token gevonden", fontSize = 14.sp, color = Color.DarkGray)
         }
     }
 }
