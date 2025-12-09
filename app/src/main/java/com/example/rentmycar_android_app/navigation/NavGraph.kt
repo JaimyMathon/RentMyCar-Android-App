@@ -10,6 +10,7 @@ import com.example.rentmycar_android_app.ui.LoginScreen
 import com.example.rentmycar_android_app.ui.RegisterScreen
 import com.example.rentmycar_android_app.ui.HomeScreen
 import com.example.rentmycar_android_app.ui.ResetPasswordScreen
+import com.example.rentmycar_android_app.ui.MapScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -18,6 +19,8 @@ sealed class Screen(val route: String) {
         fun createRoute(token: String) = "reset-password/$token"
 
     }    object Home : Screen("home")
+    object Home : Screen("home")
+    object Map : Screen("map")
 }
 
 @Composable
@@ -69,5 +72,12 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
+        composable(Screen.Map.route) {
+            MapScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
