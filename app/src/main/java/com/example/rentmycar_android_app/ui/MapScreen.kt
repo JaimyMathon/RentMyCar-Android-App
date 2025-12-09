@@ -221,8 +221,8 @@ fun OpenStreetMapView(carId: String) {
                     val carService = apiClientWithToken.instance.create(CarService::class.java)
                     carService.getCar(carId).enqueue(object : Callback<com.example.rentmycar_android_app.network.CarResponse> {
                         override fun onResponse(call: retrofit2.Call<com.example.rentmycar_android_app.network.CarResponse>, response: Response<com.example.rentmycar_android_app.network.CarResponse>) {
-                            if (response.isSuccessful && response.body() != null) {
-                                val car = response.body()!!
+                            if (response.isSuccessful && response.body() != null && response.body()!!.cars.isNotEmpty()) {
+                                val car = response.body()!!.cars.first()
                                 val carLocation = GeoPoint(car.latitude, car.longitude)
 
                                 // Fetch actual route using OSRM
