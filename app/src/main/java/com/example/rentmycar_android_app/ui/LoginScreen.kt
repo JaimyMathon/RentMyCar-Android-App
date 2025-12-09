@@ -1,7 +1,8 @@
+// Bestandsnaam: app/src/main/java/com/example/rentmycar_android_app/ui/LoginScreen.kt
+
 package com.example.rentmycar_android_app.ui
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,13 +17,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import com.example.rentmycar_android_app.network.*
-import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     onLoginSuccess: (String) -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNavigateToRegister: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -70,18 +71,13 @@ fun LoginScreen(
                     errorMessage = null
                     val request = LoginRequest(email, password)
 
-                    val service = ApiClient.instance.create(AuthService::class.java)
-
                     service.login(request).enqueue(object: retrofit2.Callback<AuthResponse> {
                         override fun onResponse(call: retrofit2.Call<AuthResponse>, response: retrofit2.Response<AuthResponse>) {
                             loading = false
                             if (response.isSuccessful && response.body() != null) {
                                 val authResponse = response.body()!!
-                                // Token opslaan
                                 val sharedPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                                 sharedPrefs.edit().putString("jwt_token", authResponse.token).apply()
-
-                                // Optioneel: gebruikersnaam opslaan
                                 sharedPrefs.edit().putString("username", authResponse.username).apply()
                                 onLoginSuccess(authResponse.username)
                             } else {
@@ -98,6 +94,10 @@ fun LoginScreen(
                 shape = RoundedCornerShape(12.dp),
                 enabled = !loading
             ) { Text("Inloggen") }
+
+            TextButton(onClick = onNavigateToForgotPassword) {
+                Text("Wachtwoord vergeten?")
+            }
 
             TextButton(onClick = onNavigateToRegister) {
                 Text("Nog geen account? Registreer hier")
