@@ -7,11 +7,13 @@ import androidx.navigation.compose.composable
 import com.example.rentmycar_android_app.ui.LoginScreen
 import com.example.rentmycar_android_app.ui.RegisterScreen
 import com.example.rentmycar_android_app.ui.HomeScreen
+import com.example.rentmycar_android_app.ui.MapScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
     object Home : Screen("home")
+    object Map : Screen("map")
 }
 
 @Composable
@@ -45,6 +47,14 @@ fun NavGraph(navController: NavHostController) {
 
         composable(Screen.Home.route) {
             HomeScreen()
+        }
+
+        composable(Screen.Map.route) {
+            MapScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
