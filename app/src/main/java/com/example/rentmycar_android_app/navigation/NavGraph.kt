@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.example.rentmycar_android_app.ui.LoginScreen
 import com.example.rentmycar_android_app.ui.RegisterScreen
 import com.example.rentmycar_android_app.ui.HomeScreen
+import com.example.rentmycar_android_app.ui.ReservationScreen
 import com.example.rentmycar_android_app.ui.ResetPasswordScreen
 import com.example.rentmycar_android_app.ui.MapScreen
 
@@ -20,13 +21,17 @@ sealed class Screen(val route: String) {
 
     }    object Home : Screen("home")
     object Home : Screen("home")
+    object Reservation : Screen("reservation")
     object Map : Screen("map")
 }
 
 @Composable
 fun NavGraph(navController: NavHostController) {
 
-    NavHost(navController = navController, startDestination = Screen.Login.route) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Login.route
+    ) {
 
         composable(Screen.Login.route) {
             LoginScreen(
@@ -47,12 +52,40 @@ fun NavGraph(navController: NavHostController) {
                         popUpTo(Screen.Register.route) { inclusive = true }
                     }
                 },
-                onNavigateToLogin = { navController.popBackStack() }
+                onNavigateToLogin = {
+                    navController.popBackStack()
+                }
             )
         }
 
         composable(Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(
+                onNavigateToReservation = {
+                    navController.navigate(Screen.Reservation.route)
+                }
+                // onNavigateToCars, onNavigateToReservationsOverview, onNavigateToProfile
+                // laten we voorlopig op de default {} staan
+            )
+        }
+
+        composable(Screen.Home.route) {
+            HomeScreen(
+                onNavigateToReservation = {
+                    navController.navigate(Screen.Reservation.route)
+                },
+                onNavigateToCars = { /* later: navController.navigate(Screen.Cars.route) */ },
+                onNavigateToReservationsOverview = { /* navController.navigate(...) */ },
+                onNavigateToProfile = { /* navController.navigate(Screen.Profile.route) */ }
+            )
+        }
+
+        composable(Screen.Reservation.route) {
+            ReservationScreen(
+                onBackClick = { navController.popBackStack() },
+                onContinueClick = { fromDate, toDate, kms ->
+                    // hier later: ReservationDto maken + ReservationService.addReservation aanroepen
+                }
+            )
         }
 
         composable(
