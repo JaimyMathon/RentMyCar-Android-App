@@ -11,5 +11,7 @@ data class CarDto(
     val pricePerDay: Double,
     val pricePerKm: Double?,
     val rating: Double?,       // 4.8
-    val imageUrl: String?      // voor later, nu placeholder
+    val imageUrl: String?,     // voor later, nu placeholder
+    val latitude: Double,
+    val longitude: Double
 )
