@@ -18,8 +18,4 @@ object RetrofitInstance {
     fun init(context: Context) {
         retrofit = ApiClient.instance
     }
-
-    val api: ApiService by lazy {
-        retrofit.create(ApiService::class.java)
-    }
 }

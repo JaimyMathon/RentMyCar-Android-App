@@ -10,4 +10,9 @@ interface AuthService {
 
     @POST("/register")
     fun register(@Body request: RegisterRequest): Call<AuthResponse>
+
+    @POST("reset-password")
+    fun resetPassword(
+        @Body request: ResetPasswordRequest
+    ): Call<SimpleResponse>
 }
