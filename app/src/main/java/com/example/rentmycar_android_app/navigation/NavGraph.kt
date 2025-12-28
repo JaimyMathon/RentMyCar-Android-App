@@ -6,20 +6,18 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.rentmycar_android_app.ui.ForgotPasswordScreen
 import com.example.rentmycar_android_app.ui.LoginScreen
 import com.example.rentmycar_android_app.ui.RegisterScreen
 import com.example.rentmycar_android_app.ui.HomeScreen
-import com.example.rentmycar_android_app.ui.ReservationScreen
-import com.example.rentmycar_android_app.ui.ResetPasswordScreen
 import com.example.rentmycar_android_app.ui.MapScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
-    object ResetPassword : Screen("reset-password/{token}") {
-        fun createRoute(token: String) = "reset-password/$token"
+    object ForgotPassword : Screen("forgot_password")
 
-    }    object Home : Screen("home")
+
     object Home : Screen("home")
     object Reservation : Screen("reservation")
     object Map : Screen("map")
@@ -41,7 +39,11 @@ fun NavGraph(navController: NavHostController) {
                     }
                 },
                 onNavigateToRegister = { navController.navigate(Screen.Register.route) },
-                onNavigateToForgotPassword = { navController.navigate(Screen.ResetPassword.route) }
+
+                // gebruiker moet email invullen → we geven het email mee aan ResetPassword
+                onNavigateToForgotPassword = {
+                    navController.navigate(Screen.ForgotPassword.route)
+                }
             )
         }
 
@@ -58,13 +60,19 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
+        composable(Screen.ForgotPassword.route) {
+            ForgotPasswordScreen(
+                onNavigateBackToLogin = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
         composable(Screen.Home.route) {
             HomeScreen(
                 onNavigateToReservation = {
                     navController.navigate(Screen.Reservation.route)
                 }
-                // onNavigateToCars, onNavigateToReservationsOverview, onNavigateToProfile
-                // laten we voorlopig op de default {} staan
             )
         }
 
@@ -73,35 +81,9 @@ fun NavGraph(navController: NavHostController) {
                 onNavigateToReservation = {
                     navController.navigate(Screen.Reservation.route)
                 },
-                onNavigateToCars = { /* later: navController.navigate(Screen.Cars.route) */ },
-                onNavigateToReservationsOverview = { /* navController.navigate(...) */ },
-                onNavigateToProfile = { /* navController.navigate(Screen.Profile.route) */ }
-            )
-        }
-
-        composable(Screen.Reservation.route) {
-            ReservationScreen(
-                onBackClick = { navController.popBackStack() },
-                onContinueClick = { fromDate, toDate, kms ->
-                    // hier later: ReservationDto maken + ReservationService.addReservation aanroepen
-                }
-            )
-        }
-
-        composable(
-            route = "reset-password/{token}"
-        ) { backStackEntry ->
-
-            val token = backStackEntry.arguments?.getString("token") ?: ""
-
-            ResetPasswordScreen(
-                tokenFromLink = token,
-                onSuccess = {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                },
-                onBackToLogin = { navController.popBackStack() }
+                onNavigateToCars = {},
+                onNavigateToReservationsOverview = {},
+                onNavigateToProfile = { }
             )
         }
 
