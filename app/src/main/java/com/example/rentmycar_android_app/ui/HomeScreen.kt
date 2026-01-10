@@ -2,28 +2,39 @@ package com.example.rentmycar_android_app.ui
 
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -57,18 +68,32 @@ fun HomeScreen(
     val username = sharedPrefs.getString("username", "Onbekend")
 
     val uiState by viewModel.uiState.collectAsState()
+    var showFilterDialog by remember { mutableStateOf(false) }
 
-    Scaffold(
-        bottomBar = {
-            HomeBottomBar(
-                onHomeClick = { /* al op Home */ },
-                onExploreClick = onNavigateToCars,                 // Explore -> auto's bekijken
-                onFavoritesClick = onNavigateToReservationsOverview,
-                onKeysClick = onNavigateToReservation,            // Key-tab -> reserveringen
-                onProfileClick = onNavigateToProfile
-            )
-        }
-    ) { innerPadding ->
+    if (showFilterDialog) {
+        FilterDialog(
+            filterState = uiState.filterState,
+            availableBrands = uiState.availableBrands,
+            onDismiss = { showFilterDialog = false },
+            onApply = { newFilter ->
+                viewModel.updateFilters(newFilter)
+            },
+            onReset = {
+                viewModel.resetFilters()
+            }
+        )
+    } else {
+        Scaffold(
+            bottomBar = {
+                HomeBottomBar(
+                    onHomeClick = { /* al op Home */ },
+                    onExploreClick = onNavigateToCars,                 // Explore -> auto's bekijken
+                    onFavoritesClick = onNavigateToReservationsOverview,
+                    onKeysClick = onNavigateToReservation,            // Key-tab -> reserveringen
+                    onProfileClick = onNavigateToProfile
+                )
+            }
+        ) { innerPadding ->
 
         Column(
             modifier = Modifier
@@ -94,7 +119,13 @@ fun HomeScreen(
             )
 
             // Locatie + zoekveld (grijze kaart)
-            LocationSearchCard()
+            LocationSearchCard(
+                searchQuery = uiState.searchQuery,
+                onSearchQueryChange = { query ->
+                    viewModel.updateSearchQuery(query)
+                },
+                onFilterClick = { showFilterDialog = true }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -142,12 +173,13 @@ fun HomeScreen(
                         ),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(uiState.cars) { car ->
+                        items(uiState.filteredCars) { car ->
                             CarCard(car = car)
                         }
                     }
                 }
             }
+        }
         }
     }
 }
@@ -157,7 +189,11 @@ fun HomeScreen(
 // --------- BOVENSTE KAART: LOCATIE + ZOEK ---------
 
 @Composable
-private fun LocationSearchCard() {
+private fun LocationSearchCard(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onFilterClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -202,26 +238,30 @@ private fun LocationSearchCard() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SearchField(
+                    query = searchQuery,
+                    onQueryChange = onSearchQueryChange,
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                FilterButton()
+                FilterButton(onClick = onFilterClick)
             }
         }
     }
 }
 
 @Composable
-private fun SearchField(modifier: Modifier = Modifier) {
-    var query by remember { mutableStateOf("") }
-
+private fun SearchField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     OutlinedTextField(
         value = query,
-        onValueChange = { query = it },
+        onValueChange = onQueryChange,
         modifier = modifier
             .height(48.dp)
             .clip(RoundedCornerShape(24.dp)),
-        placeholder = { Text("Vul locatie in") },
+        placeholder = { Text("Zoek op merk, model of stad") },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
@@ -239,12 +279,13 @@ private fun SearchField(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun FilterButton() {
+private fun FilterButton(onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(48.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(Color(0xFFF0E9E9)),
+            .background(Color(0xFFF0E9E9))
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         // Simpele placeholder voor filter-icoon
@@ -376,7 +417,7 @@ private fun CarCard(car: CarDto) {
                         color = Color.DarkGray
                     )
                     Text(
-                        text = car.fuelType ?: "",
+                        text = car.category ?: "",
                         fontSize = 13.sp,
                         color = Color.DarkGray
                     )
@@ -390,6 +431,274 @@ private fun CarCard(car: CarDto) {
                     )
                 }
             }
+        }
+    }
+}
+
+// --------- FILTER DIALOG ---------
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilterDialog(
+    filterState: FilterState,
+    availableBrands: List<String>,
+    onDismiss: () -> Unit,
+    onApply: (FilterState) -> Unit,
+    onReset: () -> Unit
+) {
+    var currentFilter by remember(filterState) { mutableStateOf(filterState) }
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Filter", fontWeight = FontWeight.SemiBold) },
+                navigationIcon = {
+                    IconButton(onClick = onDismiss) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Terug")
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.White
+                )
+            )
+        },
+        containerColor = Color.White
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp)
+        ) {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Types",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    FilterChipGroup(
+                        options = listOf("All", "ICE", "BEV", "FCEV"),
+                        selectedOptions = currentFilter.selectedTypes,
+                        onSelectionChange = { newSelection ->
+                            currentFilter = if ("All" in newSelection && "All" !in currentFilter.selectedTypes) {
+                                currentFilter.copy(selectedTypes = setOf("All"))
+                            } else if (newSelection.size > 1 && "All" in newSelection) {
+                                currentFilter.copy(selectedTypes = newSelection - "All")
+                            } else if (newSelection.isEmpty()) {
+                                currentFilter.copy(selectedTypes = setOf("All"))
+                            } else {
+                                currentFilter.copy(selectedTypes = newSelection)
+                            }
+                        }
+                    )
+                }
+
+                item {
+                    Text(
+                        text = "Prijs per Km",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    PriceRangeSlider(
+                        range = currentFilter.pricePerKmRange,
+                        onRangeChange = { newRange ->
+                            currentFilter = currentFilter.copy(pricePerKmRange = newRange)
+                        },
+                        minValue = 0.0f,
+                        maxValue = 0.5f,
+                        valueFormatter = { "€%.2f".format(it) },
+                        steps = 100  // 100 steps between 0 and 10 (0.10 increments)
+                    )
+                }
+
+                item {
+                    Text(
+                        text = "Prijs per dag",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    PriceRangeSlider(
+                        range = currentFilter.pricePerDayRange,
+                        onRangeChange = { newRange ->
+                            currentFilter = currentFilter.copy(pricePerDayRange = newRange)
+                        },
+                        minValue = 0f,
+                        maxValue = 500f,
+                        valueFormatter = { "€%.0f".format(it) },
+                        steps = 50  // 100 steps between 0 and 1000 (10 increments)
+                    )
+                }
+
+                item {
+                    Text(
+                        text = "Merken",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    FilterChipGroup(
+                        options = listOf("All") + availableBrands,
+                        selectedOptions = currentFilter.selectedBrands,
+                        onSelectionChange = { newSelection ->
+                            currentFilter = if ("All" in newSelection && "All" !in currentFilter.selectedBrands) {
+                                currentFilter.copy(selectedBrands = setOf("All"))
+                            } else if (newSelection.size > 1 && "All" in newSelection) {
+                                currentFilter.copy(selectedBrands = newSelection - "All")
+                            } else if (newSelection.isEmpty()) {
+                                currentFilter.copy(selectedBrands = setOf("All"))
+                            } else {
+                                currentFilter.copy(selectedBrands = newSelection)
+                            }
+                        }
+                    )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(80.dp))
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Button(
+                    onClick = {
+                        onReset()
+                        currentFilter = FilterState()
+                    },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF8F8F99)
+                    ),
+                    shape = RoundedCornerShape(24.dp)
+                ) {
+                    Text("Reset", color = Color.White)
+                }
+
+                Button(
+                    onClick = {
+                        onApply(currentFilter)
+                        onDismiss()
+                    },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF8F8F99)
+                    ),
+                    shape = RoundedCornerShape(24.dp)
+                ) {
+                    Text("Toepassen", color = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilterChipGroup(
+    options: List<String>,
+    selectedOptions: Set<String>,
+    onSelectionChange: (Set<String>) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        options.forEach { option ->
+            val isSelected = option in selectedOptions
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(if (isSelected) Color(0xFF8F8F99) else Color.Transparent)
+                    .border(
+                        width = 1.dp,
+                        color = if (isSelected) Color.Transparent else Color(0xFFCCCCCC),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .clickable {
+                        val newSelection = if (isSelected) {
+                            selectedOptions - option
+                        } else {
+                            selectedOptions + option
+                        }
+                        onSelectionChange(newSelection)
+                    }
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = option,
+                    color = if (isSelected) Color.White else Color(0xFF666666),
+                    fontSize = 14.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PriceRangeSlider(
+    range: ClosedFloatingPointRange<Float>,
+    onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
+    minValue: Float,
+    maxValue: Float,
+    valueFormatter: (Float) -> String,
+    steps: Int = 0
+) {
+    Column {
+        // Show current selected value
+        Text(
+            text = valueFormatter(range.endInclusive),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Slider(
+            value = range.endInclusive,
+            onValueChange = { newEnd ->
+                // Manually snap to steps to hide step dots
+                val stepSize = (maxValue - minValue) / (steps + 1)
+                val snappedValue = minValue + (kotlin.math.round((newEnd - minValue) / stepSize) * stepSize)
+                onRangeChange(range.start..snappedValue)
+            },
+            valueRange = minValue..maxValue,
+            steps = 0,  // No visual steps, we handle snapping manually
+            colors = SliderDefaults.colors(
+                thumbColor = Color(0xFF8F8F99),
+                activeTrackColor = Color(0xFF8F8F99),
+                inactiveTrackColor = Color(0xFFE0E0E0)
+            )
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = valueFormatter(minValue),
+                fontSize = 12.sp,
+                color = Color.Gray
+            )
+            Text(
+                text = valueFormatter(maxValue),
+                fontSize = 12.sp,
+                color = Color.Gray
+            )
         }
     }
 }

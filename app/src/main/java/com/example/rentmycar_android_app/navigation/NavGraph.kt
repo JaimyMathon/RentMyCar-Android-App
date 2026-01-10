@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import com.example.rentmycar_android_app.ui.LoginScreen
 import com.example.rentmycar_android_app.ui.RegisterScreen
 import com.example.rentmycar_android_app.ui.HomeScreen
-import com.example.rentmycar_android_app.ui.ReservationScreen
+//import com.example.rentmycar_android_app.ui.ReservationScreen
 import com.example.rentmycar_android_app.ui.ResetPasswordScreen
 import com.example.rentmycar_android_app.ui.MapScreen
 
@@ -18,8 +18,7 @@ sealed class Screen(val route: String) {
     object Register : Screen("register")
     object ResetPassword : Screen("reset-password/{token}") {
         fun createRoute(token: String) = "reset-password/$token"
-
-    }    object Home : Screen("home")
+    }
     object Home : Screen("home")
     object Reservation : Screen("reservation")
     object Map : Screen("map")
@@ -62,16 +61,6 @@ fun NavGraph(navController: NavHostController) {
             HomeScreen(
                 onNavigateToReservation = {
                     navController.navigate(Screen.Reservation.route)
-                }
-                // onNavigateToCars, onNavigateToReservationsOverview, onNavigateToProfile
-                // laten we voorlopig op de default {} staan
-            )
-        }
-
-        composable(Screen.Home.route) {
-            HomeScreen(
-                onNavigateToReservation = {
-                    navController.navigate(Screen.Reservation.route)
                 },
                 onNavigateToCars = { /* later: navController.navigate(Screen.Cars.route) */ },
                 onNavigateToReservationsOverview = { /* navController.navigate(...) */ },
@@ -79,6 +68,8 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
+        // Commented out until ReservationScreen is implemented
+        /*
         composable(Screen.Reservation.route) {
             ReservationScreen(
                 onBackClick = { navController.popBackStack() },
@@ -87,6 +78,7 @@ fun NavGraph(navController: NavHostController) {
                 }
             )
         }
+        */
 
         composable(
             route = "reset-password/{token}"
