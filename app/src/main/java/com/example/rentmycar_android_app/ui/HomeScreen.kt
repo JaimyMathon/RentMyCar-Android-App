@@ -27,10 +27,17 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     onCarClick: (String) -> Unit,
-    onNavigateToCars: () -> Unit,
-    onNavigateToReservationsOverview: () -> Unit,
+//    onNavigateToCars: () -> Unit,
+//    onNavigateToReservationsOverview: () -> Unit,
     onNavigateToReservation: () -> Unit,
-    onNavigateToProfile: () -> Unit
+    onNavigateToCars: () -> Unit = {},
+    onNavigateToReservationsOverview: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToDrivingTracker: () -> Unit = {},
+    onNavigateToDrivingStats: () -> Unit = {},
+    viewModel: HomeViewModel = viewModel(
+        factory = HomeViewModelFactory(LocalContext.current)
+    )
 ) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE) }
@@ -62,32 +69,58 @@ fun HomeScreen(
                 .background(Color(0xFFF5F5F5))
         ) {
 
-            // Titel
-            Text(
-                text = "Home",
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+            // Header met titel en Start Rit knop
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "Home",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = "Welkom terug, $username",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.DarkGray
+                    )
+                }
 
-            // Welkom
-            Text(
-                text = "Welkom terug, $username",
-                modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp),
-                color = Color.DarkGray
-            )
+                Card(
+                    modifier = Modifier
+                        .clickable { onNavigateToDrivingTracker() },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFF4CAF50)
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier. padding(horizontal = 16.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            "Start Rit",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            }
 
-            // ✅ Locatie + zoekbalk kaart (dit miste je)
             LocationSearchCard()
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier. height(16.dp))
 
-            // Titel boven de lijst
             Text(
-                text = "Auto’s",
+                text = "Auto's",
                 modifier = Modifier.padding(horizontal = 16.dp),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -99,7 +132,9 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .weight(1f),
                         contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
 
                 uiState.error != null -> {
@@ -180,14 +215,13 @@ private fun LocationSearchCard() {
                     tint = Color.White,
                     modifier = Modifier.size(16.dp)
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Amsterdam, Nederland",
                     color = Color.White,
                     fontSize = 14.sp
                 )
             }
-
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -210,7 +244,12 @@ private fun SearchField(modifier: Modifier = Modifier) {
             .height(48.dp)
             .clip(RoundedCornerShape(24.dp)),
         placeholder = { Text("Vul locatie in") },
-        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null
+            )
+        },
         singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
             unfocusedContainerColor = Color(0xFFF0E9E9),
@@ -252,11 +291,15 @@ private fun CarCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFD0CACA)),
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFFDCD3D3)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Home, contentDescription = null)
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = null,
+                    tint = Color.DarkGray
+                )
             }
 
             Spacer(Modifier.height(8.dp))
@@ -296,35 +339,35 @@ private fun HomeBottomBar(
     onKeysClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
-    NavigationBar {
+    NavigationBar(containerColor = Color(0xFFF3F3F3)) {
         NavigationBarItem(
             selected = true,
             onClick = onHomeClick,
-            icon = { Icon(Icons.Default.Home, null) },
+            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
             label = { Text("Home") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onExploreClick,
-            icon = { Icon(Icons.Default.Search, null) },
+            icon = { Icon(Icons.Default.Search, contentDescription = "Explore") },
             label = { Text("Explore") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onFavoritesClick,
-            icon = { Icon(Icons.Default.FavoriteBorder, null) },
+            icon = { Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite") },
             label = { Text("Favorite") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onKeysClick,
-            icon = { Icon(Icons.Default.Home, null) },
+            icon = { Icon(Icons.Default.Home, contentDescription = "Key") }, // placeholder
             label = { Text("Key") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onProfileClick,
-            icon = { Icon(Icons.Default.Person, null) },
+            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
             label = { Text("Profile") }
         )
     }

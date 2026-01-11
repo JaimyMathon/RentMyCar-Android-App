@@ -13,5 +13,8 @@ data class CarDto(
     val category: String? = null,
     val status: String? = null,
     val tco: Double? = null,
-    val addedBy: String? = null
+    val addedBy: String? = null,
+    val imageUrl: String?,
+    val latitude: Double,
+    val longitude: Double
 )
