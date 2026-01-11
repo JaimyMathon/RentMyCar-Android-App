@@ -49,6 +49,12 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // EXTRA: Material 2 voor Scaffold, TopAppBar, Button, OutlinedTextField, etc.
+    // Dit heb je nodig voor de ReservationScreen die androidx.compose.material.* gebruikt.
+    implementation("androidx.compose.material:material")
+
+    // Retrofit + netwerk
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")

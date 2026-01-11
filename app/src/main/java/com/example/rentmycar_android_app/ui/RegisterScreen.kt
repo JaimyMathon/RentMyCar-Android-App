@@ -109,5 +109,6 @@ fun RegisterScreen(
             errorMessage?.let { Text(it, color = Color.Red, modifier = Modifier.padding(top = 16.dp)) }
             if (loading) CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
         }
+
     }
 }

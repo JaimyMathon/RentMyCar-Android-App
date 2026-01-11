@@ -1,17 +1,20 @@
 package com.example.rentmycar_android_app.network
 
 // Pas de veldnamen aan jouw echte API-response aan
+import com.google.gson.annotations.SerializedName
+
 data class CarDto(
-    val id: String,
-    val brand: String,
-    val model: String,
-    val bodyType: String?,     // Sedan, SUV, ...
-    val city: String?,
-    val fuelType: String?,     // ICE, EV, Hybrid, ...
-    val pricePerDay: Double,
-    val pricePerKm: Double?,
-    val rating: Double?,       // 4.8
-    val imageUrl: String?,     // voor later, nu placeholder
+    @SerializedName("_id")
+    val id: String = "",
+    val brand: String? = null,
+    val model: String? = null,
+    val pricePerTimeSlot: Double? = null,
+    val costPerKm: Double? = null,
+    val category: String? = null,
+    val status: String? = null,
+    val tco: Double? = null,
+    val addedBy: String? = null,
+    val imageUrl: String?,
     val latitude: Double,
     val longitude: Double
 )
