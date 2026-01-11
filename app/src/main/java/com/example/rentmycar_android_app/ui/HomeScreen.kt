@@ -2,34 +2,15 @@ package com.example.rentmycar_android_app.ui
 
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,30 +22,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rentmycar_android_app.network.CarDto
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
+    onCarClick: (String) -> Unit,
+    onNavigateToCars: () -> Unit,
+    onNavigateToReservationsOverview: () -> Unit,
     onNavigateToReservation: () -> Unit,
-    onNavigateToCars: () -> Unit = {},
-    onNavigateToReservationsOverview: () -> Unit = {},
-    onNavigateToProfile: () -> Unit = {},
-    viewModel: HomeViewModel = viewModel(
-        factory = HomeViewModelFactory(LocalContext.current)
-    )
+    onNavigateToProfile: () -> Unit
 ) {
     val context = LocalContext.current
-    val sharedPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-    val username = sharedPrefs.getString("username", "Onbekend")
+    val sharedPrefs = remember { context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE) }
+    val username = sharedPrefs.getString("username", "Onbekend") ?: "Onbekend"
 
-    val uiState by viewModel.uiState.collectAsState()
+    val vm: HomeViewModel = viewModel(factory = HomeViewModelFactory(context))
+    val uiState by vm.uiState.collectAsState()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             HomeBottomBar(
-                onHomeClick = { /* al op Home */ },
-                onExploreClick = onNavigateToCars,                 // Explore -> auto's bekijken
+                onHomeClick = {},
+                onExploreClick = onNavigateToCars,
                 onFavoritesClick = onNavigateToReservationsOverview,
-                onKeysClick = onNavigateToReservation,            // Key-tab -> reserveringen
+                onKeysClick = onNavigateToReservation,
                 onProfileClick = onNavigateToProfile
             )
         }
@@ -77,31 +62,32 @@ fun HomeScreen(
                 .background(Color(0xFFF5F5F5))
         ) {
 
-            // Titel bovenaan
+            // Titel
             Text(
                 text = "Home",
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
-                style = MaterialTheme.typography.titleLarge,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.SemiBold
             )
 
-            // Welkom-tekst
+            // Welkom
             Text(
                 text = "Welkom terug, $username",
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp),
-                style = MaterialTheme.typography.bodyMedium,
                 color = Color.DarkGray
             )
 
-            // Locatie + zoekveld (grijze kaart)
+            // ✅ Locatie + zoekbalk kaart (dit miste je)
             LocationSearchCard()
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
+            // Titel boven de lijst
             Text(
                 text = "Auto’s",
                 modifier = Modifier.padding(horizontal = 16.dp),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -113,9 +99,7 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .weight(1f),
                         contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    ) { CircularProgressIndicator() }
                 }
 
                 uiState.error != null -> {
@@ -143,7 +127,21 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(uiState.cars) { car ->
-                            CarCard(car = car)
+                            CarCard(
+                                car = car,
+                                onClick = {
+                                    if (car.id.isNotBlank()) {
+                                        onCarClick(car.id)
+                                    } else {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = "Auto id ontbreekt (backend stuurt _id)",
+                                                withDismissAction = true
+                                            )
+                                        }
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -151,10 +149,6 @@ fun HomeScreen(
         }
     }
 }
-
-
-
-// --------- BOVENSTE KAART: LOCATIE + ZOEK ---------
 
 @Composable
 private fun LocationSearchCard() {
@@ -179,16 +173,14 @@ private fun LocationSearchCard() {
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.LocationOn,
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(16.dp)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = "Amsterdam, Nederland",
                     color = Color.White,
@@ -198,12 +190,8 @@ private fun LocationSearchCard() {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                SearchField(
-                    modifier = Modifier.weight(1f)
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                SearchField(modifier = Modifier.weight(1f))
                 Spacer(modifier = Modifier.width(8.dp))
                 FilterButton()
             }
@@ -222,12 +210,7 @@ private fun SearchField(modifier: Modifier = Modifier) {
             .height(48.dp)
             .clip(RoundedCornerShape(24.dp)),
         placeholder = { Text("Vul locatie in") },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null
-            )
-        },
+        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null) },
         singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
             unfocusedContainerColor = Color(0xFFF0E9E9),
@@ -247,154 +230,63 @@ private fun FilterButton() {
             .background(Color(0xFFF0E9E9)),
         contentAlignment = Alignment.Center
     ) {
-        // Simpele placeholder voor filter-icoon
         Text("≡", fontSize = 18.sp)
     }
 }
 
-// --------- AUTO KAART ---------
-
 @Composable
-private fun CarCard(car: CarDto) {
+private fun CarCard(
+    car: CarDto,
+    onClick: () -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFEDE7E7)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFEDE7E7))
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp)
-        ) {
+        Column(modifier = Modifier.padding(12.dp)) {
 
-            // Boven: rating + favorite
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (car.rating != null) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.White)
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = Color(0xFFFFC107),
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = String.format("%.1f", car.rating),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                } else {
-                    Spacer(modifier = Modifier.height(18.dp))
-                }
-
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = "Favorite",
-                    tint = Color.DarkGray
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Afbeelding placeholder
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFDCD3D3)),
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFFD0CACA)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Home, // placeholder ipv echte afbeelding
-                    contentDescription = null,
-                    tint = Color.DarkGray
-                )
+                Icon(Icons.Default.Home, contentDescription = null)
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (!car.bodyType.isNullOrBlank()) {
-                    Text(
-                        text = car.bodyType,
-                        fontSize = 11.sp,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.White)
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        color = Color.Gray
-                    )
-                } else {
-                    Spacer(modifier = Modifier.height(18.dp))
-                }
-
-                Text(
-                    text = "€${car.pricePerDay.toInt()}/dag",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(Modifier.height(8.dp))
 
             Text(
-                text = "${car.brand} ${car.model}",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
+                text = "${car.brand.orEmpty()} ${car.model.orEmpty()}",
+                fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(Modifier.height(4.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = car.city ?: "",
-                        fontSize = 13.sp,
-                        color = Color.DarkGray
-                    )
-                    Text(
-                        text = car.fuelType ?: "",
-                        fontSize = 13.sp,
-                        color = Color.DarkGray
-                    )
-                }
+            Text(
+                text = "€${(car.pricePerTimeSlot ?: 0.0).toInt()}/dag",
+                fontWeight = FontWeight.SemiBold
+            )
 
-                if (car.pricePerKm != null) {
-                    Text(
-                        text = String.format("€%.2f p/km", car.pricePerKm),
-                        fontSize = 13.sp,
-                        color = Color.DarkGray
-                    )
-                }
+            Spacer(Modifier.height(4.dp))
+
+            if (car.costPerKm != null) {
+                Text(
+                    text = "€${car.costPerKm} p/km",
+                    fontSize = 13.sp,
+                    color = Color.DarkGray
+                )
             }
         }
     }
 }
-
-// --------- BOTTOM NAV ---------
 
 @Composable
 private fun HomeBottomBar(
@@ -404,37 +296,35 @@ private fun HomeBottomBar(
     onKeysClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
-    NavigationBar(
-        containerColor = Color(0xFFF3F3F3)
-    ) {
+    NavigationBar {
         NavigationBarItem(
             selected = true,
             onClick = onHomeClick,
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+            icon = { Icon(Icons.Default.Home, null) },
             label = { Text("Home") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onExploreClick,
-            icon = { Icon(Icons.Default.Search, contentDescription = "Explore") },
+            icon = { Icon(Icons.Default.Search, null) },
             label = { Text("Explore") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onFavoritesClick,
-            icon = { Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite") },
+            icon = { Icon(Icons.Default.FavoriteBorder, null) },
             label = { Text("Favorite") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onKeysClick,
-            icon = { Icon(Icons.Default.Home, contentDescription = "Key") }, // placeholder
+            icon = { Icon(Icons.Default.Home, null) },
             label = { Text("Key") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onProfileClick,
-            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+            icon = { Icon(Icons.Default.Person, null) },
             label = { Text("Profile") }
         )
     }

@@ -1,10 +1,13 @@
 package com.example.rentmycar_android_app.network
 
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface CarService {
 
-    // volledige pad vanaf baseUrl
     @GET("get-cars")
-    suspend fun getCars(): CarResponse
+    suspend fun getCars(): CarResponse  // <-- dit moet matchen met carPage JSON
+
+    @GET("get-car/{id}")
+    suspend fun getCarById(@Path("id") id: String): CarDto
 }

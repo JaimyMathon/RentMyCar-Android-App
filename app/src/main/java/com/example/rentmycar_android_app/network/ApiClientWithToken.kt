@@ -2,12 +2,13 @@ package com.example.rentmycar_android_app.network
 
 import android.content.Context
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class ApiClientWithToken(context: Context) {
-    private val BASE_URL = "http://10.0.2.2:8080/"
+
+    // zelfde poort als je backend / login
+    private val BASE_URL = "http://10.0.2.2:8081/"
 
     private val client = OkHttpClient.Builder()
         .addInterceptor { chain ->
