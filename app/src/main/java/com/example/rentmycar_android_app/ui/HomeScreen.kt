@@ -35,6 +35,8 @@ fun HomeScreen(
     onNavigateToProfile: () -> Unit = {},
     onNavigateToDrivingTracker: () -> Unit = {},
     onNavigateToDrivingStats: () -> Unit = {},
+    onNavigateToFilter: () -> Unit = {},
+    onFilterApplied: ((FilterState) -> Unit)? = null,
     viewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(LocalContext.current)
     )
@@ -43,8 +45,7 @@ fun HomeScreen(
     val sharedPrefs = remember { context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE) }
     val username = sharedPrefs.getString("username", "Onbekend") ?: "Onbekend"
 
-    val vm: HomeViewModel = viewModel(factory = HomeViewModelFactory(context))
-    val uiState by vm.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -113,7 +114,10 @@ fun HomeScreen(
                 }
             }
 
-            LocationSearchCard()
+            LocationSearchCard(
+                onFilterClick = onNavigateToFilter,
+                onSearchQueryChange = { query -> viewModel.updateSearchQuery(query) }
+            )
 
             Spacer(modifier = Modifier. height(16.dp))
 
@@ -186,7 +190,10 @@ fun HomeScreen(
 }
 
 @Composable
-private fun LocationSearchCard() {
+private fun LocationSearchCard(
+    onFilterClick: () -> Unit,
+    onSearchQueryChange: (String) -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -225,25 +232,34 @@ private fun LocationSearchCard() {
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                SearchField(modifier = Modifier.weight(1f))
+                SearchField(
+                    modifier = Modifier.weight(1f),
+                    onQueryChange = onSearchQueryChange
+                )
                 Spacer(modifier = Modifier.width(8.dp))
-                FilterButton()
+                FilterButton(onClick = onFilterClick)
             }
         }
     }
 }
 
 @Composable
-private fun SearchField(modifier: Modifier = Modifier) {
+private fun SearchField(
+    modifier: Modifier = Modifier,
+    onQueryChange: (String) -> Unit
+) {
     var query by remember { mutableStateOf("") }
 
     OutlinedTextField(
         value = query,
-        onValueChange = { query = it },
+        onValueChange = {
+            query = it
+            onQueryChange(it)
+        },
         modifier = modifier
             .height(48.dp)
             .clip(RoundedCornerShape(24.dp)),
-        placeholder = { Text("Vul locatie in") },
+        placeholder = { Text("Zoek auto's") },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
@@ -261,12 +277,13 @@ private fun SearchField(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun FilterButton() {
+private fun FilterButton(onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(48.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(Color(0xFFF0E9E9)),
+            .background(Color(0xFFF0E9E9))
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text("≡", fontSize = 18.sp)
