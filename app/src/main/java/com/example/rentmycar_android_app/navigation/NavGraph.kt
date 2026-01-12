@@ -3,6 +3,7 @@ package com.example.rentmycar_android_app.navigation
 import android.net.Uri
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -46,6 +47,7 @@ sealed class Screen(val route: String) {
     object Profile : Screen("profile")
     object DrivingTracker : Screen("driving_tracker")
     object DrivingStats : Screen("driving_stats")
+    object Filter : Screen("filter")
 }
 
 @Composable
@@ -107,7 +109,14 @@ fun NavGraph(navController: NavHostController) {
 //        }
 
         composable(Screen.Home.route) {
+            val homeViewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+                factory = HomeViewModelFactory(context)
+            )
+
             HomeScreen(
+                onCarClick = { carId ->
+                    navController.navigate(Screen.CarDetail.createRoute(carId))
+                },
                 onNavigateToReservation = {
                     navController.navigate(Screen.Reservation.route)
                 },
@@ -121,7 +130,11 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onNavigateToDrivingStats = {
                     navController.navigate(Screen.DrivingStats.route)
-                }
+                },
+                onNavigateToFilter = {
+                    navController.navigate(Screen.Filter.route)
+                },
+                viewModel = homeViewModel
             )
         }
 
@@ -230,6 +243,26 @@ fun NavGraph(navController: NavHostController) {
                 onNavigateBack = {
                     navController.popBackStack()
                 }
+            )
+        }
+
+        composable(Screen.Filter.route) {
+            val homeEntry = remember(navController.currentBackStackEntry) {
+                navController.getBackStackEntry(Screen.Home.route)
+            }
+            val homeViewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+                viewModelStoreOwner = homeEntry,
+                factory = HomeViewModelFactory(context)
+            )
+
+            FilterScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onApplyFilters = { filterState ->
+                    homeViewModel.applyFilter(filterState)
+                },
+                initialFilterState = homeViewModel.getCurrentFilter()
             )
         }
     }

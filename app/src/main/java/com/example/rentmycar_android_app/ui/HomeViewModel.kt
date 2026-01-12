@@ -29,6 +29,10 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
     val uiState: StateFlow<HomeUiState> = _uiState
 
+    private var allCars: List<CarDto> = emptyList()
+    private var currentFilter: FilterState? = null
+    private var searchQuery: String = ""
+
     init {
         loadCars()
     }
@@ -39,10 +43,11 @@ class HomeViewModel(
 
             try {
                 val cars = carService.getCars().cars   // <<< HIER ZIT DE FIX
+                allCars = cars
 
                 _uiState.value = HomeUiState(
                     isLoading = false,
-                    cars = cars,
+                    cars = applySearch(applyFilters(cars, currentFilter), searchQuery),
                     error = null
                 )
             } catch (e: Exception) {
@@ -52,6 +57,73 @@ class HomeViewModel(
                     error = e.message ?: "Onbekende fout bij ophalen auto's"
                 )
             }
+        }
+    }
+
+    fun applyFilter(filterState: FilterState) {
+        currentFilter = filterState
+        updateCarsList()
+    }
+
+    fun updateSearchQuery(query: String) {
+        searchQuery = query
+        updateCarsList()
+    }
+
+    fun getCurrentFilter(): FilterState {
+        return currentFilter ?: FilterState()
+    }
+
+    private fun updateCarsList() {
+        val filtered = applyFilters(allCars, currentFilter)
+        val searched = applySearch(filtered, searchQuery)
+        _uiState.value = _uiState.value.copy(cars = searched)
+    }
+
+    private fun applyFilters(cars: List<CarDto>, filter: FilterState?): List<CarDto> {
+        if (filter == null) return cars
+
+        return cars.filter { car ->
+            // Filter by type/category
+            val categoryMatch = filter.selectedTypes.isEmpty() ||
+                    filter.selectedTypes.any { type ->
+                        car.category.equals(type, ignoreCase = true)
+                    }
+
+            // Filter by price per km (max price filter)
+            val pricePerKmMatch = car.costPerKm?.let { cost ->
+                cost <= filter.maxPricePerKm
+            } ?: true
+
+            // Filter by price per day (max price filter)
+            val pricePerDayMatch = car.pricePerTimeSlot?.let { price ->
+                price <= filter.maxPricePerDay
+            } ?: true
+
+            // Filter by brand
+            val brandMatch = filter.selectedBrands.isEmpty() ||
+                    filter.selectedBrands.any { brand ->
+                        car.brand.equals(brand, ignoreCase = true)
+                    }
+
+            categoryMatch && pricePerKmMatch && pricePerDayMatch && brandMatch
+        }
+    }
+
+    private fun applySearch(cars: List<CarDto>, query: String): List<CarDto> {
+        if (query.isBlank()) return cars
+
+        val lowerQuery = query.lowercase().trim()
+
+        return cars.filter { car ->
+            val brand = car.brand?.lowercase() ?: ""
+            val model = car.model?.lowercase() ?: ""
+            val category = car.category?.lowercase() ?: ""
+
+            brand.contains(lowerQuery) ||
+            model.contains(lowerQuery) ||
+            category.contains(lowerQuery) ||
+            "$brand $model".contains(lowerQuery)
         }
     }
 }
