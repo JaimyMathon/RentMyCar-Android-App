@@ -1,39 +1,18 @@
 package com.example.rentmycar_android_app.network
 
-import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.PATCH
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface ReservationService {
 
     @GET("get-reservation")
-    suspend fun getReservations(
-        @Header("Authorization") token: String,
-        @Query("sorting_field") sortingField: String? = null,
-        @Query("sorting_direction") sortingDirection: String? = null
-    ): Response<List<ReservationDto>>
-
-    @POST("add-reservation")
-    suspend fun addReservation(
-        @Header("Authorization") token: String,
-        @Body reservation: ReservationDto
-    ): Response<ReservationDto>
+    suspend fun getReservations(): List<ReservationDto>
 
     @PATCH("update-reservation/{id}")
     suspend fun updateReservation(
-        @Header("Authorization") token: String,
-        @Path("id") reservationId: String,
-        @Body reservation: ReservationDto
-    ): Response<ReservationDto>
+        @Path("id") id: String,
+        @Body request: UpdateReservationRequest
+    ): ReservationDto
 
     @PATCH("cancel-reservation/{id}")
-    suspend fun cancelReservation(
-        @Header("Authorization") token: String,
-        @Path("id") reservationId: String
-    ): Response<SimpleResponseDto>
+    suspend fun cancelReservation(@Path("id") id: String): ReservationDto
 }

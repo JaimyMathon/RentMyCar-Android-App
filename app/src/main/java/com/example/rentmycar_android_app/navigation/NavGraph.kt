@@ -12,14 +12,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.core.content.edit
 import com.example.rentmycar_android_app.ui.*
-import com.example.rentmycar_android_app.ui.ForgotPasswordScreen
-import com.example.rentmycar_android_app.ui.LoginScreen
-import com.example.rentmycar_android_app.ui.RegisterScreen
-import com.example.rentmycar_android_app.ui.HomeScreen
-import com.example.rentmycar_android_app.ui.MapScreen
-import com.example.rentmycar_android_app.ui.ProfileScreen
-import com.example.rentmycar_android_app.ui.DrivingStatsScreen
-import com.example.rentmycar_android_app.ui.DrivingTrackerScreen
 
 sealed class Screen(val route: String) {
     data object Login : Screen("login")
@@ -48,6 +40,7 @@ sealed class Screen(val route: String) {
     object DrivingTracker : Screen("driving_tracker")
     object DrivingStats : Screen("driving_stats")
     object Filter : Screen("filter")
+    object Reservations : Screen("reservations")
 }
 
 @Composable
@@ -121,7 +114,9 @@ fun NavGraph(navController: NavHostController) {
                     navController.navigate(Screen.Reservation.route)
                 },
                 onNavigateToCars = {},
-                onNavigateToReservationsOverview = {},
+                onNavigateToReservationsOverview = {
+                    navController.navigate(Screen.Reservations.route)
+                },
                 onNavigateToProfile = {
                     navController.navigate(Screen.Profile.route)
                 },
@@ -194,13 +189,13 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        composable(Screen.Map.route) {
-            MapScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
+//        composable(Screen.Map.route) {
+//            MapScreen(
+//                onNavigateBack = {
+//                    navController.popBackStack()
+//                }
+//            )
+//        }
 
         composable(Screen.PaymentMethod.route) {
             PaymentMethodScreen(
@@ -263,6 +258,18 @@ fun NavGraph(navController: NavHostController) {
                     homeViewModel.applyFilter(filterState)
                 },
                 initialFilterState = homeViewModel.getCurrentFilter()
+            )
+        }
+
+        composable(Screen.Reservations.route) {
+            ReservationsScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onNavigateToLocation = { lat: Double, lon: Double ->
+                    // You can add navigation to map screen here if needed
+                    // For now, this is a placeholder
+                }
             )
         }
     }
