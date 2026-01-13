@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class ApiClientWithToken(context: Context) {
 
     // zelfde poort als je backend / login
-    private val BASE_URL = "http://10.0.2.2:8081/"
+    private val BASE_URL = "http://10.0.2.2:8080/"
 
     private val client = OkHttpClient.Builder()
         .addInterceptor { chain ->

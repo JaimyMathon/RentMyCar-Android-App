@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.URL
@@ -198,6 +199,7 @@ fun fetchAddressForMarker(
 fun OpenStreetMapView(carId: String) {
     val context = LocalContext.current
     var mapView by remember { mutableStateOf<MapView?>(null) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         // Initialize osmdroid configuration
@@ -213,108 +215,104 @@ fun OpenStreetMapView(carId: String) {
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                location?.let {
-                    val userLocation = GeoPoint(it.latitude, it.longitude)
+                location?.let { loc ->
+                    val userLocation = GeoPoint(loc.latitude, loc.longitude)
 
-                    // Fetch car data
-                    val apiClientWithToken = ApiClientWithToken(context)
-                    val carService = apiClientWithToken.instance.create(CarService::class.java)
-                    carService.getCar(carId).enqueue(object : Callback<com.example.rentmycar_android_app.network.CarResponse> {
-                        override fun onResponse(call: retrofit2.Call<com.example.rentmycar_android_app.network.CarResponse>, response: Response<com.example.rentmycar_android_app.network.CarResponse>) {
-                            if (response.isSuccessful && response.body() != null && response.body()!!.cars.isNotEmpty()) {
-                                val car = response.body()!!.cars.first()
-                                val carLocation = GeoPoint(car.latitude, car.longitude)
+                    // Fetch car data using coroutines
+                    scope.launch {
+                        try {
+                            val apiClientWithToken = ApiClientWithToken(context)
+                            val carService = apiClientWithToken.instance.create(CarService::class.java)
+                            val car = carService.getCarById(carId)
+                            val carLocation = GeoPoint(car.latitude, car.longitude)
 
-                                // Fetch actual route using OSRM
+                            // Fetch actual route using OSRM
+                            try {
                                 val routingService = OSRMClient.instance.create(RoutingService::class.java)
-                                val coordinates = "${it.longitude},${it.latitude};${car.longitude},${car.latitude}"
-                                routingService.getRoute(coordinates, "geojson", "full").enqueue(object : Callback<com.example.rentmycar_android_app.network.RouteResponse> {
-                                    override fun onResponse(call: retrofit2.Call<com.example.rentmycar_android_app.network.RouteResponse>, response: Response<com.example.rentmycar_android_app.network.RouteResponse>) {
-                                        if (response.isSuccessful && response.body() != null) {
-                                            val routeData = response.body()!!
-                                            if (routeData.routes.isNotEmpty()) {
-                                                val route = routeData.routes[0]
-                                                val routePoints = mutableListOf<GeoPoint>()
+                                val coordinates = "${loc.longitude},${loc.latitude};${car.longitude},${car.latitude}"
+                                val routeResponse = withContext(Dispatchers.IO) {
+                                    routingService.getRoute(coordinates, "geojson", "full").execute()
+                                }
 
-                                                // Extract coordinates from GeoJSON geometry
-                                                val geometry = route.geometry
-                                                val coordinates = geometry.getAsJsonArray("coordinates")
+                                if (routeResponse.isSuccessful && routeResponse.body() != null) {
+                                    val routeData = routeResponse.body()!!
+                                    if (routeData.routes.isNotEmpty()) {
+                                        val route = routeData.routes[0]
+                                        val routePoints = mutableListOf<GeoPoint>()
 
-                                                for (coord in coordinates) {
-                                                    val coordArray = coord.asJsonArray
-                                                    val lon = coordArray.get(0).asDouble
-                                                    val lat = coordArray.get(1).asDouble
-                                                    routePoints.add(GeoPoint(lat, lon))
-                                                }
+                                        // Extract coordinates from GeoJSON geometry
+                                        val geometry = route.geometry
+                                        val coords = geometry.getAsJsonArray("coordinates")
 
-                                                if (routePoints.isNotEmpty()) {
-                                                    // Draw route polyline
-                                                    val routeLine = Polyline().apply {
-                                                        setPoints(routePoints)
-                                                        outlinePaint.color = android.graphics.Color.BLUE
-                                                        outlinePaint.strokeWidth = 8f
-                                                    }
-                                                    map.overlays.add(routeLine)
-
-                                                    // Fetch address using reverse geocoding
-                                                    fetchAddressForMarker(car.latitude, car.longitude) { address ->
-                                                        val carMarker = Marker(map).apply {
-                                                            position = carLocation
-                                                            title = "Car Location"
-                                                            subDescription = address
-                                                        }
-                                                        map.overlays.add(carMarker)
-                                                        map.invalidate()
-                                                    }
-
-                                                    // Center map between user and car
-                                                    val centerLat = (it.latitude + car.latitude) / 2
-                                                    val centerLon = (it.longitude + car.longitude) / 2
-                                                    map.controller.setCenter(GeoPoint(centerLat, centerLon))
-                                                    map.controller.setZoom(16.0)
-                                                    map.invalidate()
-                                                }
-                                            }
+                                        for (coord in coords) {
+                                            val coordArray = coord.asJsonArray
+                                            val lon = coordArray.get(0).asDouble
+                                            val lat = coordArray.get(1).asDouble
+                                            routePoints.add(GeoPoint(lat, lon))
                                         }
-                                    }
 
-                                    override fun onFailure(call: retrofit2.Call<com.example.rentmycar_android_app.network.RouteResponse>, t: Throwable) {
-                                        // Fallback: draw straight line if routing fails
-                                        val routePoints = listOf(userLocation, carLocation)
-                                        val routeLine = Polyline().apply {
-                                            setPoints(routePoints)
-                                            outlinePaint.color = android.graphics.Color.RED
-                                            outlinePaint.strokeWidth = 5f
-                                        }
-                                        map.overlays.add(routeLine)
-
-                                        // Fetch address using reverse geocoding
-                                        fetchAddressForMarker(car.latitude, car.longitude) { address ->
-                                            val carMarker = Marker(map).apply {
-                                                position = carLocation
-                                                title = "Car Location"
-                                                subDescription = address
+                                        if (routePoints.isNotEmpty()) {
+                                            // Draw route polyline
+                                            val routeLine = Polyline().apply {
+                                                setPoints(routePoints)
+                                                outlinePaint.color = android.graphics.Color.BLUE
+                                                outlinePaint.strokeWidth = 8f
                                             }
-                                            map.overlays.add(carMarker)
+                                            map.overlays.add(routeLine)
+
+                                            // Fetch address using reverse geocoding
+                                            fetchAddressForMarker(car.latitude, car.longitude) { address ->
+                                                val carMarker = Marker(map).apply {
+                                                    position = carLocation
+                                                    title = "Car Location"
+                                                    subDescription = address
+                                                }
+                                                map.overlays.add(carMarker)
+                                                map.invalidate()
+                                            }
+
+                                            // Center map between user and car
+                                            val centerLat = (loc.latitude + car.latitude) / 2
+                                            val centerLon = (loc.longitude + car.longitude) / 2
+                                            map.controller.setCenter(GeoPoint(centerLat, centerLon))
+                                            map.controller.setZoom(16.0)
                                             map.invalidate()
                                         }
-
-                                        val centerLat = (it.latitude + car.latitude) / 2
-                                        val centerLon = (it.longitude + car.longitude) / 2
-                                        map.controller.setCenter(GeoPoint(centerLat, centerLon))
-                                        map.controller.setZoom(16.0)
-                                        map.invalidate()
                                     }
-                                })
-                            }
-                        }
+                                }
+                            } catch (e: Exception) {
+                                // Fallback: draw straight line if routing fails
+                                val routePoints = listOf(userLocation, carLocation)
+                                val routeLine = Polyline().apply {
+                                    setPoints(routePoints)
+                                    outlinePaint.color = android.graphics.Color.RED
+                                    outlinePaint.strokeWidth = 5f
+                                }
+                                map.overlays.add(routeLine)
 
-                        override fun onFailure(call: retrofit2.Call<com.example.rentmycar_android_app.network.CarResponse>, t: Throwable) {
+                                // Fetch address using reverse geocoding
+                                fetchAddressForMarker(car.latitude, car.longitude) { address ->
+                                    val carMarker = Marker(map).apply {
+                                        position = carLocation
+                                        title = "Car Location"
+                                        subDescription = address
+                                    }
+                                    map.overlays.add(carMarker)
+                                    map.invalidate()
+                                }
+
+                                val centerLat = (loc.latitude + car.latitude) / 2
+                                val centerLon = (loc.longitude + car.longitude) / 2
+                                map.controller.setCenter(GeoPoint(centerLat, centerLon))
+                                map.controller.setZoom(16.0)
+                                map.invalidate()
+                            }
+                        } catch (e: Exception) {
                             // Fallback: just show user location if car fetch fails
                             map.controller.setCenter(userLocation)
                             map.controller.setZoom(15.0)
                         }
-                    })
+                    }
                 }
             }
         }

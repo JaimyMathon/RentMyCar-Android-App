@@ -108,6 +108,9 @@ fun NavGraph(navController: NavHostController) {
 
         composable(Screen.Home.route) {
             HomeScreen(
+                onCarClick = { carId ->
+                    navController.navigate(Screen.CarDetail.createRoute(carId))
+                },
                 onNavigateToReservation = {
                     navController.navigate(Screen.Reservation.route)
                 },
