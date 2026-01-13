@@ -1,5 +1,7 @@
 package com.example.rentmycar_android_app.navigation
 
+import DrivingStatsScreen
+import ProfileScreen
 import android.net.Uri
 import android.content.Context
 import androidx.compose.runtime.Composable
