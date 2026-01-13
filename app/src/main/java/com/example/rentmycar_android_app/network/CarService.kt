@@ -10,4 +10,7 @@ interface CarService {
 
     @GET("get-car/{id}")
     suspend fun getCarById(@Path("id") id: String): CarDto
+
+    @GET("get-photo/{carId}")
+    suspend fun getCarPhotos(@Path("carId") carId: String): List<PhotoDto>
 }

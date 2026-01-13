@@ -70,8 +70,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // OpenStreetMap (osmdroid)
-    implementation("org.osmdroid:osmdroid-android:6.1.18")
+    // MapLibre GL Native for Android
+    implementation("org.maplibre.gl:android-sdk:11.5.0")
 
     // Google Play Services for Location
     implementation("com.google.android.gms:play-services-location:21.0.1")
@@ -83,4 +83,7 @@ dependencies {
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)
+
+    // Coil for image loading
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }
