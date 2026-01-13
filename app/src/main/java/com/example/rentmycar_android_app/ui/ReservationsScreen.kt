@@ -16,13 +16,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.rentmycar_android_app.network.ApiClientWithToken
+import com.example.rentmycar_android_app.network.CarService
 import com.example.rentmycar_android_app.network.ReservationDto
 import com.example.rentmycar_android_app.network.ReservationService
+import com.example.rentmycar_android_app.network.SimpleResponse
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -57,9 +64,27 @@ fun ReservationsScreen(
                 android.util.Log.e("ReservationsScreen", "No token in SharedPreferences")
             } else {
                 android.util.Log.d("ReservationsScreen", "Attempting to fetch reservations...")
-                val service = ApiClientWithToken(context).instance.create(ReservationService::class.java)
-                reservations = service.getReservations()
-                android.util.Log.d("ReservationsScreen", "Successfully loaded ${reservations.size} reservations")
+                val reservationService = ApiClientWithToken(context).instance.create(ReservationService::class.java)
+                val loadedReservations = reservationService.getReservations()
+                android.util.Log.d("ReservationsScreen", "Successfully loaded ${loadedReservations.size} reservations")
+
+                // Fetch car details for reservations that don't have car data
+                val carService = ApiClientWithToken(context).instance.create(CarService::class.java)
+                reservations = loadedReservations.map { reservation ->
+                    if (reservation.car == null && reservation.carId != null) {
+                        try {
+                            val car = carService.getCarById(reservation.carId)
+                            android.util.Log.d("ReservationsScreen", "Fetched car details for carId: ${reservation.carId}")
+                            reservation.copy(car = car)
+                        } catch (e: Exception) {
+                            android.util.Log.e("ReservationsScreen", "Failed to fetch car for carId: ${reservation.carId}", e)
+                            reservation
+                        }
+                    } else {
+                        reservation
+                    }
+                }
+                android.util.Log.d("ReservationsScreen", "Finished fetching car details")
             }
         } catch (e: retrofit2.HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -134,13 +159,37 @@ fun ReservationsScreen(
                                     onCancelClick = { id ->
                                         scope.launch {
                                             try {
-                                                val service = ApiClientWithToken(context)
+                                                val reservationService = ApiClientWithToken(context)
                                                     .instance.create(ReservationService::class.java)
-                                                service.cancelReservation(id)
-                                                // Refresh reservations
-                                                reservations = service.getReservations()
+                                                reservationService.cancelReservation(id)
+                                                // Refresh reservations and fetch car details
+                                                val loadedReservations = reservationService.getReservations()
+                                                val carService = ApiClientWithToken(context).instance.create(CarService::class.java)
+                                                reservations = loadedReservations.map { reservation ->
+                                                    if (reservation.car == null && reservation.carId != null) {
+                                                        try {
+                                                            val car = carService.getCarById(reservation.carId)
+                                                            reservation.copy(car = car)
+                                                        } catch (e: Exception) {
+                                                            reservation
+                                                        }
+                                                    } else {
+                                                        reservation
+                                                    }
+                                                }
+                                            } catch (e: retrofit2.HttpException) {
+                                                // Parse the error response from the API
+                                                val errorBody = e.response()?.errorBody()?.string()
+                                                error = try {
+                                                    val errorResponse = Gson().fromJson(errorBody, SimpleResponse::class.java)
+                                                    errorResponse.message
+                                                } catch (ex: Exception) {
+                                                    "Fout bij annuleren: ${e.code()}"
+                                                }
+                                                android.util.Log.e("ReservationsScreen", "Cancel failed: $errorBody")
                                             } catch (e: Exception) {
                                                 error = e.message ?: "Fout bij annuleren"
+                                                android.util.Log.e("ReservationsScreen", "Cancel error", e)
                                             }
                                         }
                                     },
@@ -164,8 +213,44 @@ fun ReservationCard(
     onCancelClick: (String) -> Unit,
     onNavigateClick: (Double, Double) -> Unit
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val car = reservation.car
-    
+
+    // State to hold the photo URL
+    var photoUrl by remember { mutableStateOf<String?>(null) }
+
+    // Fetch car photo
+    LaunchedEffect(car?.id) {
+        if (car?.id != null) {
+            try {
+                val carService = ApiClientWithToken(context).instance.create(CarService::class.java)
+                val photos = carService.getCarPhotos(car.id)
+                if (photos.isNotEmpty()) {
+                    // Construct full URL: base URL + photo path
+                    photoUrl = "http://10.0.2.2:8080${photos[0].url}"
+                    android.util.Log.d("ReservationCard", "Loaded photo URL: $photoUrl")
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ReservationCard", "Failed to load car photo: ${e.message}")
+            }
+        }
+    }
+
+    // Check if reservation has already started
+    val hasStarted = try {
+        reservation.startTime?.let { startTime ->
+            val startInstant = ZonedDateTime.parse(startTime).toInstant()
+            val now = java.time.Instant.now()
+            startInstant <= now
+        } ?: false
+    } catch (e: Exception) {
+        false
+    }
+
+    // Only show cancel button if allowed and reservation hasn't started yet
+    val canCancel = showCancelButton && !hasStarted
+
     Card(
         modifier = Modifier
             .fillMaxWidth(),
@@ -181,215 +266,200 @@ fun ReservationCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(200.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
+                    .border(2.dp, Color(0xFF2196F3), RoundedCornerShape(8.dp))
                     .background(Color(0xFFE0E0E0)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Home,
-                    contentDescription = "Auto",
-                    modifier = Modifier.size(64.dp),
-                    tint = Color.Gray
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Status Badge
-            Surface(
-                color = when (reservation.status?.lowercase()) {
-                    "confirmed" -> Color(0xFF4CAF50)
-                    "pending" -> Color(0xFFFFC107)
-                    "cancelled" -> Color(0xFFF44336)
-                    "completed" -> Color(0xFF2196F3)
-                    else -> Color.Gray
-                },
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.align(Alignment.Start)
-            ) {
-                Text(
-                    text = reservation.status?.uppercase() ?: "UNKNOWN",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                )
+                if (photoUrl != null) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(photoUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Auto foto",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    // Placeholder icon
+                    Icon(
+                        imageVector = Icons.Default.Home,
+                        contentDescription = "Auto",
+                        modifier = Modifier.size(80.dp),
+                        tint = Color(0xFF757575)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             // Car Category
             Text(
-                text = car?.category ?: "N/A",
+                text = car?.category ?: "Sedan",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
+                color = Color(0xFF757575)
             )
 
-            // Car Name
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Car Name and Price
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(
-                        text = "${car?.brand ?: "Unknown"} ${car?.model ?: ""}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    if (car?.licensePlate != null) {
-                        Text(
-                            text = "📋 ${car.licensePlate}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
-                        )
-                    }
-                }
-
+                Text(
+                    text = "${car?.brand ?: "Unknown"} ${car?.model ?: ""}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Medium
+                )
                 Text(
                     text = "€${car?.pricePerTimeSlot?.toInt() ?: 0}/dag",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Color(0xFF757575)
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Reservation Details Card
+            // Fuel Type Badge
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Surface(
+                    color = Color(0xFFF5F5F5),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = "Brandstof",
+                            modifier = Modifier.size(16.dp),
+                            tint = Color(0xFF757575)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "ICE",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFF757575)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Reservation Dates
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = Color(0xFFF5F5F5),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(12.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Dates
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Start",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.Gray
-                            )
-                            Text(
-                                text = formatDateTime(reservation.startTime),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Eind",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.Gray
-                            )
-                            Text(
-                                text = formatDateTime(reservation.endTime),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Start",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFF757575)
+                        )
+                        Text(
+                            text = formatDateTime(reservation.startTime),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
 
-                    if (reservation.estimatedDistance != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        HorizontalDivider()
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Geschatte afstand",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray
-                            )
-                            Text(
-                                text = "${reservation.estimatedDistance} km",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-
-                    if (car?.costPerKm != null && reservation.estimatedDistance != null) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Kosten per km",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray
-                            )
-                            Text(
-                                text = "€${String.format("%.2f", car.costPerKm)}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Eind",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFF757575)
+                        )
+                        Text(
+                            text = formatDateTime(reservation.endTime),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Location and Navigate
+            // Location and Navigate Button
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Locatie",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Lat: ${String.format("%.4f", car?.latitude ?: 0.0)}, Lon: ${String.format("%.4f", car?.longitude ?: 0.0)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
-                    )
-                }
+                Text(
+                    text = "auto Locatie",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF757575)
+                )
 
-                TextButton(
+                Button(
                     onClick = {
-                        car?.let {
-                            onNavigateClick(it.latitude, it.longitude)
+                        if (car != null) {
+                            onNavigateClick(car.latitude, car.longitude)
+                        } else if (reservation.carId != null) {
+                            scope.launch {
+                                try {
+                                    val carService = ApiClientWithToken(context)
+                                        .instance.create(CarService::class.java)
+                                    val fetchedCar = carService.getCarById(reservation.carId)
+                                    onNavigateClick(fetchedCar.latitude, fetchedCar.longitude)
+                                } catch (e: Exception) {
+                                    android.util.Log.e("ReservationCard", "Error fetching car details: ${e.message}")
+                                }
+                            }
                         }
-                    }
+                    },
+                    modifier = Modifier.height(36.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF9E9E9E)
+                    ),
+                    shape = RoundedCornerShape(18.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                 ) {
-                    Text("Navigeer")
+                    Text(
+                        "Navigate",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
 
             // Cancel Button
-            if (showCancelButton) {
-                Spacer(modifier = Modifier.height(12.dp))
+            if (canCancel) {
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
                     onClick = { onCancelClick(reservation.id) },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFF44336)
-                    )
+                        containerColor = Color(0xFF9E9E9E)
+                    ),
+                    shape = RoundedCornerShape(24.dp)
                 ) {
-                    Text("Annuleren", color = Color.White)
+                    Text(
+                        "Annuleren",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         }

@@ -1,384 +1,589 @@
-//package com.example.rentmycar_android_app.ui
-//
-//import android.Manifest
-//import android.annotation.SuppressLint
-//import android.content.Context
-//import android.content.pm.PackageManager
-//import android.location.Location
-//import android.util.Log
-//import androidx.activity.compose.rememberLauncherForActivityResult
-//import androidx.activity.result.contract.ActivityResultContracts
-//import kotlinx.coroutines.Dispatchers
-//import kotlinx.coroutines.withContext
-//import org.json.JSONObject
-//import java.net.URL
-//import androidx.compose.foundation.layout.*
-//import androidx.compose.material.icons.Icons
-//import androidx.compose.material.icons.automirrored.filled.ExitToApp
-//import androidx.compose.material.icons.filled.LocationOn
-//import androidx.compose.material3.*
-//import androidx.compose.runtime.*
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.platform.LocalContext
-//import androidx.compose.ui.unit.dp
-//import androidx.compose.ui.viewinterop.AndroidView
-//import androidx.core.content.ContextCompat
-//import com.example.rentmycar_android_app.network.ApiClientWithToken
-//import com.example.rentmycar_android_app.network.CarService
-//import com.example.rentmycar_android_app.network.GeocodingService
-//import com.example.rentmycar_android_app.network.NominatimClient
-//import com.example.rentmycar_android_app.network.OSRMClient
-//import com.example.rentmycar_android_app.network.RoutingService
-//import com.google.android.gms.location.LocationServices
-//import com.google.android.gms.location.Priority
-//import com.google.android.gms.tasks.CancellationTokenSource
-//import org.osmdroid.config.Configuration
-//import retrofit2.Callback
-//import retrofit2.Response
-//import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-//import org.osmdroid.util.GeoPoint
-//import org.osmdroid.views.MapView
-//import org.osmdroid.views.overlay.Marker
-//import org.osmdroid.views.overlay.Polyline
-//import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-//import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-//import androidx.compose.ui.graphics.Color
-//import androidx.compose.ui.graphics.toArgb
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun MapScreen(
-//    onNavigateBack: () -> Unit,
-//    carId: String = "692f09ee1d8fa80521492f32"
-//) {
-//    val context = LocalContext.current
-//    var showLogoutDialog by remember { mutableStateOf(false) }
-//    var hasLocationPermission by remember {
-//        mutableStateOf(
-//            ContextCompat.checkSelfPermission(
-//                context,
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ) == PackageManager.PERMISSION_GRANTED
-//        )
-//    }
-//
-//    val locationPermissionLauncher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.RequestMultiplePermissions()
-//    ) { permissions ->
-//        hasLocationPermission = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-//                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-//    }
-//
-//    LaunchedEffect(Unit) {
-//        if (!hasLocationPermission) {
-//            locationPermissionLauncher.launch(
-//                arrayOf(
-//                    Manifest.permission.ACCESS_FINE_LOCATION,
-//                    Manifest.permission.ACCESS_COARSE_LOCATION
-//                )
-//            )
-//        }
-//    }
-//
-//    if (showLogoutDialog) {
-//        AlertDialog(
-//            onDismissRequest = { showLogoutDialog = false },
-//            title = { Text("Logout") },
-//            text = { Text("Are you sure you want to logout?") },
-//            confirmButton = {
-//                TextButton(
-//                    onClick = {
-//                        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-//                            .edit()
-//                            .clear()
-//                            .apply()
-//                        onNavigateBack()
-//                    }
-//                ) {
-//                    Text("Yes")
-//                }
-//            },
-//            dismissButton = {
-//                TextButton(onClick = { showLogoutDialog = false }) {
-//                    Text("Cancel")
-//                }
-//            }
-//        )
-//    }
-//
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = { Text("Find Cars Nearby") }
-//            )
-//        }
-//    ) { padding ->
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(padding)
-//        ) {
-//            if (hasLocationPermission) {
-//                OpenStreetMapView(carId = carId)
-//            } else {
-//                Column(
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .padding(16.dp),
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                    verticalArrangement = Arrangement.Center
-//                ) {
-//                    Text(
-//                        text = "Location permission is required to show the map",
-//                        style = MaterialTheme.typography.bodyLarge
-//                    )
-//                    Spacer(modifier = Modifier.height(16.dp))
-//                    Button(
-//                        onClick = {
-//                            locationPermissionLauncher.launch(
-//                                arrayOf(
-//                                    Manifest.permission.ACCESS_FINE_LOCATION,
-//                                    Manifest.permission.ACCESS_COARSE_LOCATION
-//                                )
-//                            )
-//                        }
-//                    ) {
-//                        Text("Grant Permission")
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//fun fetchAddressForMarker(
-//    lat: Double,
-//    lon: Double,
-//    onAddressFound: (String) -> Unit
-//) {
-//    val geocodingService = NominatimClient.instance.create(GeocodingService::class.java)
-//    geocodingService.reverseGeocode(lat, lon).enqueue(object : Callback<com.example.rentmycar_android_app.network.GeocodingResponse> {
-//        override fun onResponse(call: retrofit2.Call<com.example.rentmycar_android_app.network.GeocodingResponse>, response: Response<com.example.rentmycar_android_app.network.GeocodingResponse>) {
-//            if (response.isSuccessful && response.body() != null) {
-//                val geoData = response.body()!!
-//
-//                // Try display_name first (more reliable)
-//                if (!geoData.display_name.isNullOrEmpty()) {
-//                    Log.d("GeocodingDebug", "Got display_name: ${geoData.display_name}")
-//                    onAddressFound(geoData.display_name)
-//                    return
-//                }
-//
-//                // Fall back to formatted address
-//                val formattedAddress = geoData.address?.toFullAddress()
-//                if (!formattedAddress.isNullOrEmpty()) {
-//                    Log.d("GeocodingDebug", "Got formatted address: $formattedAddress")
-//                    onAddressFound(formattedAddress)
-//                    return
-//                }
-//
-//                Log.d("GeocodingDebug", "No address found in response: $geoData")
-//            } else {
-//                Log.d("GeocodingDebug", "Response not successful: ${response.code()}")
-//            }
-//
-//            onAddressFound("Address not available")
-//        }
-//
-//        override fun onFailure(call: retrofit2.Call<com.example.rentmycar_android_app.network.GeocodingResponse>, t: Throwable) {
-//            Log.d("GeocodingDebug", "Network error: ${t.message}")
-//            onAddressFound("Address not available")
-//        }
-//    })
-//}
-//
-//@SuppressLint("MissingPermission")
-//@Composable
-//fun OpenStreetMapView(carId: String) {
-//    val context = LocalContext.current
-//    var mapView by remember { mutableStateOf<MapView?>(null) }
-//
-//    LaunchedEffect(Unit) {
-//        // Initialize osmdroid configuration
-//        Configuration.getInstance().apply {
-//            userAgentValue = context.packageName
-//            osmdroidBasePath = context.getDir("osmdroid", android.content.Context.MODE_PRIVATE)
-//            osmdroidTileCache = context.getDir("osmdroid_tile_cache", android.content.Context.MODE_PRIVATE)
-//        }
-//    }
-//
-//    LaunchedEffect(mapView) {
-//        mapView?.let { map ->
-//            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-//
-//            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-//                location?.let {
-//                    val userLocation = GeoPoint(it.latitude, it.longitude)
-//
-//                    // Fetch car data
-//                    val apiClientWithToken = ApiClientWithToken(context)
-//                    val carService = apiClientWithToken.instance.create(CarService::class.java)
-//                    carService.getCar(carId).enqueue(object : Callback<com.example.rentmycar_android_app.network.CarResponse> {
-//                        override fun onResponse(call: retrofit2.Call<com.example.rentmycar_android_app.network.CarResponse>, response: Response<com.example.rentmycar_android_app.network.CarResponse>) {
-//                            if (response.isSuccessful && response.body() != null && response.body()!!.cars.isNotEmpty()) {
-//                                val car = response.body()!!.cars.first()
-//                                val carLocation = GeoPoint(car.latitude, car.longitude)
-//
-//                                // Fetch actual route using OSRM
-//                                val routingService = OSRMClient.instance.create(RoutingService::class.java)
-//                                val coordinates = "${it.longitude},${it.latitude};${car.longitude},${car.latitude}"
-//                                routingService.getRoute(coordinates, "geojson", "full").enqueue(object : Callback<com.example.rentmycar_android_app.network.RouteResponse> {
-//                                    override fun onResponse(call: retrofit2.Call<com.example.rentmycar_android_app.network.RouteResponse>, response: Response<com.example.rentmycar_android_app.network.RouteResponse>) {
-//                                        if (response.isSuccessful && response.body() != null) {
-//                                            val routeData = response.body()!!
-//                                            if (routeData.routes.isNotEmpty()) {
-//                                                val route = routeData.routes[0]
-//                                                val routePoints = mutableListOf<GeoPoint>()
-//
-//                                                // Extract coordinates from GeoJSON geometry
-//                                                val geometry = route.geometry
-//                                                val coordinates = geometry.getAsJsonArray("coordinates")
-//
-//                                                for (coord in coordinates) {
-//                                                    val coordArray = coord.asJsonArray
-//                                                    val lon = coordArray.get(0).asDouble
-//                                                    val lat = coordArray.get(1).asDouble
-//                                                    routePoints.add(GeoPoint(lat, lon))
-//                                                }
-//
-//                                                if (routePoints.isNotEmpty()) {
-//                                                    // Draw route polyline
-//                                                    val routeLine = Polyline().apply {
-//                                                        setPoints(routePoints)
-//                                                        outlinePaint.color = android.graphics.Color.BLUE
-//                                                        outlinePaint.strokeWidth = 8f
-//                                                    }
-//                                                    map.overlays.add(routeLine)
-//
-//                                                    // Fetch address using reverse geocoding
-//                                                    fetchAddressForMarker(car.latitude, car.longitude) { address ->
-//                                                        val carMarker = Marker(map).apply {
-//                                                            position = carLocation
-//                                                            title = "Car Location"
-//                                                            subDescription = address
-//                                                        }
-//                                                        map.overlays.add(carMarker)
-//                                                        map.invalidate()
-//                                                    }
-//
-//                                                    // Center map between user and car
-//                                                    val centerLat = (it.latitude + car.latitude) / 2
-//                                                    val centerLon = (it.longitude + car.longitude) / 2
-//                                                    map.controller.setCenter(GeoPoint(centerLat, centerLon))
-//                                                    map.controller.setZoom(16.0)
-//                                                    map.invalidate()
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//
-//                                    override fun onFailure(call: retrofit2.Call<com.example.rentmycar_android_app.network.RouteResponse>, t: Throwable) {
-//                                        // Fallback: draw straight line if routing fails
-//                                        val routePoints = listOf(userLocation, carLocation)
-//                                        val routeLine = Polyline().apply {
-//                                            setPoints(routePoints)
-//                                            outlinePaint.color = android.graphics.Color.RED
-//                                            outlinePaint.strokeWidth = 5f
-//                                        }
-//                                        map.overlays.add(routeLine)
-//
-//                                        // Fetch address using reverse geocoding
-//                                        fetchAddressForMarker(car.latitude, car.longitude) { address ->
-//                                            val carMarker = Marker(map).apply {
-//                                                position = carLocation
-//                                                title = "Car Location"
-//                                                subDescription = address
-//                                            }
-//                                            map.overlays.add(carMarker)
-//                                            map.invalidate()
-//                                        }
-//
-//                                        val centerLat = (it.latitude + car.latitude) / 2
-//                                        val centerLon = (it.longitude + car.longitude) / 2
-//                                        map.controller.setCenter(GeoPoint(centerLat, centerLon))
-//                                        map.controller.setZoom(16.0)
-//                                        map.invalidate()
-//                                    }
-//                                })
-//                            }
-//                        }
-//
-//                        override fun onFailure(call: retrofit2.Call<com.example.rentmycar_android_app.network.CarResponse>, t: Throwable) {
-//                            // Fallback: just show user location if car fetch fails
-//                            map.controller.setCenter(userLocation)
-//                            map.controller.setZoom(15.0)
-//                        }
-//                    })
-//                }
-//            }
-//        }
-//    }
-//
-//    AndroidView(
-//        factory = { ctx ->
-//            MapView(ctx).apply {
-//                setTileSource(TileSourceFactory.MAPNIK)
-//                setMultiTouchControls(true)
-//                controller.setZoom(14.0)
-//
-//                // Add location overlay
-//                val locationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(ctx), this)
-//                locationOverlay.enableMyLocation()
-//                overlays.add(locationOverlay)
-//
-//                mapView = this
-//            }
-//        },
-//        modifier = Modifier.fillMaxSize()
-//    )
-//}
-//
-//suspend fun fetchRoute(start: GeoPoint, end: GeoPoint): List<GeoPoint> = withContext(Dispatchers.IO) {
-//    try {
-//        val url = "https://router.project-osrm.org/route/v1/driving/" +
-//                "${start.longitude},${start.latitude};${end.longitude},${end.latitude}" +
-//                "?overview=full&geometries=geojson"
-//
-//        val response = URL(url).readText()
-//        val json = JSONObject(response)
-//
-//        if (json.getString("code") == "Ok") {
-//            val routes = json.getJSONArray("routes")
-//            val geometry = routes.getJSONObject(0)
-//                .getJSONObject("geometry")
-//                .getJSONArray("coordinates")
-//
-//            val points = mutableListOf<GeoPoint>()
-//            for (i in 0 until geometry.length()) {
-//                val coord = geometry.getJSONArray(i)
-//                points.add(GeoPoint(coord.getDouble(1), coord.getDouble(0)))
-//            }
-//            points
-//        } else {
-//            Log.e("MapScreen", "OSRM Error: ${json.getString("code")}")
-//            listOf(start, end)
-//        }
-//    } catch (e: Exception) {
-//        Log.e("MapScreen", "Failed to fetch route: ${e.message}")
-//        listOf(start, end)
-//    }
-//}
-//
-//fun drawRouteWithPoints(map: MapView, points: List<GeoPoint>) {
-//    map.overlays.removeAll { it is Polyline }
-//
-//    val routeLine = Polyline().apply {
-//        setPoints(points)
-//        outlinePaint.color = Color.Blue.toArgb()
-//        outlinePaint.strokeWidth = 10f
-//    }
-//
-//    map.overlays.add(routeLine)
-//    map.invalidate()
-//}
+package com.example.rentmycar_android_app.ui
+
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+import com.example.rentmycar_android_app.network.RoutingService
+import com.example.rentmycar_android_app.network.OSRMClient
+import com.google.android.gms.location.LocationServices
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
+import org.maplibre.android.location.LocationComponentActivationOptions
+import org.maplibre.android.location.LocationComponentOptions
+import org.maplibre.android.location.modes.CameraMode
+import org.maplibre.android.location.modes.RenderMode
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.Style
+import org.maplibre.android.style.layers.CircleLayer
+import org.maplibre.android.style.layers.LineLayer
+import org.maplibre.android.style.layers.PropertyFactory.*
+import org.maplibre.android.style.sources.GeoJsonSource
+import org.maplibre.android.camera.CameraUpdateFactory
+import retrofit2.Callback
+import retrofit2.Response
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MapScreen(
+    onNavigateBack: () -> Unit,
+    carLatitude: Double,
+    carLongitude: Double
+) {
+    val context = LocalContext.current
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        hasLocationPermission = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+    }
+
+    // Request location permission on first launch
+    LaunchedEffect(Unit) {
+        if (!hasLocationPermission) {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Route naar auto") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Terug")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            if (hasLocationPermission) {
+                MapLibreMapView(
+                    carLatitude = carLatitude,
+                    carLongitude = carLongitude
+                )
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Locatie toegang is vereist om de kaart te tonen",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            locationPermissionLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                    Manifest.permission.ACCESS_COARSE_LOCATION
+                                )
+                            )
+                        }
+                    ) {
+                        Text("Geef Toestemming")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@SuppressLint("MissingPermission")
+@Composable
+fun MapLibreMapView(
+    carLatitude: Double,
+    carLongitude: Double
+) {
+    val context = LocalContext.current
+    var mapView by remember { mutableStateOf<MapView?>(null) }
+    var mapLibreMap by remember { mutableStateOf<MapLibreMap?>(null) }
+    var isNavigating by remember { mutableStateOf(true) } // Route shown by default
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            try {
+                mapView?.let { view ->
+                    view.onStop()
+                    view.onPause()
+                    view.onDestroy()
+                }
+            } catch (e: Exception) {
+                Log.e("MapLibre", "Error disposing map", e)
+            }
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(
+            factory = { ctx ->
+                MapView(ctx).apply {
+                    mapView = this
+                    onCreate(null)
+                    onStart()
+                    onResume()
+
+                    getMapAsync { map ->
+                        mapLibreMap = map
+
+                        // Create a modern style with CartoDB Voyager tiles
+                        val styleJson = """
+                        {
+                          "version": 8,
+                          "name": "Modern Map",
+                          "sources": {
+                            "carto": {
+                              "type": "raster",
+                              "tiles": ["https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png"],
+                              "tileSize": 256,
+                              "attribution": "© OpenStreetMap contributors, © CARTO",
+                              "maxzoom": 19
+                            }
+                          },
+                          "layers": [
+                            {
+                              "id": "carto-layer",
+                              "type": "raster",
+                              "source": "carto",
+                              "minzoom": 0,
+                              "maxzoom": 22
+                            }
+                          ]
+                        }
+                        """.trimIndent()
+
+                        map.setStyle(
+                            Style.Builder().fromJson(styleJson)
+                        ) { style ->
+                            // Enable location component
+                            val locationComponentOptions = LocationComponentOptions.builder(ctx)
+                                .pulseEnabled(true)
+                                .build()
+
+                            val locationComponentActivationOptions = LocationComponentActivationOptions
+                                .builder(ctx, style)
+                                .locationComponentOptions(locationComponentOptions)
+                                .build()
+
+                            map.locationComponent.apply {
+                                activateLocationComponent(locationComponentActivationOptions)
+                                isLocationComponentEnabled = true
+                                cameraMode = CameraMode.TRACKING
+                                renderMode = RenderMode.COMPASS
+                            }
+
+                            // Add car marker immediately
+                            addCarMarker(style, carLatitude, carLongitude)
+
+                            // Get user location and fetch route automatically
+                            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(ctx)
+                            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                                location?.let { userLoc ->
+                                    // Automatically fetch and draw the route
+                                    fetchAndDrawRouteOnLoad(
+                                        map = map,
+                                        style = style,
+                                        userLatitude = userLoc.latitude,
+                                        userLongitude = userLoc.longitude,
+                                        carLatitude = carLatitude,
+                                        carLongitude = carLongitude
+                                    )
+                                } ?: run {
+                                    // No user location, center on car
+                                    val carLatLng = LatLng(carLatitude, carLongitude)
+                                    map.animateCamera(
+                                        CameraUpdateFactory.newLatLngZoom(carLatLng, 14.0)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // Navigate button
+        FloatingActionButton(
+            onClick = {
+                isNavigating = !isNavigating
+                if (isNavigating) {
+                    // Fetch and display route
+                    isLoading = true
+                    errorMessage = null
+
+                    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                        location?.let { userLoc ->
+                            fetchAndDrawRoute(
+                                mapLibreMap = mapLibreMap,
+                                userLatitude = userLoc.latitude,
+                                userLongitude = userLoc.longitude,
+                                carLatitude = carLatitude,
+                                carLongitude = carLongitude,
+                                onSuccess = {
+                                    isLoading = false
+                                },
+                                onError = { error ->
+                                    isLoading = false
+                                    errorMessage = error
+                                }
+                            )
+                        } ?: run {
+                            isLoading = false
+                            errorMessage = "Kon gebruikerslocatie niet ophalen"
+                        }
+                    }.addOnFailureListener {
+                        isLoading = false
+                        errorMessage = "Fout bij ophalen locatie"
+                    }
+                } else {
+                    // Clear route
+                    clearRoute(mapLibreMap)
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = if (isNavigating) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+        ) {
+            Icon(
+                imageVector = Icons.Default.Place,
+                contentDescription = if (isNavigating) "Stop navigatie" else "Start navigatie"
+            )
+        }
+
+        // Loading indicator
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(50.dp)
+            )
+        }
+
+        // Error message
+        errorMessage?.let { error ->
+            Snackbar(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp),
+                action = {
+                    TextButton(onClick = { errorMessage = null }) {
+                        Text("Sluiten")
+                    }
+                }
+            ) {
+                Text(error)
+            }
+        }
+    }
+}
+
+@SuppressLint("MissingPermission")
+private fun fetchAndDrawRouteOnLoad(
+    map: MapLibreMap,
+    style: Style,
+    userLatitude: Double,
+    userLongitude: Double,
+    carLatitude: Double,
+    carLongitude: Double
+) {
+    val routingService = OSRMClient.instance.create(RoutingService::class.java)
+    val coordinates = "${userLongitude},${userLatitude};${carLongitude},${carLatitude}"
+
+    Log.d("MapLibre", "Fetching route for coordinates: $coordinates")
+
+    routingService.getRoute(coordinates, "geojson", "full").enqueue(object : Callback<com.example.rentmycar_android_app.network.RouteResponse> {
+        override fun onResponse(
+            call: retrofit2.Call<com.example.rentmycar_android_app.network.RouteResponse>,
+            response: Response<com.example.rentmycar_android_app.network.RouteResponse>
+        ) {
+            // Check if map is still valid before updating
+            if (map.style == null) {
+                Log.w("MapLibre", "Map style is null, skipping route update")
+                return
+            }
+
+            if (response.isSuccessful && response.body() != null) {
+                val routeData = response.body()!!
+                if (routeData.routes.isNotEmpty()) {
+                    val route = routeData.routes[0]
+
+                    Log.d("MapLibre", "Route received, drawing line")
+
+                    try {
+                        // Add route line to map
+                        val routeSource = GeoJsonSource("route-source", route.geometry.toString())
+                        style.addSource(routeSource)
+
+                        val routeLayer = LineLayer("route-layer", "route-source")
+                            .withProperties(
+                                lineColor("#0080FF"),
+                                lineWidth(6f),
+                                lineOpacity(0.9f),
+                                lineCap("round"),
+                                lineJoin("round")
+                            )
+                        style.addLayer(routeLayer)
+
+                        // Adjust camera to show the entire route
+                        val userLatLng = LatLng(userLatitude, userLongitude)
+                        val carLatLng = LatLng(carLatitude, carLongitude)
+                        val bounds = LatLngBounds.Builder()
+                            .include(userLatLng)
+                            .include(carLatLng)
+                            .build()
+
+                        map.easeCamera(
+                            CameraUpdateFactory.newLatLngBounds(bounds, 100),
+                            1000
+                        )
+                    } catch (e: Exception) {
+                        Log.e("MapLibre", "Error drawing route", e)
+                    }
+                } else {
+                    Log.e("MapLibre", "No routes found in response")
+                    // Just center on both locations without route
+                    val userLatLng = LatLng(userLatitude, userLongitude)
+                    val carLatLng = LatLng(carLatitude, carLongitude)
+                    val bounds = LatLngBounds.Builder()
+                        .include(userLatLng)
+                        .include(carLatLng)
+                        .build()
+
+                    map.easeCamera(
+                        CameraUpdateFactory.newLatLngBounds(bounds, 100)
+                    )
+                }
+            } else {
+                Log.e("MapLibre", "Route response not successful: ${response.code()}")
+                // Just center on both locations without route
+                val userLatLng = LatLng(userLatitude, userLongitude)
+                val carLatLng = LatLng(carLatitude, carLongitude)
+                val bounds = LatLngBounds.Builder()
+                    .include(userLatLng)
+                    .include(carLatLng)
+                    .build()
+
+                map.easeCamera(
+                    CameraUpdateFactory.newLatLngBounds(bounds, 100)
+                )
+            }
+        }
+
+        override fun onFailure(
+            call: retrofit2.Call<com.example.rentmycar_android_app.network.RouteResponse>,
+            t: Throwable
+        ) {
+            Log.e("MapLibre", "Route fetch failed", t)
+            // Just center on both locations without route
+            val userLatLng = LatLng(userLatitude, userLongitude)
+            val carLatLng = LatLng(carLatitude, carLongitude)
+            val bounds = LatLngBounds.Builder()
+                .include(userLatLng)
+                .include(carLatLng)
+                .build()
+
+            map.easeCamera(
+                CameraUpdateFactory.newLatLngBounds(bounds, 100)
+            )
+        }
+    })
+}
+
+@SuppressLint("MissingPermission")
+private fun fetchAndDrawRoute(
+    mapLibreMap: MapLibreMap?,
+    userLatitude: Double,
+    userLongitude: Double,
+    carLatitude: Double,
+    carLongitude: Double,
+    onSuccess: () -> Unit,
+    onError: (String) -> Unit
+) {
+    val map = mapLibreMap ?: run {
+        onError("Kaart is niet beschikbaar")
+        return
+    }
+
+    val style = map.style ?: run {
+        onError("Kaartstijl is niet geladen")
+        return
+    }
+
+    val routingService = OSRMClient.instance.create(RoutingService::class.java)
+    val coordinates = "${userLongitude},${userLatitude};${carLongitude},${carLatitude}"
+
+    Log.d("MapLibre", "Fetching route for coordinates: $coordinates")
+
+    routingService.getRoute(coordinates, "geojson", "full").enqueue(object : Callback<com.example.rentmycar_android_app.network.RouteResponse> {
+        override fun onResponse(
+            call: retrofit2.Call<com.example.rentmycar_android_app.network.RouteResponse>,
+            response: Response<com.example.rentmycar_android_app.network.RouteResponse>
+        ) {
+            // Check if map is still valid before updating
+            if (map.style == null) {
+                onError("Map is niet meer beschikbaar")
+                return
+            }
+
+            if (response.isSuccessful && response.body() != null) {
+                val routeData = response.body()!!
+                if (routeData.routes.isNotEmpty()) {
+                    val route = routeData.routes[0]
+
+                    Log.d("MapLibre", "Route received with ${route.geometry} geometry")
+
+                    try {
+                        // Clear existing route if any
+                        clearRoute(mapLibreMap)
+
+                        // Add route line to map
+                        val routeSource = GeoJsonSource("route-source", route.geometry.toString())
+                        style.addSource(routeSource)
+
+                        val routeLayer = LineLayer("route-layer", "route-source")
+                            .withProperties(
+                                lineColor("#0080FF"),
+                                lineWidth(6f),
+                                lineOpacity(0.9f),
+                                lineCap("round"),
+                                lineJoin("round")
+                            )
+                        style.addLayer(routeLayer)
+
+                        // Adjust camera to show the entire route
+                        val userLatLng = LatLng(userLatitude, userLongitude)
+                        val carLatLng = LatLng(carLatitude, carLongitude)
+                        val bounds = LatLngBounds.Builder()
+                            .include(userLatLng)
+                            .include(carLatLng)
+                            .build()
+
+                        map.easeCamera(
+                            CameraUpdateFactory.newLatLngBounds(bounds, 100),
+                            1000
+                        )
+
+                        onSuccess()
+                    } catch (e: Exception) {
+                        Log.e("MapLibre", "Error drawing route", e)
+                        onError("Fout bij tekenen route")
+                    }
+                } else {
+                    Log.e("MapLibre", "No routes found in response")
+                    onError("Geen route gevonden")
+                }
+            } else {
+                Log.e("MapLibre", "Route response not successful: ${response.code()}")
+                onError("Fout bij ophalen route: ${response.code()}")
+            }
+        }
+
+        override fun onFailure(
+            call: retrofit2.Call<com.example.rentmycar_android_app.network.RouteResponse>,
+            t: Throwable
+        ) {
+            Log.e("MapLibre", "Route fetch failed", t)
+            onError("Netwerkfout: ${t.message}")
+        }
+    })
+}
+
+private fun clearRoute(mapLibreMap: MapLibreMap?) {
+    val map = mapLibreMap ?: return
+    val style = map.style ?: return
+
+    try {
+        // Remove route layer and source if they exist
+        style.getLayer("route-layer")?.let {
+            style.removeLayer("route-layer")
+        }
+        style.getSource("route-source")?.let {
+            style.removeSource("route-source")
+        }
+    } catch (e: Exception) {
+        Log.e("MapLibre", "Error clearing route", e)
+    }
+}
+
+private fun addCarMarker(
+    style: Style,
+    carLatitude: Double,
+    carLongitude: Double
+) {
+    // Create a GeoJSON feature for the car marker
+    val carFeature = JsonObject().apply {
+        addProperty("type", "Feature")
+        val geometry = JsonObject().apply {
+            addProperty("type", "Point")
+            val coordinates = JsonArray().apply {
+                add(carLongitude)
+                add(carLatitude)
+            }
+            add("coordinates", coordinates)
+        }
+        add("geometry", geometry)
+
+        val properties = JsonObject().apply {
+            addProperty("title", "Auto Locatie")
+        }
+        add("properties", properties)
+    }
+
+    val carSource = GeoJsonSource("car-marker-source", carFeature.toString())
+    style.addSource(carSource)
+
+    // Use a circle layer for the car marker
+    val markerLayer = CircleLayer("car-marker-layer", "car-marker-source")
+        .withProperties(
+            circleRadius(12f),
+            circleColor("#FF0000"),
+            circleStrokeWidth(3f),
+            circleStrokeColor("#FFFFFF")
+        )
+    style.addLayer(markerLayer)
+}

@@ -15,13 +15,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.rentmycar_android_app.network.ApiClientWithToken
 import com.example.rentmycar_android_app.network.CarDto
+import com.example.rentmycar_android_app.network.CarService
 import kotlinx.coroutines.launch
 
 @Composable
@@ -293,6 +298,28 @@ private fun CarCard(
     car: CarDto,
     onClick: () -> Unit
 ) {
+    val context = LocalContext.current
+
+    // State to hold the photo URL
+    var photoUrl by remember { mutableStateOf<String?>(null) }
+
+    // Fetch car photo
+    LaunchedEffect(car.id) {
+        if (car.id.isNotBlank()) {
+            try {
+                val carService = ApiClientWithToken(context).instance.create(CarService::class.java)
+                val photos = carService.getCarPhotos(car.id)
+                if (photos.isNotEmpty()) {
+                    // Construct full URL: base URL + photo path
+                    photoUrl = "http://10.0.2.2:8080${photos[0].url}"
+                    android.util.Log.d("CarCard", "Loaded photo URL: $photoUrl")
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("CarCard", "Failed to load car photo: ${e.message}")
+            }
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -310,11 +337,24 @@ private fun CarCard(
                     .background(Color(0xFFDCD3D3)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Home,
-                    contentDescription = null,
-                    tint = Color.DarkGray
-                )
+                if (photoUrl != null) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(photoUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Auto foto",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    // Placeholder icon
+                    Icon(
+                        imageVector = Icons.Default.Home,
+                        contentDescription = null,
+                        tint = Color.DarkGray
+                    )
+                }
             }
 
             Spacer(Modifier.height(8.dp))

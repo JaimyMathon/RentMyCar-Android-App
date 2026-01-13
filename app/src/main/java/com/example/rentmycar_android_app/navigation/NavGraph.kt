@@ -35,7 +35,11 @@ sealed class Screen(val route: String) {
     }
 
     data object PaymentMethod : Screen("paymentMethod")
-    object Map : Screen("map")
+    data object Map : Screen("map/{latitude}/{longitude}") {
+        fun createRoute(latitude: Double, longitude: Double): String {
+            return "map/${latitude}/${longitude}"
+        }
+    }
     object Profile : Screen("profile")
     object DrivingTracker : Screen("driving_tracker")
     object DrivingStats : Screen("driving_stats")
@@ -187,13 +191,24 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-//        composable(Screen.Map.route) {
-//            MapScreen(
-//                onNavigateBack = {
-//                    navController.popBackStack()
-//                }
-//            )
-//        }
+        composable(
+            route = Screen.Map.route,
+            arguments = listOf(
+                navArgument("latitude") { type = NavType.StringType },
+                navArgument("longitude") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val latitude = backStackEntry.arguments?.getString("latitude")?.toDoubleOrNull() ?: 0.0
+            val longitude = backStackEntry.arguments?.getString("longitude")?.toDoubleOrNull() ?: 0.0
+
+            MapScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                carLatitude = latitude,
+                carLongitude = longitude
+            )
+        }
 
         composable(Screen.PaymentMethod.route) {
             PaymentMethodScreen(
@@ -262,8 +277,7 @@ fun NavGraph(navController: NavHostController) {
                     navController.popBackStack()
                 },
                 onNavigateToLocation = { lat: Double, lon: Double ->
-                    // You can add navigation to map screen here if needed
-                    // For now, this is a placeholder
+                    navController.navigate(Screen.Map.createRoute(lat, lon))
                 }
             )
         }
