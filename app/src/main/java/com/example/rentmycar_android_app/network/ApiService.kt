@@ -1,11 +1,12 @@
 package com.example.rentmycar_android_app.network
 
-import com.example.rentmycar_android_app.model.DrivingBehavior
-import com.example.rentmycar_android_app.model.DrivingDataRequest
-import com.example.rentmycar_android_app.model.DrivingStatsResponse
-import com.example.rentmycar_android_app.model.UpdateProfileRequest
-import com.example.rentmycar_android_app.model.User
-import com.example.rentmycar_android_app.model.UserBonus
+import com.example.rentmycar_android_app.core.network.SimpleResponse
+import com.example.rentmycar_android_app.core.model.DrivingBehavior
+import com.example.rentmycar_android_app.core.model.DrivingDataRequest
+import com.example.rentmycar_android_app.core.model.DrivingStatsResponse
+import com.example.rentmycar_android_app.core.model.UpdateProfileRequest
+import com.example.rentmycar_android_app.core.model.User
+import com.example.rentmycar_android_app.core.model.UserBonus
 import retrofit2.Response
 import retrofit2.http.*
 

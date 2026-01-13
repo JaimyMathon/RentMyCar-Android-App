@@ -1,12 +1,11 @@
 package com.example.rentmycar_android_app.viewmodels
 
-import android.util.Log
 import androidx.lifecycle. ViewModel
 import androidx.lifecycle. viewModelScope
-import com.example.rentmycar_android_app. model.User
-import com.example.rentmycar_android_app.model.UserBonus
-import com. example.rentmycar_android_app.model.UpdateProfileRequest
-import com.example. rentmycar_android_app.network.ApiClient
+import com.example.rentmycar_android_app.core.model.User
+import com.example.rentmycar_android_app.core.model.UserBonus
+import com.example.rentmycar_android_app.core.model.UpdateProfileRequest
+import com.example.rentmycar_android_app.core.network.ApiClient
 import com.example.rentmycar_android_app.network.ApiService
 import kotlinx. coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

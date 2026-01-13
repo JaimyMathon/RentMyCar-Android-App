@@ -14,9 +14,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.rentmycar_android_app.network.ApiClientWithToken
-import com.example.rentmycar_android_app.network.CarDto
-import com.example.rentmycar_android_app.network.CarService
+import com.example.rentmycar_android_app.core.network.ApiClientWithToken
+import com.example.rentmycar_android_app.car.CarDto
+import com.example.rentmycar_android_app.car.CarService
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale

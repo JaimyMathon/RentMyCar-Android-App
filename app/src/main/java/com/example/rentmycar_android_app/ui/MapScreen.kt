@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Location
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,9 +13,6 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.URL
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,15 +21,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.example.rentmycar_android_app.network.ApiClientWithToken
-import com.example.rentmycar_android_app.network.CarService
-import com.example.rentmycar_android_app.network.GeocodingService
-import com.example.rentmycar_android_app.network.NominatimClient
-import com.example.rentmycar_android_app.network.OSRMClient
-import com.example.rentmycar_android_app.network.RoutingService
+import com.example.rentmycar_android_app.core.network.ApiClientWithToken
+import com.example.rentmycar_android_app.car.CarService
+import com.example.rentmycar_android_app.routing.GeocodingService
+import com.example.rentmycar_android_app.routing.NominatimClient
+import com.example.rentmycar_android_app.routing.OSRMClient
+import com.example.rentmycar_android_app.routing.RoutingService
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import com.google.android.gms.tasks.CancellationTokenSource
 import org.osmdroid.config.Configuration
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,6 +40,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.example.rentmycar_android_app.routing.GeocodingResponse
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -159,8 +154,8 @@ fun fetchAddressForMarker(
     onAddressFound: (String) -> Unit
 ) {
     val geocodingService = NominatimClient.instance.create(GeocodingService::class.java)
-    geocodingService.reverseGeocode(lat, lon).enqueue(object : Callback<com.example.rentmycar_android_app.network.GeocodingResponse> {
-        override fun onResponse(call: retrofit2.Call<com.example.rentmycar_android_app.network.GeocodingResponse>, response: Response<com.example.rentmycar_android_app.network.GeocodingResponse>) {
+    geocodingService.reverseGeocode(lat, lon).enqueue(object : Callback<GeocodingResponse> {
+        override fun onResponse(call: retrofit2.Call<GeocodingResponse>, response: Response<GeocodingResponse>) {
             if (response.isSuccessful && response.body() != null) {
                 val geoData = response.body()!!
 
@@ -187,7 +182,7 @@ fun fetchAddressForMarker(
             onAddressFound("Address not available")
         }
 
-        override fun onFailure(call: retrofit2.Call<com.example.rentmycar_android_app.network.GeocodingResponse>, t: Throwable) {
+        override fun onFailure(call: retrofit2.Call<GeocodingResponse>, t: Throwable) {
             Log.d("GeocodingDebug", "Network error: ${t.message}")
             onAddressFound("Address not available")
         }
