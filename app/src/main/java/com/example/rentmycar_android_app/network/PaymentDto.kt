@@ -14,13 +14,3 @@ data class PaymentDto(
     val distanceCost: Double? = null,     // bv. 100
     val totalAmount: Double? = null       // bv. 1028.38
 )
-
-data class ProcessPaymentRequest(
-    val id: String        // zelfde als PaymentRequest in je backend
-)
-
-data class PaymentResponseDto(
-    val isSuccess: Boolean,
-    val message: String,
-    val payment: PaymentDto? = null
-)

@@ -19,10 +19,3 @@ data class ReservationDto(
 data class ReservationsResponse(
     val reservations: List<ReservationDto>
 )
-
-data class UpdateReservationRequest(
-    val startTime: String? = null,
-    val endTime: String? = null,
-    val estimatedDistance: Double? = null,
-    val status: String? = null
-)

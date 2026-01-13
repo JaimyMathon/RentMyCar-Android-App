@@ -1,4 +1,4 @@
-package com.example.rentmycar_android_app.ui
+package com.example.rentmycar_android_app.ui.payment
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -12,50 +12,46 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class CarDetailUiState(
+data class PaymentReviewUiState(
     val isLoading: Boolean = true,
     val car: CarDto? = null,
     val error: String? = null
 )
 
 @HiltViewModel
-class CarDetailViewModel @Inject constructor(
+class PaymentReviewViewModel @Inject constructor(
     private val carRepository: CarRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val carId: String = checkNotNull(savedStateHandle["carId"])
 
-    private val _uiState = MutableStateFlow(CarDetailUiState())
-    val uiState: StateFlow<CarDetailUiState> = _uiState
+    private val _uiState = MutableStateFlow(PaymentReviewUiState())
+    val uiState: StateFlow<PaymentReviewUiState> = _uiState
 
     init {
-        load()
+        loadCar()
     }
 
-    private fun load() {
+    private fun loadCar() {
         viewModelScope.launch {
-            _uiState.value = CarDetailUiState(isLoading = true)
+            _uiState.value = PaymentReviewUiState(isLoading = true)
 
             when (val result = carRepository.getCarById(carId)) {
                 is Result.Success -> {
-                    _uiState.value = CarDetailUiState(
+                    _uiState.value = PaymentReviewUiState(
                         isLoading = false,
                         car = result.data
                     )
                 }
                 is Result.Error -> {
-                    _uiState.value = CarDetailUiState(
+                    _uiState.value = PaymentReviewUiState(
                         isLoading = false,
-                        car = null,
                         error = result.message ?: "Fout bij ophalen auto"
                     )
                 }
-                is Result.Loading -> {
-                    // Already loading
-                }
+                is Result.Loading -> {}
             }
         }
     }
 }
-

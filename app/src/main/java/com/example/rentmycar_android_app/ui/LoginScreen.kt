@@ -15,23 +15,28 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
-import com.example.rentmycar_android_app.network.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     onLoginSuccess: (String) -> Unit,
     onNavigateToRegister: () -> Unit,
-    onNavigateToForgotPassword: () -> Unit
+    onNavigateToForgotPassword: () -> Unit,
+    viewModel: com.example.rentmycar_android_app.ui.login.LoginViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var loading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    val context = LocalContext.current
-    val service = ApiClient.instance.create(AuthService::class.java)
+    val uiState by viewModel.uiState.collectAsState()
+
+    // Handle login success
+    LaunchedEffect(uiState.loginSuccess) {
+        uiState.loginSuccess?.let { username ->
+            onLoginSuccess(username)
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize().background(Color(0xFFE3ECFF)),
@@ -67,33 +72,14 @@ fun LoginScreen(
 
             Button(
                 onClick = {
-                    loading = true
-                    errorMessage = null
-                    val request = LoginRequest(email, password)
-
-                    service.login(request).enqueue(object: retrofit2.Callback<AuthResponse> {
-                        override fun onResponse(call: retrofit2.Call<AuthResponse>, response: retrofit2.Response<AuthResponse>) {
-                            loading = false
-                            if (response.isSuccessful && response.body() != null) {
-                                val authResponse = response.body()!!
-                                val sharedPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                                sharedPrefs.edit().putString("jwt_token", authResponse.token).apply()
-                                sharedPrefs.edit().putString("username", authResponse.username).apply()
-                                onLoginSuccess(authResponse.username)
-                            } else {
-                                errorMessage = "E-mail of wachtwoord onjuist"
-                            }
-                        }
-                        override fun onFailure(call: retrofit2.Call<AuthResponse>, t: Throwable) {
-                            loading = false
-                            errorMessage = "Netwerkfout: ${t.message}"
-                        }
-                    })
+                    viewModel.login(email, password)
                 },
                 modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
                 shape = RoundedCornerShape(12.dp),
-                enabled = !loading
-            ) { Text("Inloggen") }
+                enabled = !uiState.isLoading
+            ) {
+                Text("Inloggen")
+            }
 
             TextButton(onClick = onNavigateToForgotPassword) {
                 Text("Wachtwoord vergeten?")
@@ -103,8 +89,17 @@ fun LoginScreen(
                 Text("Nog geen account? Registreer hier")
             }
 
-            errorMessage?.let { Text(it, color = Color.Red, modifier = Modifier.padding(top = 16.dp)) }
-            if (loading) CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
+            uiState.error?.let {
+                Text(
+                    it,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            if (uiState.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
+            }
         }
     }
 }

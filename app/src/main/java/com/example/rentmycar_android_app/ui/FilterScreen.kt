@@ -12,11 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 data class FilterState(
     val selectedTypes: Set<String> = emptySet(),
@@ -31,9 +29,7 @@ fun FilterScreen(
     onBackClick: () -> Unit,
     onApplyFilters: (FilterState) -> Unit,
     initialFilterState: FilterState = FilterState(),
-    viewModel: FilterViewModel = viewModel(
-        factory = FilterViewModelFactory(LocalContext.current)
-    )
+    viewModel: FilterViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
     val availableBrands by viewModel.availableBrands.collectAsState()
 

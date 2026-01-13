@@ -10,9 +10,3 @@ data class User(
     val phone: String?  = null,
     val password:  String = ""
 )
-
-data class UpdateProfileRequest(
-    val name: String,
-    val email: String,
-    val phone: String? = null
-)

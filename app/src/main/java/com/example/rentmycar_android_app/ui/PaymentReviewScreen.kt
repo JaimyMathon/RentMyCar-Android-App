@@ -10,13 +10,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.rentmycar_android_app.network.ApiClientWithToken
-import com.example.rentmycar_android_app.network.CarDto
-import com.example.rentmycar_android_app.network.CarService
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -30,26 +26,10 @@ fun PaymentReviewScreen(
     toDate: String,
     kms: String,
     onBackClick: () -> Unit,
-    onPayClick: () -> Unit
+    onPayClick: () -> Unit,
+    viewModel: com.example.rentmycar_android_app.ui.payment.PaymentReviewViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
-    val context = LocalContext.current
-    val carService = remember { ApiClientWithToken(context).instance.create(CarService::class.java) }
-
-    var isLoading by remember { mutableStateOf(true) }
-    var car by remember { mutableStateOf<CarDto?>(null) }
-    var error by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(carId) {
-        isLoading = true
-        error = null
-        try {
-            car = carService.getCarById(carId)
-        } catch (e: Exception) {
-            error = e.message ?: "Fout bij ophalen auto"
-        } finally {
-            isLoading = false
-        }
-    }
+    val uiState by viewModel.uiState.collectAsState()
 
     val df = remember { SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()) }
 
@@ -104,20 +84,24 @@ fun PaymentReviewScreen(
             contentAlignment = Alignment.TopCenter
         ) {
             when {
-                isLoading -> CircularProgressIndicator(modifier = Modifier.padding(top = 40.dp))
-                error != null -> Text(error!!, color = Color.Red, modifier = Modifier.padding(top = 40.dp))
+                uiState.isLoading -> CircularProgressIndicator(modifier = Modifier.padding(top = 40.dp))
+                uiState.error != null -> Text(
+                    uiState.error!!,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 40.dp)
+                )
 
-                car != null -> {
-                    val c = car!!
+                uiState.car != null -> {
+                    val car = uiState.car!!
 
-                    val pricePerDay = c.pricePerTimeSlot ?: 0.0
+                    val pricePerDay = car.pricePerTimeSlot ?: 0.0
                     val basePrice = pricePerDay * days
 
                     // Zoals jouw voorbeeld: TCO / 365 * dagen
-                    val tcoAnnual = c.tco ?: 0.0
+                    val tcoAnnual = car.tco ?: 0.0
                     val tcoCost = (tcoAnnual / 365.0) * days
 
-                    val costPerKm = c.costPerKm ?: 0.0
+                    val costPerKm = car.costPerKm ?: 0.0
                     val distanceCost = kmsInt * costPerKm
 
                     val total = basePrice + tcoCost + distanceCost
@@ -146,7 +130,7 @@ fun PaymentReviewScreen(
                                 Spacer(Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = "${c.brand.orEmpty()} ${c.model.orEmpty()}",
+                                        text = "${car.brand.orEmpty()} ${car.model.orEmpty()}",
                                         fontWeight = FontWeight.Bold
                                     )
                                     Text(

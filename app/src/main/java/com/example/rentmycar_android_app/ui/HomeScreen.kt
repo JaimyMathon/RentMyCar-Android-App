@@ -37,9 +37,7 @@ fun HomeScreen(
     onNavigateToDrivingStats: () -> Unit = {},
     onNavigateToFilter: () -> Unit = {},
     onFilterApplied: ((FilterState) -> Unit)? = null,
-    viewModel: HomeViewModel = viewModel(
-        factory = HomeViewModelFactory(LocalContext.current)
-    )
+    viewModel: HomeViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE) }

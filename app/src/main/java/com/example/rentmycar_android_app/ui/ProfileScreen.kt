@@ -17,7 +17,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx. compose.ui.text.style. TextAlign
 import androidx.compose. ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rentmycar_android_app.viewmodels. ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,15 +26,15 @@ fun ProfileScreen(
     onLogout: () -> Unit,
     onNavigateBack: () -> Unit = {},
     onNavigateToDrivingStats: () -> Unit = {},  // NIEUW
-    viewModel: ProfileViewModel = viewModel()
+    viewModel: ProfileViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
     val user by viewModel.user.collectAsState()
     val bonus by viewModel.bonus.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    LaunchedEffect(token) {
-        viewModel.loadProfile(token)
+    LaunchedEffect(Unit) {
+        viewModel.loadProfile()
     }
 
     Scaffold(
@@ -248,7 +247,7 @@ fun ProfileScreen(
 
                 // Gegevens opslaan button
                 Button(
-                    onClick = { viewModel.updateProfile(token) },
+                    onClick = { viewModel.updateProfile() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),

@@ -1,15 +1,15 @@
 package com.example.rentmycar_android_app.ui
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.rentmycar_android_app.network.ApiClientWithToken
+import com.example.rentmycar_android_app.domain.repository.CarRepository
 import com.example.rentmycar_android_app.network.CarDto
-import com.example.rentmycar_android_app.network.CarService
+import com.example.rentmycar_android_app.util.Result
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class HomeUiState(
     val isLoading: Boolean = false,
@@ -17,14 +17,10 @@ data class HomeUiState(
     val error: String? = null
 )
 
-class HomeViewModel(
-    private val context: Context
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val carRepository: CarRepository
 ) : ViewModel() {
-
-    // Gebruik ApiClientWithToken om CarService aan te maken
-    private val carService: CarService by lazy {
-        ApiClientWithToken(context).instance.create(CarService::class.java)
-    }
 
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
     val uiState: StateFlow<HomeUiState> = _uiState
@@ -41,21 +37,26 @@ class HomeViewModel(
         viewModelScope.launch {
             _uiState.value = HomeUiState(isLoading = true)
 
-            try {
-                val cars = carService.getCars().cars   // <<< HIER ZIT DE FIX
-                allCars = cars
+            when (val result = carRepository.getCars()) {
+                is Result.Success -> {
+                    allCars = result.data
 
-                _uiState.value = HomeUiState(
-                    isLoading = false,
-                    cars = applySearch(applyFilters(cars, currentFilter), searchQuery),
-                    error = null
-                )
-            } catch (e: Exception) {
-                _uiState.value = HomeUiState(
-                    isLoading = false,
-                    cars = emptyList(),
-                    error = e.message ?: "Onbekende fout bij ophalen auto's"
-                )
+                    _uiState.value = HomeUiState(
+                        isLoading = false,
+                        cars = applySearch(applyFilters(result.data, currentFilter), searchQuery),
+                        error = null
+                    )
+                }
+                is Result.Error -> {
+                    _uiState.value = HomeUiState(
+                        isLoading = false,
+                        cars = emptyList(),
+                        error = result.message ?: "Onbekende fout bij ophalen auto's"
+                    )
+                }
+                is Result.Loading -> {
+                    // Already loading
+                }
             }
         }
     }
@@ -128,15 +129,3 @@ class HomeViewModel(
     }
 }
 
-class HomeViewModelFactory(
-    private val context: Context
-) : ViewModelProvider.Factory {
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            return HomeViewModel(context.applicationContext) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}

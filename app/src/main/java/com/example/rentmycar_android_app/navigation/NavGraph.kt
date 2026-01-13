@@ -102,9 +102,7 @@ fun NavGraph(navController: NavHostController) {
 //        }
 
         composable(Screen.Home.route) {
-            val homeViewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-                factory = HomeViewModelFactory(context)
-            )
+            val homeViewModel: HomeViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 
             HomeScreen(
                 onCarClick = { carId ->
@@ -245,10 +243,7 @@ fun NavGraph(navController: NavHostController) {
             val homeEntry = remember(navController.currentBackStackEntry) {
                 navController.getBackStackEntry(Screen.Home.route)
             }
-            val homeViewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-                viewModelStoreOwner = homeEntry,
-                factory = HomeViewModelFactory(context)
-            )
+            val homeViewModel: HomeViewModel = androidx.hilt.navigation.compose.hiltViewModel(homeEntry)
 
             FilterScreen(
                 onBackClick = {
