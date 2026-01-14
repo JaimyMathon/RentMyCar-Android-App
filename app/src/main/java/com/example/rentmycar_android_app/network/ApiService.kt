@@ -13,6 +13,9 @@ interface ApiService {
     @GET("profile")
     suspend fun getProfile(@Header("Authorization") token: String): Response<User>
 
+    @GET("get-user")
+    suspend fun getUsers(): List<User>
+
     @PATCH("profile")
     suspend fun updateProfile(
         @Header("Authorization") token: String,

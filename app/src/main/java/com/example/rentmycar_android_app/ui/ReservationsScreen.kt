@@ -295,13 +295,6 @@ fun ReservationCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Car Category
-            Text(
-                text = car?.category ?: "Sedan",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF757575)
-            )
-
             Spacer(modifier = Modifier.height(4.dp))
 
             // Car Name and Price
@@ -337,15 +330,9 @@ fun ReservationCard(
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = "Brandstof",
-                            modifier = Modifier.size(16.dp),
-                            tint = Color(0xFF757575)
-                        )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "ICE",
+                            text = car?.category ?: "",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color(0xFF757575)
                         )
@@ -428,7 +415,7 @@ fun ReservationCard(
                     },
                     modifier = Modifier.height(36.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF9E9E9E)
+                        containerColor = Color(0xFF6B6B6B)
                     ),
                     shape = RoundedCornerShape(18.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
@@ -451,7 +438,7 @@ fun ReservationCard(
                         .fillMaxWidth()
                         .height(48.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF9E9E9E)
+                        containerColor = Color(0xFF6B6B6B)
                     ),
                     shape = RoundedCornerShape(24.dp)
                 ) {
