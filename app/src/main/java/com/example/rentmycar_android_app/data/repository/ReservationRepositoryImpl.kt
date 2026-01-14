@@ -1,6 +1,7 @@
 package com.example.rentmycar_android_app.data.repository
 
 import com.example.rentmycar_android_app.domain.repository.ReservationRepository
+import com.example.rentmycar_android_app.network.CreateReservationRequest
 import com.example.rentmycar_android_app.network.ReservationDto
 import com.example.rentmycar_android_app.network.ReservationService
 import com.example.rentmycar_android_app.network.UpdateReservationRequest
@@ -20,6 +21,17 @@ class ReservationRepositoryImpl @Inject constructor(
                 Result.Success(reservations)
             } catch (e: Exception) {
                 Result.Error(e, "Fout bij ophalen reserveringen: ${e.message}")
+            }
+        }
+    }
+
+    override suspend fun createReservation(request: CreateReservationRequest): Result<ReservationDto> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val reservation = reservationService.createReservation(request)
+                Result.Success(reservation)
+            } catch (e: Exception) {
+                Result.Error(e, "Fout bij aanmaken reservering: ${e.message}")
             }
         }
     }

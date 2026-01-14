@@ -21,7 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.rentmycar_android_app.network.ApiClientWithToken
 import com.example.rentmycar_android_app.network.CarService
+import com.example.rentmycar_android_app.network.ReservationDto
+import com.example.rentmycar_android_app.network.ReservationService
 import java.text.SimpleDateFormat
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
@@ -43,18 +47,44 @@ fun ReservationScreen(
     val context = LocalContext.current
     val dateFormat = remember { SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()) }
 
-    // Auto naam ophalen
-    val carService = remember {
-        ApiClientWithToken(context).instance.create(CarService::class.java)
-    }
-    var carName by remember { mutableStateOf<String?>(null) }
+    // Services
+    val apiClient = remember { ApiClientWithToken(context) }
+    val carService = remember { apiClient.instance.create(CarService::class.java) }
+    val reservationService = remember { apiClient.instance.create(ReservationService::class.java) }
 
+    var carName by remember { mutableStateOf<String?>(null) }
+    var reservedPeriods by remember { mutableStateOf<List<ReservationDto>>(emptyList()) }
+    var isLoadingReservations by remember { mutableStateOf(true) }
+
+    // Fetch car name and existing reservations
     LaunchedEffect(carId) {
+        // Fetch car name
         carName = try {
             val car = carService.getCarById(carId)
             "${car.brand} ${car.model}"
         } catch (_: Exception) {
             null
+        }
+
+        // Fetch existing reservations for this car
+        isLoadingReservations = true
+        reservedPeriods = try {
+            reservationService.getReservationsByCarId(carId)
+                .filter { it.status == "pending" || it.status == "confirmed" }
+        } catch (_: Exception) {
+            emptyList()
+        }
+        isLoadingReservations = false
+    }
+
+    // Helper function to format reservation dates for display
+    fun formatReservationDate(isoDate: String?): String {
+        if (isoDate == null) return ""
+        return try {
+            val zonedDateTime = ZonedDateTime.parse(isoDate)
+            zonedDateTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+        } catch (_: Exception) {
+            isoDate
         }
     }
 
@@ -112,7 +142,7 @@ fun ReservationScreen(
                         .height(52.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = if (isFormValid) Color(0xFF6F6A6A) else Color(0xFFC5C0C0),
+                        backgroundColor = if (isFormValid) Color(0xFF6B6B6B) else Color(0xFFC5C0C0),
                         contentColor = Color.White
                     )
                 ) {
@@ -154,7 +184,63 @@ fun ReservationScreen(
                 fontSize = 13.sp
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Show reserved periods
+            if (isLoadingReservations) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = Color(0xFF6F6A6A)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Beschikbaarheid laden...",
+                        fontSize = 12.sp,
+                        color = Color(0xFF6F6A6A)
+                    )
+                }
+            } else if (reservedPeriods.isNotEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    backgroundColor = Color(0xFFFFF3CD),
+                    shape = RoundedCornerShape(8.dp),
+                    elevation = 0.dp
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(
+                            text = "Let op: Deze auto is al gereserveerd op:",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 13.sp,
+                            color = Color(0xFF856404)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        reservedPeriods.forEach { reservation ->
+                            val startFormatted = formatReservationDate(reservation.startTime)
+                            val endFormatted = formatReservationDate(reservation.endTime)
+                            Row(
+                                modifier = Modifier.padding(vertical = 2.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(6.dp)
+                                        .background(Color(0xFF856404), CircleShape)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "$startFormatted t/m $endFormatted",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF856404)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             ReservationDropdownField(
                 label = "Reserveer vanaf",

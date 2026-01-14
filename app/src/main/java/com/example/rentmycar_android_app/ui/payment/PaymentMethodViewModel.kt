@@ -3,85 +3,56 @@ package com.example.rentmycar_android_app.ui.payment
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.rentmycar_android_app.domain.repository.CarRepository
 import com.example.rentmycar_android_app.domain.repository.PaymentRepository
 import com.example.rentmycar_android_app.domain.repository.ReservationRepository
 import com.example.rentmycar_android_app.domain.repository.UserRepository
-import com.example.rentmycar_android_app.network.CarDto
 import com.example.rentmycar_android_app.network.CreateReservationRequest
 import com.example.rentmycar_android_app.network.ProcessPaymentRequest
+import com.example.rentmycar_android_app.ui.PaymentMethod
 import com.example.rentmycar_android_app.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
 
-data class PaymentReviewUiState(
-    val isLoading: Boolean = true,
-    val isProcessing: Boolean = false,
-    val car: CarDto? = null,
+data class PaymentMethodUiState(
+    val isLoading: Boolean = false,
     val error: String? = null,
-    val paymentSuccess: Boolean = false
+    val paymentSuccess: Boolean = false,
+    val successMessage: String? = null
 )
 
 @HiltViewModel
-class PaymentReviewViewModel @Inject constructor(
-    private val carRepository: CarRepository,
+class PaymentMethodViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val reservationRepository: ReservationRepository,
     private val paymentRepository: PaymentRepository,
-    private val userRepository: UserRepository,
-    savedStateHandle: SavedStateHandle
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val carId: String = checkNotNull(savedStateHandle["carId"])
+    val carId: String = savedStateHandle["carId"] ?: ""
     val fromDate: String = savedStateHandle["fromDate"] ?: ""
     val toDate: String = savedStateHandle["toDate"] ?: ""
     val kms: String = savedStateHandle["kms"] ?: "0"
-    val paymentMethod: String = savedStateHandle["paymentMethod"] ?: ""
+    val amount: Double = (savedStateHandle.get<String>("amount") ?: "0").toDoubleOrNull() ?: 0.0
 
-    private val _uiState = MutableStateFlow(PaymentReviewUiState())
-    val uiState: StateFlow<PaymentReviewUiState> = _uiState
+    private val _uiState = MutableStateFlow(PaymentMethodUiState())
+    val uiState: StateFlow<PaymentMethodUiState> = _uiState.asStateFlow()
 
-    init {
-        loadCar()
-    }
-
-    private fun loadCar() {
+    fun processPayment(paymentMethod: PaymentMethod) {
         viewModelScope.launch {
-            _uiState.value = PaymentReviewUiState(isLoading = true)
-
-            when (val result = carRepository.getCarById(carId)) {
-                is Result.Success -> {
-                    _uiState.value = PaymentReviewUiState(
-                        isLoading = false,
-                        car = result.data
-                    )
-                }
-                is Result.Error -> {
-                    _uiState.value = PaymentReviewUiState(
-                        isLoading = false,
-                        error = result.message ?: "Fout bij ophalen auto"
-                    )
-                }
-                is Result.Loading -> {}
-            }
-        }
-    }
-
-    fun processPayment() {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isProcessing = true, error = null)
+            _uiState.value = PaymentMethodUiState(isLoading = true)
 
             // First get the user ID
             val userResult = userRepository.getProfile()
             val userId = when (userResult) {
                 is Result.Success -> userResult.data.id
                 is Result.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isProcessing = false,
+                    _uiState.value = PaymentMethodUiState(
                         error = userResult.message ?: "Kon gebruiker niet ophalen"
                     )
                     return@launch
@@ -127,28 +98,34 @@ class PaymentReviewViewModel @Inject constructor(
 
                     when (val paymentResult = paymentRepository.processPayment(paymentRequest)) {
                         is Result.Success -> {
-                            _uiState.value = _uiState.value.copy(
-                                isProcessing = false,
-                                paymentSuccess = true
+                            _uiState.value = PaymentMethodUiState(
+                                paymentSuccess = true,
+                                successMessage = paymentResult.data.message ?: "Betaling succesvol!"
                             )
                         }
                         is Result.Error -> {
-                            _uiState.value = _uiState.value.copy(
-                                isProcessing = false,
+                            _uiState.value = PaymentMethodUiState(
                                 error = paymentResult.message ?: "Fout bij verwerken betaling"
                             )
                         }
-                        is Result.Loading -> {}
+                        is Result.Loading -> {
+                            // Already showing loading state
+                        }
                     }
                 }
                 is Result.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isProcessing = false,
+                    _uiState.value = PaymentMethodUiState(
                         error = reservationResult.message ?: "Fout bij aanmaken reservering"
                     )
                 }
-                is Result.Loading -> {}
+                is Result.Loading -> {
+                    // Already showing loading state
+                }
             }
         }
+    }
+
+    fun clearError() {
+        _uiState.value = _uiState.value.copy(error = null)
     }
 }

@@ -11,9 +11,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentmycar_android_app.R
 
 enum class PaymentMethod {
     Paypal, ApplePay, GooglePay
@@ -22,10 +24,11 @@ enum class PaymentMethod {
 @Composable
 fun PaymentMethodScreen(
     onBackClick: () -> Unit,
-    onPaymentSelected: (PaymentMethod) -> Unit
+    onContinueClick: (PaymentMethod) -> Unit
 ) {
     val screenBg = Color(0xFFF6F5F5)
     val cardBg = Color(0xFFF0EBEB)
+    val primaryColor = Color(0xFF6B6B6B)
 
     var selectedMethod by remember { mutableStateOf<PaymentMethod?>(null) }
 
@@ -56,14 +59,15 @@ fun PaymentMethodScreen(
                 Button(
                     enabled = selectedMethod != null,
                     onClick = {
-                        selectedMethod?.let { onPaymentSelected(it) }
+                        selectedMethod?.let { onContinueClick(it) }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(24.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = primaryColor)
                 ) {
-                    Text("naar betaal overzicht")
+                    Text("naar betaal overzicht", color = Color.White)
                 }
             }
         }
@@ -75,21 +79,33 @@ fun PaymentMethodScreen(
                 .padding(horizontal = 20.dp)
                 .padding(top = 32.dp)
         ) {
-
             Text("Betaal opties", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Spacer(Modifier.height(12.dp))
+
+            PaymentOptionRow(
+                label = "Paypal",
+                background = cardBg,
+                selected = selectedMethod == PaymentMethod.Paypal,
+                onClick = { selectedMethod = PaymentMethod.Paypal }
+            )
+
             Spacer(Modifier.height(8.dp))
 
-            PaymentOptionRow("Paypal", cardBg, selectedMethod == PaymentMethod.Paypal) {
-                selectedMethod = PaymentMethod.Paypal
-            }
+            PaymentOptionRow(
+                label = "Apple Pay",
+                background = cardBg,
+                selected = selectedMethod == PaymentMethod.ApplePay,
+                onClick = { selectedMethod = PaymentMethod.ApplePay }
+            )
 
-            PaymentOptionRow("Apple Pay", cardBg, selectedMethod == PaymentMethod.ApplePay) {
-                selectedMethod = PaymentMethod.ApplePay
-            }
+            Spacer(Modifier.height(8.dp))
 
-            PaymentOptionRow("Google Pay", cardBg, selectedMethod == PaymentMethod.GooglePay) {
-                selectedMethod = PaymentMethod.GooglePay
-            }
+            PaymentOptionRow(
+                label = "Google Pay",
+                background = cardBg,
+                selected = selectedMethod == PaymentMethod.GooglePay,
+                onClick = { selectedMethod = PaymentMethod.GooglePay }
+            )
         }
     }
 }

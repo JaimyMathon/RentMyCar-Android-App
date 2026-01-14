@@ -25,11 +25,19 @@ fun PaymentReviewScreen(
     fromDate: String,
     toDate: String,
     kms: String,
+    paymentMethod: String,
     onBackClick: () -> Unit,
-    onPayClick: () -> Unit,
+    onPaymentSuccess: () -> Unit,
     viewModel: com.example.rentmycar_android_app.ui.payment.PaymentReviewViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // Handle payment success
+    LaunchedEffect(uiState.paymentSuccess) {
+        if (uiState.paymentSuccess) {
+            onPaymentSuccess()
+        }
+    }
 
     val df = remember { SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()) }
 
@@ -59,19 +67,32 @@ fun PaymentReviewScreen(
             )
         },
         bottomBar = {
+            val car = uiState.car
+            val buttonColor = Color(0xFF6B6B6B)
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
                 Button(
-                    onClick = onPayClick,
+                    onClick = { viewModel.processPayment() },
+                    enabled = car != null && !uiState.isProcessing,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
                 ) {
-                    Text("Betalen", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    if (uiState.isProcessing) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Betalen", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                    }
                 }
             }
         }
@@ -122,11 +143,6 @@ fun PaymentReviewScreen(
                                     .padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(56.dp)
-                                        .background(Color(0xFFEAEAEA), RoundedCornerShape(12.dp))
-                                )
                                 Spacer(Modifier.width(12.dp))
                                 Column {
                                     Text(

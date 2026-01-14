@@ -202,38 +202,13 @@ private fun LocationSearchCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(Color(0xFF8F8F99))
+            .background(Color(0xFF6B6B6B))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-
-            Text(
-                text = "Location",
-                color = Color.White.copy(alpha = 0.8f),
-                fontSize = 12.sp
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "Amsterdam, Nederland",
-                    color = Color.White,
-                    fontSize = 14.sp
-                )
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 SearchField(
                     modifier = Modifier.weight(1f),

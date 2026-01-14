@@ -29,14 +29,19 @@ sealed class Screen(val route: String) {
         fun createRoute(carId: String) = "reservation/${Uri.encode(carId)}"
     }
 
-    // ✅ PaymentReview krijgt ALLES wat jij nodig hebt
-    data object PaymentReview : Screen("paymentReview/{carId}/{fromDate}/{toDate}/{kms}") {
+    // PaymentMethod comes first - user selects payment option
+    data object PaymentMethod : Screen("paymentMethod/{carId}/{fromDate}/{toDate}/{kms}") {
         fun createRoute(carId: String, fromDate: String, toDate: String, kms: String): String {
-            return "paymentReview/${Uri.encode(carId)}/${Uri.encode(fromDate)}/${Uri.encode(toDate)}/${Uri.encode(kms)}"
+            return "paymentMethod/${Uri.encode(carId)}/${Uri.encode(fromDate)}/${Uri.encode(toDate)}/${Uri.encode(kms)}"
         }
     }
 
-    data object PaymentMethod : Screen("paymentMethod")
+    // PaymentReview comes after - shows totals and processes payment
+    data object PaymentReview : Screen("paymentReview/{carId}/{fromDate}/{toDate}/{kms}/{paymentMethod}") {
+        fun createRoute(carId: String, fromDate: String, toDate: String, kms: String, paymentMethod: String): String {
+            return "paymentReview/${Uri.encode(carId)}/${Uri.encode(fromDate)}/${Uri.encode(toDate)}/${Uri.encode(kms)}/${Uri.encode(paymentMethod)}"
+        }
+    }
     data object Map : Screen("map/{latitude}/{longitude}") {
         fun createRoute(latitude: Double, longitude: Double): String {
             return "map/${latitude}/${longitude}"
@@ -47,6 +52,7 @@ sealed class Screen(val route: String) {
     object DrivingStats : Screen("driving_stats")
     object Filter : Screen("filter")
     object Reservations : Screen("reservations")
+    object PaymentSuccess : Screen("payment_success")
 }
 
 @Composable
@@ -152,7 +158,7 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        // ✅ Reservation -> PaymentReview met datums + kms
+        // Reservation -> PaymentMethod (select payment option first)
         composable(
             route = Screen.Reservation.route,
             arguments = listOf(navArgument("carId") { type = NavType.StringType })
@@ -163,14 +169,14 @@ fun NavGraph(navController: NavHostController) {
                 carId = carId,
                 onBackClick = { navController.popBackStack() },
                 onContinueClick = { fromDate, toDate, kms ->
-                    navController.navigate(Screen.PaymentReview.createRoute(carId, fromDate, toDate, kms))
+                    navController.navigate(Screen.PaymentMethod.createRoute(carId, fromDate, toDate, kms))
                 }
             )
         }
 
-        // ✅ PaymentReview haalt auto uit DB via carId + gebruikt fromDate/toDate/kms uit Reservation
+        // PaymentMethod -> PaymentReview (select option, then see totals)
         composable(
-            route = Screen.PaymentReview.route,
+            route = Screen.PaymentMethod.route,
             arguments = listOf(
                 navArgument("carId") { type = NavType.StringType },
                 navArgument("fromDate") { type = NavType.StringType },
@@ -183,13 +189,45 @@ fun NavGraph(navController: NavHostController) {
             val toDate = Uri.decode(backStackEntry.arguments?.getString("toDate") ?: "")
             val kms = Uri.decode(backStackEntry.arguments?.getString("kms") ?: "")
 
+            PaymentMethodScreen(
+                onBackClick = { navController.popBackStack() },
+                onContinueClick = { paymentMethod ->
+                    navController.navigate(
+                        Screen.PaymentReview.createRoute(carId, fromDate, toDate, kms, paymentMethod.name)
+                    )
+                }
+            )
+        }
+
+        // PaymentReview -> processes payment and goes to success
+        composable(
+            route = Screen.PaymentReview.route,
+            arguments = listOf(
+                navArgument("carId") { type = NavType.StringType },
+                navArgument("fromDate") { type = NavType.StringType },
+                navArgument("toDate") { type = NavType.StringType },
+                navArgument("kms") { type = NavType.StringType },
+                navArgument("paymentMethod") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val carId = Uri.decode(backStackEntry.arguments?.getString("carId") ?: return@composable)
+            val fromDate = Uri.decode(backStackEntry.arguments?.getString("fromDate") ?: "")
+            val toDate = Uri.decode(backStackEntry.arguments?.getString("toDate") ?: "")
+            val kms = Uri.decode(backStackEntry.arguments?.getString("kms") ?: "")
+            val paymentMethod = Uri.decode(backStackEntry.arguments?.getString("paymentMethod") ?: "")
+
             PaymentReviewScreen(
                 carId = carId,
                 fromDate = fromDate,
                 toDate = toDate,
                 kms = kms,
+                paymentMethod = paymentMethod,
                 onBackClick = { navController.popBackStack() },
-                onPayClick = { navController.navigate(Screen.PaymentMethod.route) }
+                onPaymentSuccess = {
+                    navController.navigate(Screen.PaymentSuccess.route) {
+                        popUpTo(Screen.Home.route)
+                    }
+                }
             )
         }
 
@@ -212,10 +250,18 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        composable(Screen.PaymentMethod.route) {
-            PaymentMethodScreen(
-                onBackClick = { navController.popBackStack() },
-                onPaymentSelected = { /* later */ }
+        composable(Screen.PaymentSuccess.route) {
+            PaymentSuccessScreen(
+                onBackClick = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onViewReservationsClick = {
+                    navController.navigate(Screen.Reservations.route) {
+                        popUpTo(Screen.Home.route)
+                    }
+                }
             )
         }
 

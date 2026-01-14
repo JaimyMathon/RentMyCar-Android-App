@@ -7,6 +7,14 @@ interface ReservationService {
     @GET("get-reservation")
     suspend fun getReservations(): List<ReservationDto>
 
+    @GET("get-reservations-by-car/{carId}")
+    suspend fun getReservationsByCarId(@Path("carId") carId: String): List<ReservationDto>
+
+    @POST("add-reservation")
+    suspend fun createReservation(
+        @Body request: CreateReservationRequest
+    ): ReservationDto
+
     @PATCH("update-reservation/{id}")
     suspend fun updateReservation(
         @Path("id") id: String,
