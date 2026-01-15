@@ -124,4 +124,15 @@ class CarRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getCarPhotos(carId: String): Result<List<PhotoDto>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val photos = carService.getCarPhotos(carId)
+                Result.Success(photos)
+            } catch (e: Exception) {
+                Result.Error(e, "Fout bij ophalen foto's: ${e.message}")
+            }
+        }
+    }
 }

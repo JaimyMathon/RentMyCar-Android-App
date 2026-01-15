@@ -15,4 +15,6 @@ interface CarRepository {
     suspend fun updateCar(id: String, request: AddCarRequest): Result<CarDto>
     suspend fun deleteCar(id: String): Result<Boolean>
     suspend fun geocodeAddress(street: String, postcode: String, country: String): Result<Pair<Double, Double>>
+
+    suspend fun getCarPhotos(carId: String): Result<List<PhotoDto>>
 }
