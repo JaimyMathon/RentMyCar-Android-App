@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -22,11 +23,16 @@ annotation class AuthenticatedClient
 @Retention(AnnotationRetention.BINARY)
 annotation class UnauthenticatedClient
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class NominatimClient
+
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
     private const val BASE_URL = "http://10.0.2.2:8080/"
+    private const val NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/"
     private const val TIMEOUT_SECONDS = 30L
 
     @Provides
@@ -93,6 +99,41 @@ object NetworkModule {
             .build()
     }
 
+    @Provides
+    @Singleton
+    @NominatimClient
+    fun provideNominatimOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient {
+        val userAgentInterceptor = Interceptor { chain ->
+            val request = chain.request().newBuilder()
+                .header("User-Agent", "RentMyCar-Android-App/1.0 (contact@rentmycar.nl)")
+                .build()
+            chain.proceed(request)
+        }
+
+        return OkHttpClient.Builder()
+            .addInterceptor(userAgentInterceptor)
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @NominatimClient
+    fun provideNominatimRetrofit(
+        @NominatimClient okHttpClient: OkHttpClient
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(NOMINATIM_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
     // Service Providers
     @Provides
     @Singleton
@@ -137,7 +178,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideGeocodingService(
-        @UnauthenticatedClient retrofit: Retrofit
+        @NominatimClient retrofit: Retrofit
     ): GeocodingService {
         return retrofit.create(GeocodingService::class.java)
     }
