@@ -14,6 +14,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.core.content.edit
 import com.example.rentmycar_android_app.ui.*
+import com.example.rentmycar_android_app.ui.addcar.AddCarScreen
+import com.example.rentmycar_android_app.ui.mycars.MyCarsScreen
+import com.example.rentmycar_android_app.ui.updatecar.UpdateCarScreen
 
 sealed class Screen(val route: String) {
     data object Login : Screen("login")
@@ -53,6 +56,11 @@ sealed class Screen(val route: String) {
     object Filter : Screen("filter")
     object Reservations : Screen("reservations")
     object PaymentSuccess : Screen("payment_success")
+    object MyCars : Screen("my_cars")
+    object AddCar : Screen("add_car")
+    data object UpdateCar : Screen("update_car/{carId}") {
+        fun createRoute(carId: String) = "update_car/${Uri.encode(carId)}"
+    }
 }
 
 @Composable
@@ -138,6 +146,9 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onNavigateToFilter = {
                     navController.navigate(Screen.Filter.route)
+                },
+                onNavigateToMyCars = {
+                    navController.navigate(Screen.MyCars.route)
                 },
                 viewModel = homeViewModel
             )
@@ -326,6 +337,53 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onNavigateToLocation = { lat: Double, lon: Double ->
                     navController.navigate(Screen.Map.createRoute(lat, lon))
+                }
+            )
+        }
+
+        composable(Screen.MyCars.route) {
+            MyCarsScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onCarClick = { carId ->
+                    navController.navigate(Screen.UpdateCar.createRoute(carId))
+                },
+                onAddCarClick = {
+                    navController.navigate(Screen.AddCar.route)
+                }
+            )
+        }
+
+        composable(Screen.AddCar.route) {
+            AddCarScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onCarAdded = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            route = Screen.UpdateCar.route,
+            arguments = listOf(navArgument("carId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val carId = Uri.decode(backStackEntry.arguments?.getString("carId") ?: return@composable)
+
+            UpdateCarScreen(
+                carId = carId,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onCarUpdated = {
+                    navController.popBackStack()
+                },
+                onCarDeleted = {
+                    navController.navigate(Screen.MyCars.route) {
+                        popUpTo(Screen.MyCars.route) { inclusive = true }
+                    }
                 }
             )
         }
