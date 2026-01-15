@@ -1,10 +1,17 @@
 package com.example.rentmycar_android_app.scoring
 
-import kotlin. math.abs
+import kotlin.math.abs
 
+/**
+ * ConservativeScoringStrategy - ConcreteStrategy implementatie
+ *
+ * Conservatief scoring algoritme met middelmatige drempelwaarden.
+ * Balans tussen standaard en strikt.
+ */
 class ConservativeScoringStrategy : ScoringStrategy {
+
     override fun calculateLocalScore(
-        maxAccel:  Double,
+        maxAccel: Double,
         maxBraking: Double,
         harshAccelCount: Int,
         harshBrakeCount: Int
@@ -28,4 +35,6 @@ class ConservativeScoringStrategy : ScoringStrategy {
 
         return maxOf(0, score)
     }
+
+    override fun getDescription(): String = "Conservative Scoring (gebalanceerd)"
 }

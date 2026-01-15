@@ -8,14 +8,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.ApiClient
 import com.example.rentmycar_android_app.network.AuthService
 import com.example.rentmycar_android_app.network.ResetPasswordRequest
-import com.example.rentmycar_android_app.network.SimpleResponse
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,6 +32,13 @@ fun ForgotPasswordScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
     val service = ApiClient.instance.create(AuthService::class.java)
+    val scope = rememberCoroutineScope()
+
+    val fillAllFieldsText = stringResource(R.string.fill_all_fields)
+    val passwordsNotMatchText = stringResource(R.string.passwords_not_match)
+    val passwordChangedText = stringResource(R.string.password_changed)
+    val resetErrorText = stringResource(R.string.reset_error)
+    val networkErrorText = stringResource(R.string.network_error, "%s")
 
     Box(
         modifier = Modifier
@@ -43,7 +52,7 @@ fun ForgotPasswordScreen(
         ) {
 
             Text(
-                text = "Wachtwoord wijzigen",
+                text = stringResource(R.string.change_password_title),
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 24.dp)
@@ -52,7 +61,7 @@ fun ForgotPasswordScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("E-mail") },
+                label = { Text(stringResource(R.string.email_label)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -60,7 +69,7 @@ fun ForgotPasswordScreen(
             OutlinedTextField(
                 value = newPassword,
                 onValueChange = { newPassword = it },
-                label = { Text("Nieuw wachtwoord") },
+                label = { Text(stringResource(R.string.new_password_label)) },
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 modifier = Modifier
@@ -71,7 +80,7 @@ fun ForgotPasswordScreen(
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                label = { Text("Bevestig wachtwoord") },
+                label = { Text(stringResource(R.string.confirm_password_label)) },
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 modifier = Modifier
@@ -83,44 +92,36 @@ fun ForgotPasswordScreen(
                 onClick = {
                     errorMessage = null
                     successMessage = null
-                    loading = true
 
                     if (email.isBlank() || newPassword.isBlank() || confirmPassword.isBlank()) {
-                        loading = false
-                        errorMessage = "Vul alle velden in"
+                        errorMessage = fillAllFieldsText
                         return@Button
                     }
 
                     if (newPassword != confirmPassword) {
-                        loading = false
-                        errorMessage = "Wachtwoorden komen niet overeen"
+                        errorMessage = passwordsNotMatchText
                         return@Button
                     }
 
-                    val request = ResetPasswordRequest(
-                        email = email.trim(),
-                        newPassword = newPassword
-                    )
-
-                    service.resetPassword(request).enqueue(object : retrofit2.Callback<SimpleResponse> {
-
-                        override fun onResponse(
-                            call: retrofit2.Call<SimpleResponse>,
-                            response: retrofit2.Response<SimpleResponse>
-                        ) {
-                            loading = false
+                    loading = true
+                    scope.launch {
+                        try {
+                            val request = ResetPasswordRequest(
+                                email = email.trim(),
+                                newPassword = newPassword
+                            )
+                            val response = service.forgotPassword(request)
                             if (response.isSuccessful && response.body()?.isSuccess == true) {
-                                successMessage = response.body()?.message
+                                successMessage = response.body()?.message ?: passwordChangedText
                             } else {
-                                errorMessage = response.body()?.message ?: "Fout bij resetten"
+                                errorMessage = response.body()?.message ?: resetErrorText
                             }
-                        }
-
-                        override fun onFailure(call: retrofit2.Call<SimpleResponse>, t: Throwable) {
+                        } catch (e: Exception) {
+                            errorMessage = networkErrorText.replace("%s", e.message ?: "Unknown")
+                        } finally {
                             loading = false
-                            errorMessage = "Netwerkfout: ${t.message}"
                         }
-                    })
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -128,14 +129,14 @@ fun ForgotPasswordScreen(
                 shape = RoundedCornerShape(12.dp),
                 enabled = !loading
             ) {
-                Text("Wachtwoord wijzigen")
+                Text(stringResource(R.string.btn_change_password))
             }
 
             TextButton(
                 onClick = onNavigateBackToLogin,
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text("Terug naar inloggen")
+                Text(stringResource(R.string.back_to_login))
             }
 
             errorMessage?.let {

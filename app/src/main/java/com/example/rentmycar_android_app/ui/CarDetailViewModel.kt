@@ -38,7 +38,7 @@ class CarDetailViewModel(
             _uiState.value = CarDetailUiState(isLoading = true)
             try {
                 val car = carService.getCarById(carId)
-                _uiState.value = CarDetailUiState(isLoading = false, car = car)
+                _uiState.value = CarDetailUiState(isLoading = false, car = car, error = null)
             } catch (e: Exception) {
                 _uiState.value = CarDetailUiState(
                     isLoading = false,

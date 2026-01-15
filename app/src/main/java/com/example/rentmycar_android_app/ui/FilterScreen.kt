@@ -13,10 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.rentmycar_android_app.R
 
 data class FilterState(
     val selectedTypes: Set<String> = emptySet(),
@@ -42,15 +44,17 @@ fun FilterScreen(
     var maxPricePerDay by remember(initialFilterState) { mutableStateOf(initialFilterState.maxPricePerDay) }
     var selectedBrands by remember(initialFilterState) { mutableStateOf(initialFilterState.selectedBrands) }
 
+    val allText = stringResource(R.string.all)
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Filter", fontWeight = FontWeight.Medium) },
+                title = { Text(stringResource(R.string.filter_title), fontWeight = FontWeight.Medium) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Terug"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -69,22 +73,23 @@ fun FilterScreen(
         ) {
             // Types Section
             Text(
-                text = "Types",
+                text = stringResource(R.string.types),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             FilterChipGroup(
-                options = listOf("All", "ICE", "BEV", "FCEV"),
+                options = listOf(allText, "ICE", "BEV", "FCEV"),
                 selectedOptions = selectedTypes,
                 onSelectionChange = { selectedTypes = it },
+                allText = allText,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             // Price per Km Section
             Text(
-                text = "Prijs per Km",
+                text = stringResource(R.string.price_per_km),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -101,7 +106,7 @@ fun FilterScreen(
 
             // Price per Day Section
             Text(
-                text = "Prijs per dag",
+                text = stringResource(R.string.price_per_day),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -118,16 +123,17 @@ fun FilterScreen(
 
             // Brands Section
             Text(
-                text = "Merken",
+                text = stringResource(R.string.brands),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             FilterChipGroup(
-                options = listOf("All") + availableBrands,
+                options = listOf(allText) + availableBrands,
                 selectedOptions = selectedBrands,
                 onSelectionChange = { selectedBrands = it },
+                allText = allText,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
@@ -153,7 +159,7 @@ fun FilterScreen(
                     shape = RoundedCornerShape(24.dp)
                 ) {
                     Text(
-                        "Reset",
+                        stringResource(R.string.reset),
                         color = Color.White,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
@@ -179,7 +185,7 @@ fun FilterScreen(
                     shape = RoundedCornerShape(24.dp)
                 ) {
                     Text(
-                        "Toepassen",
+                        stringResource(R.string.apply),
                         color = Color.White,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
@@ -194,6 +200,7 @@ private fun FilterChipGroup(
     options: List<String>,
     selectedOptions: Set<String>,
     onSelectionChange: (Set<String>) -> Unit,
+    allText: String,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -202,7 +209,7 @@ private fun FilterChipGroup(
     ) {
         options.forEach { option ->
             val isSelected = selectedOptions.contains(option) ||
-                            (option == "All" && selectedOptions.isEmpty())
+                            (option == allText && selectedOptions.isEmpty())
 
             Box(
                 modifier = Modifier
@@ -212,7 +219,7 @@ private fun FilterChipGroup(
                         else Color(0xFFE0E0E0)
                     )
                     .clickable {
-                        if (option == "All") {
+                        if (option == allText) {
                             onSelectionChange(emptySet())
                         } else {
                             val newSelection = if (selectedOptions.contains(option)) {

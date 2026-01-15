@@ -1,24 +1,26 @@
 package com.example.rentmycar_android_app.ui
 
-import androidx.compose. foundation.background
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material. icons.Icons
-import androidx.compose.material.icons.filled. ArrowBack
-import androidx.compose. material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose. ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx. compose.ui.text.style. TextAlign
-import androidx.compose. ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.rentmycar_android_app.viewmodels. ProfileViewModel
+import com.example.rentmycar_android_app.R
+import com.example.rentmycar_android_app.viewmodels.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,7 +28,7 @@ fun ProfileScreen(
     token: String?,
     onLogout: () -> Unit,
     onNavigateBack: () -> Unit = {},
-    onNavigateToDrivingStats: () -> Unit = {},  // NIEUW
+    onNavigateToDrivingStats: () -> Unit = {},
     viewModel: ProfileViewModel = viewModel()
 ) {
     val user by viewModel.user.collectAsState()
@@ -46,7 +48,7 @@ fun ProfileScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Terug"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -61,13 +63,13 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(Color. White)
+                .background(Color.White)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Text(
-                text = "Profiel",
+                text = stringResource(R.string.profile_title),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -76,19 +78,18 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Pas hier uw persoonlijke gegevens aan",
+                text = stringResource(R.string.profile_subtitle),
                 fontSize = 14.sp,
-                color = Color. Gray,
+                color = Color.Gray,
                 textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Bonuspunten Card (clickable naar stats)
             if (bonus != null) {
                 Card(
                     modifier = Modifier
-                        . fillMaxWidth()
+                        .fillMaxWidth()
                         .clickable { onNavigateToDrivingStats() },
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
@@ -101,19 +102,19 @@ fun ProfileScreen(
                             .padding(20.dp)
                     ) {
                         Row(
-                            modifier = Modifier. fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column {
                                 Text(
-                                    "Jouw Bonuspunten",
+                                    stringResource(R.string.your_bonus_points),
                                     fontSize = 14.sp,
                                     color = Color.White.copy(alpha = 0.8f)
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    "${bonus?. totalPoints ?: 0}",
+                                    "${bonus?.totalPoints ?: 0}",
                                     fontSize = 36.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
@@ -124,39 +125,38 @@ fun ProfileScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Row(
-                            modifier = Modifier. fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                "Bekijk details",
+                                stringResource(R.string.view_details),
                                 fontSize = 13.sp,
                                 color = Color.White.copy(alpha = 0.9f),
                                 fontWeight = FontWeight.Medium
                             )
-                            Spacer(modifier = Modifier. width(4.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
                             Text("→", fontSize = 16.sp, color = Color.White)
                         }
                     }
                 }
-                Spacer(modifier = Modifier. height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             if (loading && user == null) {
                 CircularProgressIndicator()
             } else {
-                // Naam veld
                 Text(
-                    text = "Naam",
+                    text = stringResource(R.string.name_label),
                     modifier = Modifier.align(Alignment.Start),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
-                Spacer(modifier = Modifier. height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = user?.name ?: "",
                     onValueChange = viewModel::onNameChange,
-                    placeholder = { Text("Uw naam") },
+                    placeholder = { Text(stringResource(R.string.your_name_placeholder)) },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = user != null,
                     shape = RoundedCornerShape(12.dp),
@@ -169,11 +169,10 @@ fun ProfileScreen(
                     )
                 )
 
-                Spacer(modifier = Modifier. height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                // Telefoon veld
                 Text(
-                    text = "Phone Number",
+                    text = stringResource(R.string.phone_number_label),
                     modifier = Modifier.align(Alignment.Start),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
@@ -182,14 +181,14 @@ fun ProfileScreen(
                 OutlinedTextField(
                     value = user?.phone ?: "",
                     onValueChange = viewModel::onPhoneChange,
-                    placeholder = { Text("Vul uw telefoon nummer in") },
+                    placeholder = { Text(stringResource(R.string.phone_placeholder)) },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = user != null,
                     leadingIcon = {
                         Text(
                             text = "+31",
                             modifier = Modifier.padding(start = 12.dp),
-                            color = Color. Gray
+                            color = Color.Gray
                         )
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -198,16 +197,15 @@ fun ProfileScreen(
                         unfocusedContainerColor = Color(0xFFF5F5F5),
                         focusedContainerColor = Color(0xFFF5F5F5),
                         disabledContainerColor = Color(0xFFE0E0E0),
-                        unfocusedBorderColor = Color. Transparent,
+                        unfocusedBorderColor = Color.Transparent,
                         focusedBorderColor = Color(0xFF6200EA)
                     )
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Email veld
                 Text(
-                    text = "email",
+                    text = stringResource(R.string.email_label),
                     modifier = Modifier.align(Alignment.Start),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
@@ -216,7 +214,7 @@ fun ProfileScreen(
                 OutlinedTextField(
                     value = user?.email ?: "",
                     onValueChange = viewModel::onEmailChange,
-                    placeholder = { Text("Uw email") },
+                    placeholder = { Text(stringResource(R.string.your_email_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier.fillMaxWidth(),
                     enabled = user != null,
@@ -225,18 +223,17 @@ fun ProfileScreen(
                         unfocusedContainerColor = Color(0xFFF5F5F5),
                         focusedContainerColor = Color(0xFFF5F5F5),
                         disabledContainerColor = Color(0xFFE0E0E0),
-                        unfocusedBorderColor = Color. Transparent,
+                        unfocusedBorderColor = Color.Transparent,
                         focusedBorderColor = Color(0xFF6200EA)
                     )
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Foutmelding
                 if (error != null) {
                     Text(
                         text = error ?: "",
-                        color = if (error?. contains("succesvol") == true)
+                        color = if (error?.contains(stringResource(R.string.update_successful)) == true)
                             Color(0xFF4CAF50)
                         else
                             MaterialTheme.colorScheme.error,
@@ -246,7 +243,6 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // Gegevens opslaan button
                 Button(
                     onClick = { viewModel.updateProfile(token) },
                     modifier = Modifier
@@ -256,16 +252,16 @@ fun ProfileScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF8E8E93)
                     ),
-                    enabled = ! loading && user != null
+                    enabled = !loading && user != null
                 ) {
                     if (loading) {
                         CircularProgressIndicator(
-                            modifier = Modifier. size(20.dp),
+                            modifier = Modifier.size(20.dp),
                             color = Color.White
                         )
                     } else {
                         Text(
-                            text = "Gegevens opslaan",
+                            text = stringResource(R.string.save_data),
                             color = Color.White,
                             fontSize = 16.sp
                         )
@@ -274,7 +270,6 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Uitloggen button
                 Button(
                     onClick = onLogout,
                     modifier = Modifier
@@ -286,7 +281,7 @@ fun ProfileScreen(
                     )
                 ) {
                     Text(
-                        text = "Uitloggen",
+                        text = stringResource(R.string.logout),
                         color = Color.White,
                         fontSize = 16.sp
                     )

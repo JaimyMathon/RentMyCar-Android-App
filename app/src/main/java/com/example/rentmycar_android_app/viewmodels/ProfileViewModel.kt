@@ -1,32 +1,31 @@
 package com.example.rentmycar_android_app.viewmodels
 
-import android.util.Log
-import androidx.lifecycle. ViewModel
-import androidx.lifecycle. viewModelScope
-import com.example.rentmycar_android_app. model.User
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.rentmycar_android_app.model.User
 import com.example.rentmycar_android_app.model.UserBonus
-import com. example.rentmycar_android_app.model.UpdateProfileRequest
-import com.example. rentmycar_android_app.network.ApiClient
+import com.example.rentmycar_android_app.model.UpdateProfileRequest
+import com.example.rentmycar_android_app.network.ApiClient
 import com.example.rentmycar_android_app.network.ApiService
-import kotlinx. coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines. flow.asStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ProfileViewModel : ViewModel() {
 
-    private val apiService = ApiClient.instance. create(ApiService::class.java)
+    private val apiService = ApiClient.instance.create(ApiService::class.java)
 
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user.asStateFlow()
 
-    private val _bonus = MutableStateFlow<UserBonus?>(null)  // NIEUW
-    val bonus: StateFlow<UserBonus? > = _bonus.asStateFlow()
+    private val _bonus = MutableStateFlow<UserBonus?>(null)
+    val bonus: StateFlow<UserBonus?> = _bonus.asStateFlow()
 
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
-    private val _error = MutableStateFlow<String? >(null)
+    private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
     fun loadProfile(token: String?) {
@@ -43,13 +42,23 @@ class ProfileViewModel : ViewModel() {
                 // Laad gebruiker
                 val userResponse = apiService.getProfile("Bearer $token")
                 if (userResponse.isSuccessful && userResponse.body() != null) {
-                    _user.value = userResponse.body()
+                    val authResponse = userResponse.body()!!
+                    _user.value = User(
+                        id = authResponse.userId ?: "",
+                        name = authResponse.username,
+                        email = authResponse.email ?: "",
+                        phone = authResponse.phone
+                    )
                 }
 
                 // Laad bonuspunten (apart)
-                val bonusResponse = apiService.getBonusPoints("Bearer $token")
-                if (bonusResponse.isSuccessful && bonusResponse.body() != null) {
-                    _bonus. value = bonusResponse.body()
+                try {
+                    val bonusResponse = apiService.getBonusPoints("Bearer $token")
+                    if (bonusResponse.isSuccessful && bonusResponse.body() != null) {
+                        _bonus.value = bonusResponse.body()
+                    }
+                } catch (e: Exception) {
+                    // Ignore bonus errors
                 }
 
             } catch (e: Exception) {
@@ -66,7 +75,7 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun onEmailChange(newEmail: String) {
-        _user.value = _user.value?. copy(email = newEmail)
+        _user.value = _user.value?.copy(email = newEmail)
     }
 
     fun onPhoneChange(newPhone: String) {
@@ -90,14 +99,14 @@ class ProfileViewModel : ViewModel() {
             return
         }
 
-        viewModelScope. launch {
+        viewModelScope.launch {
             _loading.value = true
             _error.value = null
 
             try {
                 val updateRequest = UpdateProfileRequest(
                     name = currentUser.name,
-                    email = currentUser. email,
+                    email = currentUser.email,
                     phone = currentUser.phone
                 )
 
@@ -106,12 +115,12 @@ class ProfileViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     _error.value = "Profiel succesvol bijgewerkt"
                 } else {
-                    _error. value = "Fout bij opslaan:  ${response.message()}"
+                    _error.value = "Fout bij opslaan: ${response.message()}"
                 }
             } catch (e: Exception) {
                 _error.value = "Netwerkfout: ${e.message}"
             } finally {
-                _loading. value = false
+                _loading.value = false
             }
         }
     }

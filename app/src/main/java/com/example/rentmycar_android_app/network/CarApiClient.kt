@@ -7,8 +7,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object CarApiClient {
 
-    private const val BASE_URL = "http://10.0.2.2:8081/"
-
     fun createService(token: String?): CarService {
         val clientBuilder = OkHttpClient.Builder()
 
@@ -25,7 +23,7 @@ object CarApiClient {
         val client = clientBuilder.build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(NetworkConfig.BASE_URL)  // Gebruikt centrale configuratie
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()

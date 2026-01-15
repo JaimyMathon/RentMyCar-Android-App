@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "RentMyCar-Android-App"
 include(":app")
- 

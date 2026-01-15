@@ -14,7 +14,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.*
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +32,11 @@ fun RegisterScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
-    val service = ApiClient.instance.create(AuthService::class.java)
+    val scope = rememberCoroutineScope()
+    val service = remember { ApiClient.instance.create(AuthService::class.java) }
+
+    val registrationFailedText = stringResource(R.string.registration_failed)
+    val networkErrorText = stringResource(R.string.network_error, "%s")
 
     Box(
         modifier = Modifier.fillMaxSize().background(Color(0xFFE3ECFF)),
@@ -40,7 +47,7 @@ fun RegisterScreen(
             modifier = Modifier.padding(30.dp)
         ) {
             Text(
-                "Register",
+                stringResource(R.string.register_title),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 40.dp)
@@ -49,7 +56,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Naam") },
+                label = { Text(stringResource(R.string.name_label)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -57,7 +64,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("E-mail") },
+                label = { Text(stringResource(R.string.email_label)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
             )
@@ -65,7 +72,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Wachtwoord") },
+                label = { Text(stringResource(R.string.password_label)) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
@@ -75,40 +82,41 @@ fun RegisterScreen(
                 onClick = {
                     loading = true
                     errorMessage = null
-                    val request = RegisterRequest(name, email, password)
 
-                    service.register(request).enqueue(object: retrofit2.Callback<AuthResponse> {
-                        override fun onResponse(call: retrofit2.Call<AuthResponse>, response: retrofit2.Response<AuthResponse>) {
-                            loading = false
+                    scope.launch {
+                        try {
+                            val request = RegisterRequest(name, email, password)
+                            val response = service.register(request)
+
                             if (response.isSuccessful && response.body() != null) {
                                 val authResponse = response.body()!!
-
                                 val sharedPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                                sharedPrefs.edit().putString("jwt_token", authResponse.token).apply()
-                                sharedPrefs.edit().putString("username", authResponse.username).apply()
+                                sharedPrefs.edit()
+                                    .putString("jwt_token", authResponse.token)
+                                    .putString("username", authResponse.username)
+                                    .apply()
                                 onRegisterSuccess()
                             } else {
-                                errorMessage = "Registratie mislukt"
+                                errorMessage = registrationFailedText
                             }
-                        }
-                        override fun onFailure(call: retrofit2.Call<AuthResponse>, t: Throwable) {
+                        } catch (e: Exception) {
+                            errorMessage = networkErrorText.replace("%s", e.message ?: "Unknown")
+                        } finally {
                             loading = false
-                            errorMessage = "Netwerkfout: ${t.message}"
                         }
-                    })
+                    }
                 },
                 modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
                 shape = RoundedCornerShape(12.dp),
                 enabled = !loading
-            ) { Text("Registreren") }
+            ) { Text(stringResource(R.string.btn_register)) }
 
             TextButton(onClick = onNavigateToLogin) {
-                Text("Al een account? Log hier in")
+                Text(stringResource(R.string.already_have_account))
             }
 
             errorMessage?.let { Text(it, color = Color.Red, modifier = Modifier.padding(top = 16.dp)) }
             if (loading) CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
         }
-
     }
 }
