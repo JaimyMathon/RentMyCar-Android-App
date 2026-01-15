@@ -3,6 +3,7 @@ package com.example.rentmycar_android_app.data.repository
 import com.example.rentmycar_android_app.domain.repository.CarRepository
 import com.example.rentmycar_android_app.network.CarDto
 import com.example.rentmycar_android_app.network.CarService
+import com.example.rentmycar_android_app.network.PhotoDto
 import com.example.rentmycar_android_app.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,6 +31,17 @@ class CarRepositoryImpl @Inject constructor(
                 Result.Success(car)
             } catch (e: Exception) {
                 Result.Error(e, "Fout bij ophalen auto: ${e.message}")
+            }
+        }
+    }
+
+    override suspend fun getCarPhotos(carId: String): Result<List<PhotoDto>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val photos = carService.getCarPhotos(carId)
+                Result.Success(photos)
+            } catch (e: Exception) {
+                Result.Error(e, "Fout bij ophalen foto's: ${e.message}")
             }
         }
     }
