@@ -129,11 +129,13 @@ fun NavGraph(navController: NavHostController) {
                     navController.navigate(Screen.CarDetail.createRoute(carId))
                 },
                 onNavigateToReservation = {
-                    navController.navigate(Screen.Reservation.route)
-                },
-                onNavigateToCars = {},
-                onNavigateToReservationsOverview = {
                     navController.navigate(Screen.Reservations.route)
+                },
+                onNavigateToCars = {
+                    navController.navigate(Screen.MyCars.route)
+                },
+                onNavigateToReservationsOverview = {
+                    navController.navigate(Screen.AddCar.route)
                 },
                 onNavigateToProfile = {
                     navController.navigate(Screen.Profile.route)
