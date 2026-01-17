@@ -258,6 +258,30 @@ class FakeCarRepository : CarRepository {
         }
     }
 
+    override suspend fun getCarsByOwner(ownerId: String): Result<List<CarDto>> {
+        return Result.Success(cars.filter { it.ownerId == ownerId })
+    }
+
+    override suspend fun addCar(request: com.example.rentmycar_android_app.network.AddCarRequest): Result<CarDto> {
+        return Result.Success(CarDto(id = "new-car", brand = request.brand, model = request.model))
+    }
+
+    override suspend fun addPhoto(carId: String, description: String, file: java.io.File): Result<PhotoDto> {
+        return Result.Success(PhotoDto(url = "/photos/$carId/photo.jpg", carId = carId))
+    }
+
+    override suspend fun updateCar(id: String, request: com.example.rentmycar_android_app.network.AddCarRequest): Result<CarDto> {
+        return Result.Success(CarDto(id = id, brand = request.brand, model = request.model))
+    }
+
+    override suspend fun deleteCar(id: String): Result<Boolean> {
+        return Result.Success(true)
+    }
+
+    override suspend fun geocodeAddress(street: String, postcode: String, country: String): Result<Pair<Double, Double>> {
+        return Result.Success(Pair(52.0, 4.0))
+    }
+
     override suspend fun getCarPhotos(carId: String): Result<List<PhotoDto>> {
         return Result.Success(emptyList())
     }
