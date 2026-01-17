@@ -10,9 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.ui.payment.PaymentReviewUiState
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -95,10 +97,10 @@ fun PaymentReviewScreenContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Betaal overzicht") },
+                title = { Text(stringResource(R.string.payment_overview)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Terug")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -132,7 +134,7 @@ fun PaymentReviewScreenContent(
                         )
                     } else {
                         Text(
-                            "Betalen",
+                            stringResource(R.string.pay),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = Color.White
@@ -213,7 +215,7 @@ fun PaymentReviewScreenContent(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Ophaal datum", color = Color.Gray)
+                            Text(stringResource(R.string.pickup_date), color = Color.Gray)
                             Text(fromDate, fontWeight = FontWeight.SemiBold)
                         }
 
@@ -223,7 +225,7 @@ fun PaymentReviewScreenContent(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Terug breng datum", color = Color.Gray)
+                            Text(stringResource(R.string.return_date), color = Color.Gray)
                             Text(toDate, fontWeight = FontWeight.SemiBold)
                         }
 
@@ -235,7 +237,7 @@ fun PaymentReviewScreenContent(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Totale uren", color = Color.Gray)
+                            Text(stringResource(R.string.total_hours), color = Color.Gray)
                             Text("$totalHours", fontWeight = FontWeight.SemiBold)
                         }
 
@@ -246,7 +248,7 @@ fun PaymentReviewScreenContent(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Text("Basis huurprijs", color = Color.Gray)
+                                Text(stringResource(R.string.base_rental_price), color = Color.Gray)
                                 Text("$days x ${currency.format(pricePerDay)}", color = Color.Gray)
                             }
                             Text(currency.format(basePrice), fontWeight = FontWeight.SemiBold)
@@ -259,7 +261,7 @@ fun PaymentReviewScreenContent(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Text("TCO-kosten", color = Color.Gray)
+                                Text(stringResource(R.string.tco_costs), color = Color.Gray)
                                 Text("${currency.format(tcoAnnual)} : 365 x $days", color = Color.Gray)
                             }
                             Text(currency.format(tcoCost), fontWeight = FontWeight.SemiBold)
@@ -272,7 +274,7 @@ fun PaymentReviewScreenContent(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Text("Afstand kosten", color = Color.Gray)
+                                Text(stringResource(R.string.distance_costs), color = Color.Gray)
                                 Text("${kmsInt}km x ${currency.format(costPerKm)}", color = Color.Gray)
                             }
                             Text(currency.format(distanceCost), fontWeight = FontWeight.SemiBold)
@@ -286,7 +288,7 @@ fun PaymentReviewScreenContent(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Totaal", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.total), fontWeight = FontWeight.Bold)
                             Text(currency.format(total), fontWeight = FontWeight.Bold)
                         }
                     }

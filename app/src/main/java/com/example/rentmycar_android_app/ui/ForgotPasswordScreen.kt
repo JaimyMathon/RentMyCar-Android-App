@@ -8,10 +8,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.ApiClient
 import com.example.rentmycar_android_app.network.AuthService
 import com.example.rentmycar_android_app.network.ResetPasswordRequest
@@ -43,7 +45,7 @@ fun ForgotPasswordScreen(
         ) {
 
             Text(
-                text = "Wachtwoord wijzigen",
+                text = stringResource(R.string.change_password),
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 24.dp)
@@ -52,7 +54,7 @@ fun ForgotPasswordScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("E-mail") },
+                label = { Text(stringResource(R.string.email)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -60,7 +62,7 @@ fun ForgotPasswordScreen(
             OutlinedTextField(
                 value = newPassword,
                 onValueChange = { newPassword = it },
-                label = { Text("Nieuw wachtwoord") },
+                label = { Text(stringResource(R.string.new_password)) },
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 modifier = Modifier
@@ -71,7 +73,7 @@ fun ForgotPasswordScreen(
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                label = { Text("Bevestig wachtwoord") },
+                label = { Text(stringResource(R.string.confirm_password)) },
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 modifier = Modifier
@@ -128,14 +130,14 @@ fun ForgotPasswordScreen(
                 shape = RoundedCornerShape(12.dp),
                 enabled = !loading
             ) {
-                Text("Wachtwoord wijzigen")
+                Text(stringResource(R.string.change_password))
             }
 
             TextButton(
                 onClick = onNavigateBackToLogin,
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text("Terug naar inloggen")
+                Text(stringResource(R.string.back_to_login))
             }
 
             errorMessage?.let {

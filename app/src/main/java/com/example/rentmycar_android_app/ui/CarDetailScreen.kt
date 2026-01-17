@@ -18,11 +18,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.ApiClientWithToken
 import com.example.rentmycar_android_app.network.ApiService
 import com.example.rentmycar_android_app.network.CarDto
@@ -79,7 +81,7 @@ fun CarDetailScreen(
                 }
             }
         } catch (e: Exception) {
-            error = e.message ?: "Fout bij ophalen auto"
+            error = e.message ?: context.getString(R.string.error_fetching_car)
         } finally {
             isLoading = false
         }
@@ -90,7 +92,7 @@ fun CarDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Auto details",
+                        stringResource(R.string.car_details_title),
                         fontWeight = FontWeight.SemiBold
                     )
                 },
@@ -98,7 +100,7 @@ fun CarDetailScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Terug"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -123,12 +125,12 @@ fun CarDetailScreen(
                     ) {
                         Column {
                             Text(
-                                text = "Prijs",
+                                text = stringResource(R.string.price),
                                 fontSize = 14.sp,
                                 color = Color.Gray
                             )
                             Text(
-                                text = "€${(car!!.pricePerTimeSlot ?: 0.0).toInt()}/dag",
+                                text = stringResource(R.string.price_per_day, (car!!.pricePerTimeSlot ?: 0.0).toInt()),
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -142,7 +144,7 @@ fun CarDetailScreen(
                             )
                         ) {
                             Text(
-                                text = "Reserveer nu",
+                                text = stringResource(R.string.reserve_now),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -197,7 +199,7 @@ fun CarDetailScreen(
                                         .data(photoUrl)
                                         .crossfade(true)
                                         .build(),
-                                    contentDescription = "Auto foto",
+                                    contentDescription = stringResource(R.string.car_photo),
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop
                                 )
@@ -240,12 +242,12 @@ fun CarDetailScreen(
                             Tab(
                                 selected = selectedTabIndex == 0,
                                 onClick = { selectedTabIndex = 0 },
-                                text = { Text("Over") }
+                                text = { Text(stringResource(R.string.about)) }
                             )
                             Tab(
                                 selected = selectedTabIndex == 1,
                                 onClick = { selectedTabIndex = 1 },
-                                text = { Text("Gallerij") }
+                                text = { Text(stringResource(R.string.gallery_tab)) }
                             )
                         }
 
@@ -288,12 +290,12 @@ private fun OverTabContent(car: CarDto, ownerName: String?) {
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = ownerName ?: "Onbekend",
+                    text = ownerName ?: stringResource(R.string.unknown),
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
                 Text(
-                    text = "Owner",
+                    text = stringResource(R.string.owner),
                     color = Color.Gray,
                     fontSize = 14.sp
                 )
@@ -303,11 +305,11 @@ private fun OverTabContent(car: CarDto, ownerName: String?) {
         Spacer(modifier = Modifier.height(8.dp))
 
         // Car Details
-        DetailRow(label = "Merk", value = car.brand ?: "-")
-        DetailRow(label = "Model", value = car.model ?: "-")
-        DetailRow(label = "Prijs Per KM", value = "€${car.costPerKm ?: 0.0}")
-        DetailRow(label = "TCO", value = "€${(car.tco ?: 0.0).toInt()}")
-        DetailRow(label = "Category", value = car.category ?: "-")
+        DetailRow(label = stringResource(R.string.brand), value = car.brand ?: "-")
+        DetailRow(label = stringResource(R.string.model), value = car.model ?: "-")
+        DetailRow(label = stringResource(R.string.price_per_km_label), value = "€${car.costPerKm ?: 0.0}")
+        DetailRow(label = stringResource(R.string.tco), value = "€${(car.tco ?: 0.0).toInt()}")
+        DetailRow(label = stringResource(R.string.category), value = car.category ?: "-")
     }
 }
 
@@ -356,7 +358,7 @@ private fun GalleryTabContent(carId: String) {
             }
             photoUrls.isEmpty() -> {
                 Text(
-                    text = "Geen foto's beschikbaar",
+                    text = stringResource(R.string.no_photos_available),
                     color = Color.Gray
                 )
             }
@@ -370,7 +372,7 @@ private fun GalleryTabContent(carId: String) {
                                 .data(url)
                                 .crossfade(true)
                                 .build(),
-                            contentDescription = "Auto foto",
+                            contentDescription = stringResource(R.string.car_photo),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp)

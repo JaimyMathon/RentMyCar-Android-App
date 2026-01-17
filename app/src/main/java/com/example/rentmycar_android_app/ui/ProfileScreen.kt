@@ -13,11 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.input.KeyboardType
+import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.viewmodels.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +50,7 @@ fun ProfileScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Terug"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -68,7 +70,7 @@ fun ProfileScreen(
         ) {
 
             Text(
-                text = "Profiel",
+                text = stringResource(R.string.profile_title),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -77,7 +79,7 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Pas hier uw persoonlijke gegevens aan",
+                text = stringResource(R.string.profile_subtitle),
                 fontSize = 14.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center
@@ -108,7 +110,7 @@ fun ProfileScreen(
                         ) {
                             Column {
                                 Text(
-                                    "Jouw Bonuspunten",
+                                    stringResource(R.string.your_bonus_points),
                                     fontSize = 14.sp,
                                     color = Color.White.copy(alpha = 0.8f)
                                 )
@@ -130,7 +132,7 @@ fun ProfileScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                "Bekijk details",
+                                stringResource(R.string.view_details),
                                 fontSize = 13.sp,
                                 color = Color.White.copy(alpha = 0.9f),
                                 fontWeight = FontWeight.Medium
@@ -149,7 +151,7 @@ fun ProfileScreen(
                 TextField(
                     value = user?.name ?: "",
                     onValueChange = viewModel::onNameChange,
-                    placeholder = { Text("Uw naam") }
+                    placeholder = { Text(stringResource(R.string.your_name)) }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -157,8 +159,8 @@ fun ProfileScreen(
                 TextField(
                     value = user?.phone ?: "",
                     onValueChange = viewModel::onPhoneChange,
-                    placeholder = { Text("Vul uw telefoon nummer in") },
-                    leadingIcon = { Text("+31") },
+                    placeholder = { Text(stringResource(R.string.enter_phone)) },
+                    leadingIcon = { Text(stringResource(R.string.phone_prefix)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                 )
 
@@ -167,7 +169,7 @@ fun ProfileScreen(
                 TextField(
                     value = user?.email ?: "",
                     onValueChange = viewModel::onEmailChange,
-                    placeholder = { Text("Uw email") },
+                    placeholder = { Text(stringResource(R.string.your_email)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                 )
 
@@ -200,7 +202,7 @@ fun ProfileScreen(
                         )
                     } else {
                         Text(
-                            text = "Gegevens opslaan",
+                            text = stringResource(R.string.save_data),
                             color = Color.White,
                             fontSize = 16.sp
                         )
@@ -218,7 +220,7 @@ fun ProfileScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8E8E93))
                 ) {
                     Text(
-                        text = "Uitloggen",
+                        text = stringResource(R.string.logout),
                         color = Color.White,
                         fontSize = 16.sp
                     )
@@ -264,13 +266,13 @@ fun LogoutConfirmationDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Uitloggen",
+                    text = stringResource(R.string.logout),
                     fontSize = 20.sp,
                     color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Weet je zeker dat je wilt uitloggen?",
+                    text = stringResource(R.string.logout_confirmation),
                     fontSize = 16.sp,
                     color = Color.Gray
                 )
@@ -285,7 +287,7 @@ fun LogoutConfirmationDialog(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
                     ) {
-                        Text(text = "Annuleren", color = Color.Black)
+                        Text(text = stringResource(R.string.cancel), color = Color.Black)
                     }
 
                     Button(
@@ -293,7 +295,7 @@ fun LogoutConfirmationDialog(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                     ) {
-                        Text(text = "Ja, Uitloggen", color = Color.White)
+                        Text(text = stringResource(R.string.yes_logout), color = Color.White)
                     }
                 }
             }

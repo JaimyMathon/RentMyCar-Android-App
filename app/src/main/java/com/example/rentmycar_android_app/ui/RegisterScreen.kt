@@ -9,11 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
+import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +42,7 @@ fun RegisterScreen(
             modifier = Modifier.padding(30.dp)
         ) {
             Text(
-                "Register",
+                stringResource(R.string.register_title),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 40.dp)
@@ -49,7 +51,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Naam") },
+                label = { Text(stringResource(R.string.name)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -57,7 +59,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("E-mail") },
+                label = { Text(stringResource(R.string.email)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
             )
@@ -65,7 +67,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Wachtwoord") },
+                label = { Text(stringResource(R.string.password)) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
@@ -100,10 +102,10 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
                 shape = RoundedCornerShape(12.dp),
                 enabled = !loading
-            ) { Text("Registreren") }
+            ) { Text(stringResource(R.string.register_title)) }
 
             TextButton(onClick = onNavigateToLogin) {
-                Text("Al een account? Log hier in")
+                Text(stringResource(R.string.already_have_account))
             }
 
             errorMessage?.let { Text(it, color = Color.Red, modifier = Modifier.padding(top = 16.dp)) }
