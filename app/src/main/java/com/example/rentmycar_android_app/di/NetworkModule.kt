@@ -26,7 +26,7 @@ annotation class UnauthenticatedClient
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "http://10.0.2.2:8080/"
+    private const val BASE_URL = "http://10.0.2.2:8081/"
     private const val TIMEOUT_SECONDS = 30L
 
     @Provides

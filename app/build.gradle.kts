@@ -51,6 +51,20 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:5.3.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:<compose_version>")
+    debugImplementation ("androidx.compose.ui:ui-test-manifest:<compose_version>")
+
+    androidTestImplementation ("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation ("androidx.test:runner:1.5.2")
+
+        // ... bestaande dependencies ...
+
+        // Unit Testing
+
 
     // EXTRA: Material 2 voor Scaffold, TopAppBar, Button, OutlinedTextField, etc.
     // Dit heb je nodig voor de ReservationScreen die androidx.compose.material.* gebruikt.
