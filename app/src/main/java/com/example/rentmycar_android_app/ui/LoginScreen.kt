@@ -9,11 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentmycar_android_app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +47,7 @@ fun LoginScreen(
 
         // Title
         Text(
-            "Log In",
+            stringResource(R.string.login_title),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -54,7 +56,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            "Hallo welkom terug, we hebben je gemist",
+            stringResource(R.string.login_welcome),
             fontSize = 14.sp,
             color = Color.Gray,
             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -64,7 +66,7 @@ fun LoginScreen(
 
         // Email label
         Text(
-            "Email",
+            stringResource(R.string.email),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -74,7 +76,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            placeholder = { Text("voorbeeld@gmail.com", color = Color.Gray) },
+            placeholder = { Text(stringResource(R.string.email_placeholder), color = Color.Gray) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -90,7 +92,7 @@ fun LoginScreen(
 
         // Password label
         Text(
-            "Wachtwoord",
+            stringResource(R.string.password),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -100,7 +102,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            placeholder = { Text("Wachtwoord", color = Color.Gray) },
+            placeholder = { Text(stringResource(R.string.password), color = Color.Gray) },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
@@ -117,7 +119,7 @@ fun LoginScreen(
 
         // Forgot password link
         Text(
-            "Wachtwoord vergeten",
+            stringResource(R.string.forgot_password),
             fontSize = 14.sp,
             color = Color.Gray,
             textDecoration = TextDecoration.Underline,
@@ -158,7 +160,7 @@ fun LoginScreen(
                 )
             } else {
                 Text(
-                    "Log In",
+                    stringResource(R.string.login_title),
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp
                 )
@@ -175,12 +177,12 @@ fun LoginScreen(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                "Heb je nog geen account? ",
+                stringResource(R.string.no_account_register),
                 fontSize = 14.sp,
                 color = Color.Gray
             )
             Text(
-                "Registreer hier",
+                stringResource(R.string.register_here),
                 fontSize = 14.sp,
                 color = Color.Gray,
                 textDecoration = TextDecoration.Underline,

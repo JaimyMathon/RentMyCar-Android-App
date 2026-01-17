@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.ApiClientWithToken
 import com.example.rentmycar_android_app.network.CarDto
 import com.example.rentmycar_android_app.network.CarService
@@ -50,7 +52,8 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE) }
-    val username = sharedPrefs.getString("username", "Onbekend") ?: "Onbekend"
+    val unknownText = stringResource(R.string.unknown)
+    val username = sharedPrefs.getString("username", unknownText) ?: unknownText
 
     val uiState by viewModel.uiState.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -101,12 +104,12 @@ fun HomeScreen(
             ) {
                 Column {
                     Text(
-                        text = "Home",
+                        text = stringResource(R.string.home),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "Welkom terug, $username",
+                        text = stringResource(R.string.welcome_back, username),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.DarkGray
                     )
@@ -126,7 +129,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            "Start Rit",
+                            stringResource(R.string.start_trip),
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
@@ -143,7 +146,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier. height(16.dp))
 
             Text(
-                text = "Auto's",
+                text = stringResource(R.string.cars),
                 modifier = Modifier.padding(horizontal = 16.dp),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
@@ -170,7 +173,7 @@ fun HomeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Fout bij laden auto's:\n${uiState.error}",
+                            text = stringResource(R.string.error_loading_cars, uiState.error ?: ""),
                             color = Color.Red
                         )
                     }
@@ -195,7 +198,7 @@ fun HomeScreen(
                                     } else {
                                         scope.launch {
                                             snackbarHostState.showSnackbar(
-                                                message = "Auto id ontbreekt (backend stuurt _id)",
+                                                message = context.getString(R.string.car_id_missing),
                                                 withDismissAction = true
                                             )
                                         }
@@ -255,7 +258,7 @@ private fun SearchField(
         modifier = modifier
             .height(48.dp)
             .clip(RoundedCornerShape(24.dp)),
-        placeholder = { Text("Zoek auto's") },
+        placeholder = { Text(stringResource(R.string.search_cars)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
@@ -336,7 +339,7 @@ private fun CarCard(
                             .data(photoUrl)
                             .crossfade(true)
                             .build(),
-                        contentDescription = "Auto foto",
+                        contentDescription = stringResource(R.string.car_photo),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
@@ -391,32 +394,32 @@ private fun HomeBottomBar(
         NavigationBarItem(
             selected = true,
             onClick = onHomeClick,
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home") }
+            icon = { Icon(Icons.Default.Home, contentDescription = stringResource(R.string.nav_home)) },
+            label = { Text(stringResource(R.string.nav_home)) }
         )
         NavigationBarItem(
             selected = false,
             onClick = onExploreClick,
-            icon = { Icon(Icons.Default.LocationOn, contentDescription = "Explore") },
-            label = { Text("Mijn auto's") }
+            icon = { Icon(Icons.Default.LocationOn, contentDescription = stringResource(R.string.nav_my_cars)) },
+            label = { Text(stringResource(R.string.nav_my_cars)) }
         )
         NavigationBarItem(
             selected = false,
             onClick = onFavoritesClick,
-            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Favorite") },
-            label = { Text("Toevoegen") }
+            icon = { Icon(Icons.Default.AddCircle, contentDescription = stringResource(R.string.nav_add)) },
+            label = { Text(stringResource(R.string.nav_add)) }
         )
         NavigationBarItem(
             selected = false,
             onClick = onKeysClick,
-            icon = { Icon(Icons.Default.CheckCircle, contentDescription = "Key") }, // placeholder
-            label = { Text("reservering") }
+            icon = { Icon(Icons.Default.CheckCircle, contentDescription = stringResource(R.string.nav_reservations)) },
+            label = { Text(stringResource(R.string.nav_reservations)) }
         )
         NavigationBarItem(
             selected = false,
             onClick = onProfileClick,
-            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-            label = { Text("Profiel") }
+            icon = { Icon(Icons.Default.Person, contentDescription = stringResource(R.string.nav_profile)) },
+            label = { Text(stringResource(R.string.nav_profile)) }
         )
     }
 }
