@@ -421,26 +421,26 @@ private fun HomeBottomBar(
         NavigationBarItem(
             selected = false,
             onClick = onExploreClick,
-            icon = { Icon(Icons.Default.Search, contentDescription = "Explore") },
-            label = { Text("Explore") }
+            icon = { Icon(Icons.Default.LocationOn, contentDescription = "Explore") },
+            label = { Text("Mijn auto's") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onFavoritesClick,
-            icon = { Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite") },
-            label = { Text("Favorite") }
+            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Favorite") },
+            label = { Text("Toevoegen") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onKeysClick,
-            icon = { Icon(Icons.Default.Home, contentDescription = "Key") }, // placeholder
-            label = { Text("Key") }
+            icon = { Icon(Icons.Default.CheckCircle, contentDescription = "Key") }, // placeholder
+            label = { Text("reservering") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onProfileClick,
             icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-            label = { Text("Profile") }
+            label = { Text("Profiel") }
         )
     }
 }

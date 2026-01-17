@@ -51,9 +51,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
-    // EXTRA: Material 2 voor Scaffold, TopAppBar, Button, OutlinedTextField, etc.
-    // Dit heb je nodig voor de ReservationScreen die androidx.compose.material.* gebruikt.
     implementation("androidx.compose.material:material")
 
     // Retrofit + netwerk
@@ -71,6 +68,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Unit Testing
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")  // <- VOEG DEZE TOE
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
     // MapLibre GL Native for Android
     implementation("org.maplibre.gl:android-sdk:11.5.0")
 
