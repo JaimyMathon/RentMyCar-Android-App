@@ -33,6 +33,11 @@ class TokenManagerImpl @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.JWT_TOKEN] = token
         }
+        // Also save to SharedPreferences for backward compatibility with ApiClientWithToken
+        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            .edit()
+            .putString("jwt_token", token)
+            .apply()
     }
 
     override suspend fun getToken(): String? {
@@ -54,6 +59,11 @@ class TokenManagerImpl @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.USERNAME] = username
         }
+        // Also save to SharedPreferences for backward compatibility
+        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            .edit()
+            .putString("username", username)
+            .apply()
     }
 
     override suspend fun getUsername(): String? {
@@ -69,6 +79,11 @@ class TokenManagerImpl @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences.clear()
         }
+        // Also clear SharedPreferences for backward compatibility
+        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            .edit()
+            .clear()
+            .apply()
     }
 
     /**
@@ -82,11 +97,17 @@ class TokenManagerImpl @Inject constructor(
 
         // Only migrate if we have data in SharedPreferences and nothing in DataStore
         if ((token != null || username != null) && getTokenFromDataStore() == null) {
-            token?.let { saveToken(it) }
-            username?.let { saveUsername(it) }
-
-            // Clear SharedPreferences after successful migration
-            sharedPrefs.edit().clear().apply()
+            // Save to DataStore only (saveToken already syncs back to SharedPreferences)
+            token?.let {
+                context.dataStore.edit { preferences ->
+                    preferences[PreferencesKeys.JWT_TOKEN] = it
+                }
+            }
+            username?.let {
+                context.dataStore.edit { preferences ->
+                    preferences[PreferencesKeys.USERNAME] = it
+                }
+            }
         }
     }
 
