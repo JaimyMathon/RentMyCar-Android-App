@@ -1,6 +1,5 @@
 package com.example.rentmycar_android_app.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -10,14 +9,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentmycar_android_app.ui.payment.PaymentReviewUiState
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.max
 
+/**
+ * Wrapper composable die de state uit de (Hilt) ViewModel haalt.
+ * UI tests richten zich op PaymentReviewScreenContent zodat Hilt niet nodig is in tests.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentReviewScreen(
@@ -28,10 +33,41 @@ fun PaymentReviewScreen(
     paymentMethod: String,
     onBackClick: () -> Unit,
     onPaymentSuccess: () -> Unit,
-    viewModel: com.example.rentmycar_android_app.ui.payment.PaymentReviewViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+    viewModel: com.example.rentmycar_android_app.ui.payment.PaymentReviewViewModel =
+        androidx.hilt.navigation.compose.hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    PaymentReviewScreenContent(
+        carId = carId,
+        fromDate = fromDate,
+        toDate = toDate,
+        kms = kms,
+        paymentMethod = paymentMethod,
+        uiState = uiState,
+        onBackClick = onBackClick,
+        onPaymentSuccess = onPaymentSuccess,
+        onPayClick = { viewModel.processPayment() }
+    )
+}
+
+/**
+ * UI-only composable. Hierin zit alle render logic.
+ * Deze is testbaar zonder Hilt / netwerk / repositories.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PaymentReviewScreenContent(
+    carId: String,
+    fromDate: String,
+    toDate: String,
+    kms: String,
+    paymentMethod: String,
+    uiState: PaymentReviewUiState,
+    onBackClick: () -> Unit,
+    onPaymentSuccess: () -> Unit,
+    onPayClick: () -> Unit
+) {
     // Handle payment success
     LaunchedEffect(uiState.paymentSuccess) {
         if (uiState.paymentSuccess) {
@@ -46,13 +82,14 @@ fun PaymentReviewScreen(
             val f = df.parse(from)!!.time
             val t = df.parse(to)!!.time
             val diffDays = ((t - f) / (1000L * 60L * 60L * 24L)).toInt()
-            max(1, diffDays) // 04->07 = 3
-        } catch (_: Exception) { 1 }
+            max(1, diffDays)
+        } catch (_: Exception) {
+            1
+        }
     }
 
     val days = daysBetween(fromDate, toDate)
     val kmsInt = kms.toIntOrNull() ?: 0
-
     val currency = remember { NumberFormat.getCurrencyInstance(Locale("nl", "NL")) }
 
     Scaffold(
@@ -76,22 +113,30 @@ fun PaymentReviewScreen(
                     .padding(16.dp)
             ) {
                 Button(
-                    onClick = { viewModel.processPayment() },
+                    onClick = onPayClick,
                     enabled = car != null && !uiState.isProcessing,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(54.dp),
+                        .height(54.dp)
+                        .testTag("payment_pay_button"),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
                 ) {
                     if (uiState.isProcessing) {
                         CircularProgressIndicator(
                             color = Color.White,
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier
+                                .size(24.dp)
+                                .testTag("payment_processing"),
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Betalen", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                        Text(
+                            "Betalen",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
+                        )
                     }
                 }
             }
@@ -105,11 +150,18 @@ fun PaymentReviewScreen(
             contentAlignment = Alignment.TopCenter
         ) {
             when {
-                uiState.isLoading -> CircularProgressIndicator(modifier = Modifier.padding(top = 40.dp))
+                uiState.isLoading -> CircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(top = 40.dp)
+                        .testTag("payment_loading")
+                )
+
                 uiState.error != null -> Text(
                     uiState.error!!,
                     color = Color.Red,
-                    modifier = Modifier.padding(top = 40.dp)
+                    modifier = Modifier
+                        .padding(top = 40.dp)
+                        .testTag("payment_error")
                 )
 
                 uiState.car != null -> {
@@ -118,7 +170,6 @@ fun PaymentReviewScreen(
                     val pricePerDay = car.pricePerTimeSlot ?: 0.0
                     val basePrice = pricePerDay * days
 
-                    // Zoals jouw voorbeeld: TCO / 365 * dagen
                     val tcoAnnual = car.tco ?: 0.0
                     val tcoCost = (tcoAnnual / 365.0) * days
 
@@ -132,7 +183,6 @@ fun PaymentReviewScreen(
 
                         Spacer(Modifier.height(12.dp))
 
-                        // Header auto
                         Card(
                             colors = CardDefaults.cardColors(containerColor = Color.White),
                             shape = RoundedCornerShape(16.dp)
@@ -159,13 +209,20 @@ fun PaymentReviewScreen(
 
                         Spacer(Modifier.height(16.dp))
 
-                        // Datums
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Text("Ophaal datum", color = Color.Gray)
                             Text(fromDate, fontWeight = FontWeight.SemiBold)
                         }
+
                         Spacer(Modifier.height(6.dp))
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Text("Terug breng datum", color = Color.Gray)
                             Text(toDate, fontWeight = FontWeight.SemiBold)
                         }
@@ -174,16 +231,20 @@ fun PaymentReviewScreen(
                         Divider()
                         Spacer(Modifier.height(16.dp))
 
-                        // Totale uren
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Text("Totale uren", color = Color.Gray)
                             Text("$totalHours", fontWeight = FontWeight.SemiBold)
                         }
 
                         Spacer(Modifier.height(12.dp))
 
-                        // Basis huurprijs
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Column {
                                 Text("Basis huurprijs", color = Color.Gray)
                                 Text("$days x ${currency.format(pricePerDay)}", color = Color.Gray)
@@ -193,8 +254,10 @@ fun PaymentReviewScreen(
 
                         Spacer(Modifier.height(12.dp))
 
-                        // TCO
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Column {
                                 Text("TCO-kosten", color = Color.Gray)
                                 Text("${currency.format(tcoAnnual)} : 365 x $days", color = Color.Gray)
@@ -204,8 +267,10 @@ fun PaymentReviewScreen(
 
                         Spacer(Modifier.height(12.dp))
 
-                        // Afstand
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Column {
                                 Text("Afstand kosten", color = Color.Gray)
                                 Text("${kmsInt}km x ${currency.format(costPerKm)}", color = Color.Gray)
@@ -217,8 +282,10 @@ fun PaymentReviewScreen(
                         Divider()
                         Spacer(Modifier.height(16.dp))
 
-                        // Totaal
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Text("Totaal", fontWeight = FontWeight.Bold)
                             Text(currency.format(total), fontWeight = FontWeight.Bold)
                         }

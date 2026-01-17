@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 @Deprecated("Use Hilt dependency injection instead")
 object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2:8080/"
+    private const val BASE_URL = "http://10.0.2.2:8081/"
 
     val instance: Retrofit by lazy {
         Retrofit.Builder()
