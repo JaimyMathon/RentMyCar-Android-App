@@ -32,11 +32,11 @@ fun FilterScreen(
     viewModel: FilterViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
     val availableBrands by viewModel.availableBrands.collectAsState()
+    val filterState by viewModel.filterState.collectAsState()
 
-    var selectedTypes by remember(initialFilterState) { mutableStateOf(initialFilterState.selectedTypes) }
-    var maxPricePerKm by remember(initialFilterState) { mutableStateOf(initialFilterState.maxPricePerKm) }
-    var maxPricePerDay by remember(initialFilterState) { mutableStateOf(initialFilterState.maxPricePerDay) }
-    var selectedBrands by remember(initialFilterState) { mutableStateOf(initialFilterState.selectedBrands) }
+    LaunchedEffect(initialFilterState) {
+        viewModel.initializeFilter(initialFilterState)
+    }
 
     Scaffold(
         topBar = {
@@ -73,8 +73,8 @@ fun FilterScreen(
 
             FilterChipGroup(
                 options = listOf("All", "ICE", "BEV", "FCEV"),
-                selectedOptions = selectedTypes,
-                onSelectionChange = { selectedTypes = it },
+                selectedOptions = filterState.selectedTypes,
+                onSelectionChange = { viewModel.updateSelectedTypes(it) },
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -89,8 +89,8 @@ fun FilterScreen(
             PriceSlider(
                 minValue = 0.10f,
                 maxValue = 0.70f,
-                currentValue = maxPricePerKm,
-                onValueChange = { maxPricePerKm = it },
+                currentValue = filterState.maxPricePerKm,
+                onValueChange = { viewModel.updateMaxPricePerKm(it) },
                 valueFormatter = { "€%.2f".format(it) },
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -106,8 +106,8 @@ fun FilterScreen(
             PriceSlider(
                 minValue = 50f,
                 maxValue = 300f,
-                currentValue = maxPricePerDay,
-                onValueChange = { maxPricePerDay = it },
+                currentValue = filterState.maxPricePerDay,
+                onValueChange = { viewModel.updateMaxPricePerDay(it) },
                 valueFormatter = { "€${it.toInt()}" },
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -122,8 +122,8 @@ fun FilterScreen(
 
             FilterChipGroup(
                 options = listOf("All") + availableBrands,
-                selectedOptions = selectedBrands,
-                onSelectionChange = { selectedBrands = it },
+                selectedOptions = filterState.selectedBrands,
+                onSelectionChange = { viewModel.updateSelectedBrands(it) },
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
@@ -136,12 +136,7 @@ fun FilterScreen(
             ) {
                 // Reset Button
                 Button(
-                    onClick = {
-                        selectedTypes = emptySet()
-                        maxPricePerKm = 0.70f
-                        maxPricePerDay = 300f
-                        selectedBrands = emptySet()
-                    },
+                    onClick = { viewModel.resetFilters() },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF9E9E9E)
@@ -158,14 +153,7 @@ fun FilterScreen(
                 // Apply Button
                 Button(
                     onClick = {
-                        onApplyFilters(
-                            FilterState(
-                                selectedTypes = selectedTypes,
-                                maxPricePerKm = maxPricePerKm,
-                                maxPricePerDay = maxPricePerDay,
-                                selectedBrands = selectedBrands
-                            )
-                        )
+                        onApplyFilters(viewModel.getCurrentFilterState())
                         onBackClick()
                     },
                     modifier = Modifier.weight(1f),

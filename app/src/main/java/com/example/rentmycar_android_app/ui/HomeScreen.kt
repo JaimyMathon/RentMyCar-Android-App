@@ -17,10 +17,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -41,6 +44,7 @@ fun HomeScreen(
     onNavigateToDrivingTracker: () -> Unit = {},
     onNavigateToDrivingStats: () -> Unit = {},
     onNavigateToFilter: () -> Unit = {},
+    onNavigateToMyCars: () -> Unit = {},
     onFilterApplied: ((FilterState) -> Unit)? = null,
     viewModel: HomeViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
@@ -49,6 +53,20 @@ fun HomeScreen(
     val username = sharedPrefs.getString("username", "Onbekend") ?: "Onbekend"
 
     val uiState by viewModel.uiState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // Refresh when screen becomes visible again (after navigating back)
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadCars()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -94,25 +112,49 @@ fun HomeScreen(
                     )
                 }
 
-                Card(
-                    modifier = Modifier
-                        .clickable { onNavigateToDrivingTracker() },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF4CAF50)
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier. padding(horizontal = 16.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            "Start Rit",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Card(
+                        modifier = Modifier
+                            .clickable { onNavigateToMyCars() },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFF6B6B6B)
                         )
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                "Mijn Auto's",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+
+                    Card(
+                        modifier = Modifier
+                            .clickable { onNavigateToDrivingTracker() },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFF4CAF50)
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                "Start Rit",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        }
                     }
                 }
             }
@@ -379,26 +421,26 @@ private fun HomeBottomBar(
         NavigationBarItem(
             selected = false,
             onClick = onExploreClick,
-            icon = { Icon(Icons.Default.Search, contentDescription = "Explore") },
-            label = { Text("Explore") }
+            icon = { Icon(Icons.Default.LocationOn, contentDescription = "Explore") },
+            label = { Text("Mijn auto's") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onFavoritesClick,
-            icon = { Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite") },
-            label = { Text("Favorite") }
+            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Favorite") },
+            label = { Text("Toevoegen") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onKeysClick,
-            icon = { Icon(Icons.Default.Home, contentDescription = "Key") }, // placeholder
-            label = { Text("Key") }
+            icon = { Icon(Icons.Default.CheckCircle, contentDescription = "Key") }, // placeholder
+            label = { Text("reservering") }
         )
         NavigationBarItem(
             selected = false,
             onClick = onProfileClick,
             icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-            label = { Text("Profile") }
+            label = { Text("Profiel") }
         )
     }
 }

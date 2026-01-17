@@ -11,4 +11,13 @@ interface GeocodingService {
         @Query("lon") lon: Double,
         @Query("format") format: String = "json"
     ): Call<GeocodingResponse>
+
+    @GET("search")
+    suspend fun forwardGeocode(
+        @Query("street") street: String,
+        @Query("postalcode") postalcode: String,
+        @Query("country") country: String,
+        @Query("format") format: String = "json",
+        @Query("limit") limit: Int = 1
+    ): List<GeocodingResponse>
 }
