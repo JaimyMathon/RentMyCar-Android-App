@@ -8,6 +8,7 @@ import com.example.rentmycar_android_app.network.PhotoDto
 import com.example.rentmycar_android_app.network.ReservationDto
 import com.example.rentmycar_android_app.network.UpdateReservationRequest
 import com.example.rentmycar_android_app.util.Result
+import com.example.rentmycar_android_app.viewmodels.ReservationsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher

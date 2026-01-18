@@ -49,7 +49,6 @@ class MyCarsViewModel @Inject constructor(
                 if (profileResponse.isSuccessful) {
                     val userId = profileResponse.body()?.id
                     if (userId != null) {
-                        // Fetch all cars and filter client-side by addedBy
                         when (val result = carRepository.getCars()) {
                             is Result.Success -> {
                                 val myCars = result.data.filter { car ->

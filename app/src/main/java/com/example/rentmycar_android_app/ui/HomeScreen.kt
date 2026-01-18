@@ -26,12 +26,12 @@ import androidx.compose.ui.unit.sp
 import com.example.rentmycar_android_app.R
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.rentmycar_android_app.network.ApiClientWithToken
 import com.example.rentmycar_android_app.network.CarDto
 import com.example.rentmycar_android_app.network.CarService
+import com.example.rentmycar_android_app.viewmodels.HomeViewModel
 import kotlinx.coroutines.launch
 
 @Composable

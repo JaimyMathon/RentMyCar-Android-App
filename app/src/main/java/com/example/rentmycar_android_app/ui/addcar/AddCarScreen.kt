@@ -47,7 +47,6 @@ fun AddCarScreen(
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
 
-    // Form state
     var brand by remember { mutableStateOf("") }
     var model by remember { mutableStateOf("") }
     var licensePlate by remember { mutableStateOf("") }
@@ -59,24 +58,20 @@ fun AddCarScreen(
     var insurance by remember { mutableStateOf("") }
     var depreciation by remember { mutableStateOf("") }
 
-    // Address state
     var streetName by remember { mutableStateOf("") }
     var houseNumber by remember { mutableStateOf("") }
     var postcode by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("Nederland") }
 
-    // Photo state
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var tempPhotoUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Photo picker
     val pickMedia = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         selectedImageUri = uri
     }
 
-    // Camera
     val takePicture = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->

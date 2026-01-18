@@ -134,7 +134,6 @@ object NetworkModule {
             .build()
     }
 
-    // Service Providers
     @Provides
     @Singleton
     fun provideAuthService(

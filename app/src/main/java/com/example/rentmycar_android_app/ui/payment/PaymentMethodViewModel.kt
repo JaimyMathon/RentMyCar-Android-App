@@ -60,7 +60,6 @@ class PaymentMethodViewModel @Inject constructor(
                 is Result.Loading -> return@launch
             }
 
-            // Convert date format from dd-MM-yyyy to ISO format for kotlinx.datetime.LocalDateTime
             val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
             val outputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
 

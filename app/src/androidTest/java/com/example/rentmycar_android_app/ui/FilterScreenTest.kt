@@ -8,6 +8,7 @@ import com.example.rentmycar_android_app.network.AddCarRequest
 import com.example.rentmycar_android_app.network.CarDto
 import com.example.rentmycar_android_app.network.PhotoDto
 import com.example.rentmycar_android_app.util.Result
+import com.example.rentmycar_android_app.viewmodels.FilterViewModel
 import java.io.File
 import org.junit.Assert.*
 import org.junit.Before
@@ -47,22 +48,18 @@ class FilterScreenTest {
             )
         }
 
-        // Verify title is displayed
         composeTestRule.onNodeWithText("Filter").assertIsDisplayed()
 
-        // Verify section titles
         composeTestRule.onNodeWithText("Types").assertIsDisplayed()
         composeTestRule.onNodeWithText("Prijs per Km").assertIsDisplayed()
         composeTestRule.onNodeWithText("Prijs per dag").assertIsDisplayed()
         composeTestRule.onNodeWithText("Merken").assertIsDisplayed()
 
-        // Verify type chips are displayed
         composeTestRule.onNodeWithText("All").assertIsDisplayed()
         composeTestRule.onNodeWithText("ICE").assertIsDisplayed()
         composeTestRule.onNodeWithText("BEV").assertIsDisplayed()
         composeTestRule.onNodeWithText("FCEV").assertIsDisplayed()
 
-        // Verify action buttons
         composeTestRule.onNodeWithText("Reset").assertIsDisplayed()
         composeTestRule.onNodeWithText("Toepassen").assertIsDisplayed()
     }
@@ -77,10 +74,8 @@ class FilterScreenTest {
             )
         }
 
-        // Click on BEV chip
         composeTestRule.onNodeWithText("BEV").performClick()
 
-        // Verify the selection is updated in ViewModel
         assertTrue(viewModel.getCurrentFilterState().selectedTypes.contains("BEV"))
     }
 
@@ -94,11 +89,9 @@ class FilterScreenTest {
             )
         }
 
-        // Click on BEV and ICE chips
         composeTestRule.onNodeWithText("BEV").performClick()
         composeTestRule.onNodeWithText("ICE").performClick()
 
-        // Verify both selections are updated in ViewModel
         val selectedTypes = viewModel.getCurrentFilterState().selectedTypes
         assertTrue(selectedTypes.contains("BEV"))
         assertTrue(selectedTypes.contains("ICE"))
@@ -114,14 +107,11 @@ class FilterScreenTest {
             )
         }
 
-        // First select a type
         composeTestRule.onNodeWithText("BEV").performClick()
         assertTrue(viewModel.getCurrentFilterState().selectedTypes.contains("BEV"))
 
-        // Click on All chip
         composeTestRule.onNodeWithText("All").performClick()
 
-        // Verify selection is cleared
         assertTrue(viewModel.getCurrentFilterState().selectedTypes.isEmpty())
     }
 
@@ -135,14 +125,11 @@ class FilterScreenTest {
             )
         }
 
-        // Select some filters
         composeTestRule.onNodeWithText("BEV").performClick()
         assertTrue(viewModel.getCurrentFilterState().selectedTypes.isNotEmpty())
 
-        // Click reset button
         composeTestRule.onNodeWithText("Reset").performClick()
 
-        // Verify all filters are reset
         val filterState = viewModel.getCurrentFilterState()
         assertTrue(filterState.selectedTypes.isEmpty())
         assertEquals(0.70f, filterState.maxPricePerKm)
@@ -160,17 +147,13 @@ class FilterScreenTest {
             )
         }
 
-        // Select a filter
         composeTestRule.onNodeWithText("FCEV").performClick()
 
-        // Click apply button
         composeTestRule.onNodeWithText("Toepassen").performClick()
 
-        // Verify filters were applied
         assertNotNull(appliedFilterState)
         assertTrue(appliedFilterState!!.selectedTypes.contains("FCEV"))
 
-        // Verify back navigation was triggered
         assertTrue(backClicked)
     }
 
@@ -184,10 +167,8 @@ class FilterScreenTest {
             )
         }
 
-        // Click back button
         composeTestRule.onNodeWithContentDescription("Terug").performClick()
 
-        // Verify back navigation was triggered
         assertTrue(backClicked)
     }
 
@@ -201,10 +182,8 @@ class FilterScreenTest {
             )
         }
 
-        // Wait for brands to load
         composeTestRule.waitForIdle()
 
-        // Verify brands from repository are displayed (sorted alphabetically)
         composeTestRule.onNodeWithText("Audi").assertIsDisplayed()
         composeTestRule.onNodeWithText("BMW").assertIsDisplayed()
         composeTestRule.onNodeWithText("Tesla").assertIsDisplayed()
@@ -220,13 +199,10 @@ class FilterScreenTest {
             )
         }
 
-        // Wait for brands to load
         composeTestRule.waitForIdle()
 
-        // Click on a brand
         composeTestRule.onNodeWithText("Tesla").performClick()
 
-        // Verify selection
         assertTrue(viewModel.getCurrentFilterState().selectedBrands.contains("Tesla"))
     }
 
@@ -250,7 +226,6 @@ class FilterScreenTest {
 
         composeTestRule.waitForIdle()
 
-        // Verify initial state is applied
         val currentState = viewModel.getCurrentFilterState()
         assertTrue(currentState.selectedTypes.contains("BEV"))
         assertEquals(0.50f, currentState.maxPricePerKm)

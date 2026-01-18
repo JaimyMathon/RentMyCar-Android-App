@@ -25,6 +25,7 @@ import com.example.rentmycar_android_app.R
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.rentmycar_android_app.network.ReservationDto
+import com.example.rentmycar_android_app.viewmodels.ReservationsViewModel
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 

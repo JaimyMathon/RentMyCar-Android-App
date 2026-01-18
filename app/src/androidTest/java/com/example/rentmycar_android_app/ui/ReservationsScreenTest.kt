@@ -11,6 +11,7 @@ import com.example.rentmycar_android_app.network.PhotoDto
 import com.example.rentmycar_android_app.network.ReservationDto
 import com.example.rentmycar_android_app.network.UpdateReservationRequest
 import com.example.rentmycar_android_app.util.Result
+import com.example.rentmycar_android_app.viewmodels.ReservationsViewModel
 import java.io.File
 import org.junit.Assert.*
 import org.junit.Before
@@ -86,7 +87,6 @@ class ReservationsScreenTest {
             )
         }
 
-        // Loading indicator should be displayed while loading
         composeTestRule.onNode(hasTestTag("loading") or hasContentDescription("loading"))
             .assertExists()
     }
@@ -157,7 +157,6 @@ class ReservationsScreenTest {
 
         composeTestRule.waitForIdle()
 
-        // Verify car details are displayed
         composeTestRule.onNodeWithText("Tesla Model 3").assertIsDisplayed()
         composeTestRule.onNodeWithText("€75/dag").assertIsDisplayed()
         composeTestRule.onNodeWithText("BEV").assertIsDisplayed()
@@ -186,7 +185,6 @@ class ReservationsScreenTest {
 
         composeTestRule.waitForIdle()
 
-        // Cancel button should be visible for upcoming reservations
         composeTestRule.onNodeWithText("Annuleren").assertIsDisplayed()
     }
 
@@ -213,7 +211,6 @@ class ReservationsScreenTest {
 
         composeTestRule.waitForIdle()
 
-        // Cancel button should not be visible for started reservations
         composeTestRule.onNodeWithText("Annuleren").assertDoesNotExist()
     }
 
@@ -244,15 +241,12 @@ class ReservationsScreenTest {
 
         composeTestRule.waitForIdle()
 
-        // Initially on "Komend" tab - should show pending reservation
         composeTestRule.onNodeWithText("Tesla Model 3").assertIsDisplayed()
         composeTestRule.onNodeWithText("BMW i4").assertDoesNotExist()
 
-        // Switch to "Afgehandeld" tab
         composeTestRule.onNodeWithText("Afgehandeld").performClick()
         composeTestRule.waitForIdle()
 
-        // Should now show completed reservation
         composeTestRule.onNodeWithText("BMW i4").assertIsDisplayed()
         composeTestRule.onNodeWithText("Tesla Model 3").assertDoesNotExist()
     }
@@ -284,11 +278,9 @@ class ReservationsScreenTest {
 
         composeTestRule.waitForIdle()
 
-        // Switch to "cancelled" tab
         composeTestRule.onNodeWithText("cancelled").performClick()
         composeTestRule.waitForIdle()
 
-        // Should show cancelled reservation
         composeTestRule.onNodeWithText("Audi e-tron").assertIsDisplayed()
         composeTestRule.onNodeWithText("Tesla Model 3").assertDoesNotExist()
     }

@@ -17,6 +17,7 @@ import com.example.rentmycar_android_app.ui.*
 import com.example.rentmycar_android_app.ui.addcar.AddCarScreen
 import com.example.rentmycar_android_app.ui.mycars.MyCarsScreen
 import com.example.rentmycar_android_app.ui.updatecar.UpdateCarScreen
+import com.example.rentmycar_android_app.viewmodels.HomeViewModel
 
 sealed class Screen(val route: String) {
     data object Login : Screen("login")
@@ -108,18 +109,6 @@ fun NavGraph(navController: NavHostController) {
                 }
             )
         }
-
-//        composable(Screen.Home.route) {
-//            HomeScreen(
-//                onCarClick = { carId ->
-//                    navController.navigate(Screen.CarDetail.createRoute(carId))
-//                },
-//                onNavigateToCars = { },
-//                onNavigateToReservationsOverview = { },
-//                onNavigateToReservation = { },
-//                onNavigateToProfile = { }
-//            )
-//        }
 
         composable(Screen.Home.route) {
             val homeViewModel: HomeViewModel = androidx.hilt.navigation.compose.hiltViewModel()

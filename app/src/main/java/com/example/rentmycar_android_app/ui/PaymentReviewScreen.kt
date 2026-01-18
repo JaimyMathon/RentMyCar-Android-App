@@ -70,7 +70,6 @@ fun PaymentReviewScreenContent(
     onPaymentSuccess: () -> Unit,
     onPayClick: () -> Unit
 ) {
-    // Handle payment success
     LaunchedEffect(uiState.paymentSuccess) {
         if (uiState.paymentSuccess) {
             onPaymentSuccess()

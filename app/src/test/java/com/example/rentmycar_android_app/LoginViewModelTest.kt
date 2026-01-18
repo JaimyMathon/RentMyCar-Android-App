@@ -142,6 +142,5 @@ class FakeAuthRepository : AuthRepository {
     }
 
     override suspend fun logout() {
-        // Do nothing
     }
 }
