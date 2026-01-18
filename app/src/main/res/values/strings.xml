@@ -3,22 +3,28 @@
     <string name="app_name">RentMyCar</string>
 
     <!-- Common -->
-    <string name="back">Back</string>
-    <string name="cancel">Cancel</string>
-    <string name="save">Save</string>
-    <string name="continue_text">Continue</string>
+    <string name="back">Terug</string>
+    <string name="cancel">Annuleren</string>
+    <string name="save">Opslaan</string>
+    <string name="add">Toevoegen</string>
+    <string name="delete">Verwijderen</string>
+    <string name="continue_text">Doorgaan</string>
     <string name="reset">Reset</string>
-    <string name="apply">Apply</string>
-    <string name="close">Close</string>
-    <string name="unknown">Unknown</string>
-    <string name="error">Error</string>
-    <string name="loading">Loading…</string>
-    <string name="retry">Retry</string>
-    <string name="per_day">/day</string>
+    <string name="apply">Toepassen</string>
+    <string name="close">Sluiten</string>
+    <string name="unknown">Onbekend</string>
+    <string name="error">Fout</string>
+    <string name="loading">Laden…</string>
+    <string name="retry">Opnieuw proberen</string>
+    <string name="per_day">/dag</string>
     <string name="per_km">p/km</string>
-    <string name="date">Date</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
+    <string name="date">Datum</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nee</string>
+    <string name="euro_symbol">€</string>
+    <string name="navigate">Navigeren</string>
+    <string name="no_data">Geen gegevens</string>
+    <string name="error_with_message">Fout: %1$s</string>
 
     <!-- Login Screen -->
     <string name="login_title">Log In</string>
@@ -27,8 +33,9 @@
     <string name="email_placeholder">example@gmail.com</string>
     <string name="password">Password</string>
     <string name="forgot_password">Forgot password</string>
-    <string name="no_account">Don\'t have an account? </string>
-    <string name="register_here">Register here</string>
+    <string name="no_account">Nog geen account? </string>
+    <string name="no_account_register">Nog geen account? </string>
+    <string name="register_here">Registreer hier</string>
 
     <!-- Register Screen -->
     <string name="register_title">Register</string>
@@ -66,52 +73,63 @@
     <string name="nav_profile">Profile</string>
 
     <!-- Profile Screen -->
-    <string name="profile">Profile</string>
-    <string name="profile_subtitle">Adjust your personal details here</string>
-    <string name="your_bonus_points">Your Bonus Points</string>
-    <string name="view_details">View details</string>
-    <string name="your_name">Your name</string>
-    <string name="phone_number">Enter your phone number</string>
-    <string name="your_email">Your email</string>
-    <string name="save_details">Save details</string>
-    <string name="logout">Log out</string>
-    <string name="logout_confirm">Are you sure you want to log out?</string>
-    <string name="yes_logout">Yes, Log out</string>
+    <string name="profile">Profiel</string>
+    <string name="profile_title">Profiel</string>
+    <string name="profile_subtitle">Pas hier je persoonlijke gegevens aan</string>
+    <string name="your_bonus_points">Jouw Bonuspunten</string>
+    <string name="view_details">Bekijk details</string>
+    <string name="your_name">Jouw naam</string>
+    <string name="phone_number">Voer je telefoonnummer in</string>
+    <string name="enter_phone">Voer je telefoonnummer in</string>
+    <string name="phone_prefix">+31</string>
+    <string name="your_email">Jouw email</string>
+    <string name="save_details">Gegevens opslaan</string>
+    <string name="save_data">Gegevens opslaan</string>
+    <string name="logout">Uitloggen</string>
+    <string name="logout_confirm">Weet je zeker dat je wilt uitloggen?</string>
+    <string name="logout_confirmation">Weet je zeker dat je wilt uitloggen?</string>
+    <string name="yes_logout">Ja, uitloggen</string>
+    <string name="profile_updated_success">Profiel succesvol bijgewerkt</string>
 
     <!-- Car Detail Screen -->
-    <string name="car_details">Car details</string>
-    <string name="price">Price</string>
-    <string name="reserve_now">Reserve now</string>
-    <string name="error_fetching_car">Error fetching car</string>
-    <string name="about">About</string>
-    <string name="gallery">Gallery</string>
-    <string name="owner">Owner</string>
-    <string name="brand">Brand</string>
+    <string name="car_details">Auto details</string>
+    <string name="car_details_title">Auto details</string>
+    <string name="price">Prijs</string>
+    <string name="reserve_now">Nu reserveren</string>
+    <string name="error_fetching_car">Fout bij ophalen auto</string>
+    <string name="about">Over</string>
+    <string name="gallery">Galerij</string>
+    <string name="gallery_tab">Galerij</string>
+    <string name="owner">Eigenaar</string>
+    <string name="brand">Merk</string>
     <string name="model">Model</string>
-    <string name="price_per_km">Price per KM</string>
+    <string name="price_per_km">Prijs per KM</string>
+    <string name="price_per_km_label">Prijs per KM</string>
     <string name="tco">TCO</string>
-    <string name="category">Category</string>
-    <string name="no_photos_available">No photos available</string>
+    <string name="category">Categorie</string>
+    <string name="no_photos_available">Geen foto\'s beschikbaar</string>
 
     <!-- Filter Screen -->
     <string name="filter">Filter</string>
     <string name="types">Types</string>
-    <string name="all">All</string>
-    <string name="price_per_km_filter">Price per Km</string>
-    <string name="price_per_day">Price per day</string>
-    <string name="brands">Brands</string>
+    <string name="all">Alles</string>
+    <string name="price_per_km_filter">Prijs per Km</string>
+    <string name="price_per_day">Prijs per dag</string>
+    <string name="price_per_day_filter">Prijs per dag</string>
+    <string name="brands">Merken</string>
 
     <!-- Reservations Screen -->
-    <string name="my_reservations">My reservations</string>
-    <string name="upcoming">Upcoming</string>
-    <string name="completed">Completed</string>
-    <string name="cancelled">Cancelled</string>
-    <string name="no_reservations_found">No reservations found</string>
+    <string name="my_reservations">Mijn reserveringen</string>
+    <string name="upcoming">Aankomend</string>
+    <string name="completed">Voltooid</string>
+    <string name="cancelled">Geannuleerd</string>
+    <string name="no_reservations_found">Geen reserveringen gevonden</string>
     <string name="start">Start</string>
-    <string name="end">End</string>
-    <string name="car_location">Car location</string>
-    <string name="navigate">Navigate</string>
-    <string name="cancel_reservation">Cancel</string>
+    <string name="start_date">Start</string>
+    <string name="end">Einde</string>
+    <string name="end_date">Einde</string>
+    <string name="car_location">Auto locatie</string>
+    <string name="cancel_reservation">Annuleren</string>
 
     <!-- Reservation Screen -->
     <string name="reserve_car">Reserve car</string>
@@ -150,8 +168,9 @@
     <string name="view_reservations">View reservations</string>
 
     <!-- Add Car Screen -->
-    <string name="add_car">Add Car</string>
-    <string name="photo">Photo</string>
+    <string name="add_car">Auto toevoegen</string>
+    <string name="add_car_title">Auto toevoegen</string>
+    <string name="photo">Foto</string>
     <string name="no_photo_selected">No photo selected</string>
     <string name="gallery_button">Gallery</string>
     <string name="camera">Camera</string>
@@ -169,53 +188,59 @@
     <string name="street_name">Street name</string>
     <string name="house_number">No.</string>
     <string name="postcode">Postcode</string>
-    <string name="country">Country</string>
-    <string name="netherlands">Netherlands</string>
-    <string name="lookup_address">Look up address</string>
-    <string name="location_found">Location found: %1$s, %2$s</string>
-    <string name="selected_photo">Selected photo</string>
+    <string name="country">Land</string>
+    <string name="netherlands">Nederland</string>
+    <string name="lookup_address">Adres opzoeken</string>
+    <string name="search_address">Adres zoeken</string>
+    <string name="location_found">Locatie gevonden: %1$s, %2$s</string>
+    <string name="selected_photo">Geselecteerde foto</string>
 
     <!-- My Cars Screen -->
-    <string name="my_cars">My Cars</string>
-    <string name="add_car_fab">Add car</string>
-    <string name="no_cars_added">You haven\'t added any cars yet</string>
-    <string name="click_to_add_car">Click + to add a car</string>
-    <string name="available">Available</string>
+    <string name="my_cars">Mijn Auto\'s</string>
+    <string name="my_cars_title">Mijn Auto\'s</string>
+    <string name="add_car_fab">Auto toevoegen</string>
+    <string name="no_cars_added">Je hebt nog geen auto\'s toegevoegd</string>
+    <string name="click_to_add_car">Klik + om een auto toe te voegen</string>
+    <string name="available">Beschikbaar</string>
 
     <!-- Update Car Screen -->
-    <string name="edit_car">Edit Car</string>
-    <string name="delete">Delete</string>
-    <string name="delete_car">Delete Car</string>
-    <string name="delete_car_confirm">Are you sure you want to delete this car? This cannot be undone.</string>
-    <string name="location_optional">Location (optional change)</string>
-    <string name="current_location">Current location: %1$s, %2$s</string>
-    <string name="new_street_name">New street name</string>
-    <string name="lookup_new_address">Look up new address</string>
-    <string name="new_location">New location: %1$s, %2$s</string>
+    <string name="edit_car">Auto bewerken</string>
+    <string name="edit_car_title">Auto bewerken</string>
+    <string name="delete_car">Auto verwijderen</string>
+    <string name="delete_car_title">Auto verwijderen</string>
+    <string name="delete_car_confirm">Weet je zeker dat je deze auto wilt verwijderen? Dit kan niet ongedaan worden gemaakt.</string>
+    <string name="delete_car_confirmation">Weet je zeker dat je deze auto wilt verwijderen? Dit kan niet ongedaan worden gemaakt.</string>
+    <string name="location_optional">Locatie (optionele wijziging)</string>
+    <string name="current_location">Huidige locatie: %1$s, %2$s</string>
+    <string name="new_street_name">Nieuwe straatnaam</string>
+    <string name="lookup_new_address">Nieuw adres opzoeken</string>
+    <string name="search_new_address">Nieuw adres zoeken</string>
+    <string name="new_location">Nieuwe locatie: %1$s, %2$s</string>
 
     <!-- Driving Tracker Screen -->
-    <string name="driving_tracker">Driving Tracker</string>
-    <string name="driving">Driving…</string>
-    <string name="stopped">Stopped</string>
-    <string name="duration">Duration: %1$s</string>
-    <string name="distance">Distance: %1$s km</string>
-    <string name="acceleration">Acceleration</string>
-    <string name="braking">Braking</string>
+    <string name="driving_tracker">Rijgedrag Tracker</string>
+    <string name="driving">Rijden…</string>
+    <string name="stopped">Gestopt</string>
+    <string name="duration">Duur: %1$s</string>
+    <string name="distance">Afstand: %1$s km</string>
+    <string name="acceleration">Acceleratie</string>
+    <string name="braking">Remmen</string>
     <string name="max">Max: %1$s</string>
-    <string name="harsh_count">Harsh: %1$dx</string>
-    <string name="stop_and_save">Stop and Save</string>
-    <string name="start_trip_button">Start Trip</string>
-    <string name="trip_too_short">Trip too short</string>
-    <string name="no_token_found">No token found</string>
-    <string name="points_earned">%1$d points!</string>
+    <string name="max_value">Max: %1$s</string>
+    <string name="ms_squared">m/s²</string>
+    <string name="harsh_count">Hard: %1$dx</string>
+    <string name="stop_and_save">Stoppen en Opslaan</string>
+    <string name="start_trip_button">Start Rit</string>
+    <string name="trip_too_short">Rit te kort</string>
+    <string name="no_token_found">Geen token gevonden</string>
+    <string name="points_earned">%1$d punten!</string>
 
     <!-- Driving Stats Screen -->
     <string name="my_trips">My Trips</string>
-    <string name="car_name">Car Name</string>
-    <string name="points">points</string>
-    <string name="rating">Rating</string>
-    <string name="no_data">No data</string>
-    <string name="no_trips_available">No trips available yet.</string>
+    <string name="car_name">Autonaam</string>
+    <string name="points">punten</string>
+    <string name="rating">Beoordeling</string>
+    <string name="no_trips_available">Nog geen ritten beschikbaar.</string>
     <string name="error_occurred">An error occurred</string>
     <string name="no_valid_token">No valid token</string>
 

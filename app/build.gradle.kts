@@ -19,6 +19,9 @@ android {
 
         // ✅ Hilt test runner (anders crasht hiltViewModel() in tests)
         testInstrumentationRunner = "com.example.rentmycar_android_app.HiltTestRunner"
+
+        // Keep only these locales to ensure proper language switching
+        resourceConfigurations += listOf("nl", "en")
     }
 
     buildTypes {

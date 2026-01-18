@@ -121,9 +121,9 @@
     <string name="country">Country</string>
     <string name="search_address">Search Address</string>
     <string name="location_optional">Location (optional change)</string>
-    <string name="current_location">Current location: %s, %s</string>
-    <string name="location_found">Location found: %s, %s</string>
-    <string name="new_location">New location: %s, %s</string>
+    <string name="current_location">Current location: %1$s, %2$s</string>
+    <string name="location_found">Location found: %1$s, %2$s</string>
+    <string name="new_location">New location: %1$s, %2$s</string>
     <string name="new_street_name">New street name</string>
     <string name="search_new_address">Search New Address</string>
     <string name="route_to_car">Route to car</string>
@@ -200,5 +200,19 @@
     <string name="error_occurred">An error occurred</string>
 
     <!-- Errors -->
-    <string name="error_with_message">Error: %s</string>
+    <string name="error_with_message">Error: %1$s</string>
+
+    <!-- Map Screen -->
+    <string name="location_permission_required">Location access is required to show the map</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="stop_navigation">Stop navigation</string>
+    <string name="start_navigation">Start navigation</string>
+    <string name="could_not_get_location">Could not get user location</string>
+    <string name="error_getting_location">Error getting location</string>
+    <string name="map_not_available">Map is not available</string>
+    <string name="map_style_not_loaded">Map style is not loaded</string>
+    <string name="no_route_found">No route found</string>
+    <string name="error_fetching_route">Error fetching route: %1$d</string>
+    <string name="error_drawing_route">Error drawing route</string>
+    <string name="car_location_marker">Car Location</string>
 </resources>
