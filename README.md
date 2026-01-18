@@ -8,27 +8,30 @@ RentMyCar is een gebruiksvriendelijke Android-app waarmee gebruikers gemakkelijk
 
 ### Belangrijkste functionaliteiten
 
-- **Authenticatie**: Inloggen, registreren en wachtwoord herstellen
+- **Authenticatie**: Inloggen, registreren en wachtwoord herstellen met JWT tokens
 - **Auto's zoeken en filteren**: Overzicht van beschikbare auto's met geavanceerde filteropties
 - **Auto details**: Gedetailleerde informatie en foto's van beschikbare auto's
-- **Reserveringssysteem**: Selecteer data, aantal kilometers en bekijk prijsoverzicht
-- **Betalingsoverzicht**: Controleer je boeking en betaalmethode
-- **Kaartweergave**: Bekijk de locatie van auto's op een interactieve kaart
-- **Profielbeheer**: Beheer je persoonlijke gegevens
-- **Rijstatistieken**: Volg je ritten en bekijk statistieken
-- **Reserveringsoverzicht**: Bekijk al je actieve en historische reserveringen
+- **Reserveringssysteem**: Selecteer data, aantal kilometers en bekijk dynamisch prijsoverzicht
+- **Betalingssysteem**: Kies betaalmethode, controleer boeking en verwerk betalingen
+- **Kaartweergave**: Bekijk de locatie van auto's op een interactieve MapLibre kaart
+- **Auto verhuren**: Voeg je eigen auto's toe met foto's, beheer en verwijder listings
+- **Profielbeheer**: Beheer je persoonlijke gegevens en bekijk bonuspunten
+- **Rijstatistieken**: Volg je ritten en bekijk uitgebreide statistieken
+- **Driving Tracker**: Real-time GPS tracking tijdens het rijden
+- **Reserveringsoverzicht**: Bekijk, beheer en annuleer je reserveringen
 
 ## Vereisten
 
 ### Systeemvereisten
 
 - **Android Studio**: Hedgehog (2023.1.1) of nieuwer
-- **JDK**: Java 11 of hoger
+- **JDK**: Java 17 of hoger
 - **Android SDK**:
   - Minimum SDK: 24 (Android 7.0)
-  - Target SDK: 36
+  - Target SDK: 34
   - Compile SDK: 36
 - **Gradle**: 8.x (gebruikt via Gradle Wrapper)
+- **Backend API**: Draaiende RentMyCar backend server
 
 ### Apparaatvereisten
 
@@ -68,9 +71,14 @@ De afhankelijkheden worden automatisch geïnstalleerd tijdens de Gradle sync. Al
 ./gradlew build
 ```
 
-### 5. API configuratie (optioneel)
+### 5. Backend API configuratie
 
-Als de app verbinding maakt met een backend API, configureer dan de API base URL in het project.
+De app vereist een draaiende backend server. De standaard configuratie is:
+
+- **Emulator**: `http://10.0.2.2:8080/` (automatisch geconfigureerd)
+- **Fysiek apparaat**: Pas de base URL aan in `NetworkModule.kt`
+
+**Let op**: De app gebruikt `10.0.2.2` als localhost adapter voor de Android emulator. Voor fysieke apparaten moet je de URL wijzigen naar het IP-adres van je backend server.
 
 ## De applicatie uitvoeren
 
@@ -123,29 +131,49 @@ Als de app verbinding maakt met een backend API, configureer dan de API base URL
 
 1. **Auto's bekijken**:
    - Bekijk de lijst met beschikbare auto's op het startscherm
-   - Gebruik het filtericoon om te filteren op prijs, type, etc.
+   - Gebruik het filtericoon om te filteren op prijs, type, locatie, etc.
+   - Bekijk auto's op een interactieve kaart
 
 2. **Auto details**:
    - Tik op een auto om meer details te zien
    - Bekijk foto's, specificaties en locatie op de kaart
+   - Zie de exacte locatie via MapLibre kaartweergave
 
 3. **Reservering maken**:
    - Klik op "Reserveren"
    - Selecteer start- en einddatum
    - Voer het geschatte aantal kilometers in
-   - Controleer het prijsoverzicht
+   - Controleer het dynamische prijsoverzicht
    - Kies een betaalmethode
+   - Bevestig je betaling
 
 4. **Reserveringen beheren**:
    - Ga naar het reserveringsoverzicht via het menu
    - Bekijk je actieve en eerdere reserveringen
+   - Annuleer reserveringen indien nodig
    - Tik op de locatie-knop om de auto op de kaart te zien
+
+### Auto verhuren (eigenaar)
+
+1. **Auto toevoegen**:
+   - Ga naar "Mijn Auto's" via het menu
+   - Klik op "Auto toevoegen"
+   - Vul de autogegevens in (merk, model, prijs, etc.)
+   - Upload foto's van je auto
+   - Stel de locatie in
+
+2. **Auto beheren**:
+   - Bekijk al je verhuurde auto's
+   - Bewerk autogegevens en prijzen
+   - Verwijder auto's uit het aanbod
+   - Bekijk reserveringen per auto
 
 ### Extra functies
 
 - **Profiel**: Beheer je persoonlijke gegevens via het profielscherm
+- **Bonuspunten**: Bekijk je gespaard bonuspunten
 - **Rijstatistieken**: Bekijk je rijgeschiedenis en statistieken
-- **Driving Tracker**: Volg je huidige rit
+- **Driving Tracker**: Volg je huidige rit met real-time GPS tracking
 - **Wachtwoord vergeten**: Gebruik de "Wachtwoord vergeten" optie op het inlogscherm
 
 ## Technologieën
@@ -154,28 +182,46 @@ Als de app verbinding maakt met een backend API, configureer dan de API base URL
 - **Jetpack Compose**: Moderne UI toolkit
 - **Material Design 3**: Design system
 - **Hilt**: Dependency injection
-- **Retrofit**: Netwerkcommunicatie
+- **Retrofit + OkHttp**: Netwerkcommunicatie met JWT authenticatie
 - **Coil**: Image loading
-- **MapLibre**: Kaartweergave
+- **MapLibre**: Interactieve kaartweergave
+- **Google Play Services Location**: GPS en locatieservices
+- **Nominatim API**: Geocoding (OpenStreetMap)
+- **OSRM API**: Route berekeningen
 - **Navigation Compose**: Navigatie
 - **DataStore**: Lokale data opslag
+- **Coroutines + StateFlow**: Async en reactive state management
 
 ## Projectstructuur
 
 ```
-app/src/main/
-├── java/com/example/rentmycar_android_app/
-│   ├── ui/                    # UI componenten en screens
-│   │   ├── HomeScreen.kt
-│   │   ├── LoginScreen.kt
-│   │   ├── CarDetailScreen.kt
-│   │   ├── ReservationScreen.kt
-│   │   └── ...
-│   ├── navigation/            # Navigatie logica
-│   ├── data/                  # Data laag (repositories, API)
-│   ├── domain/                # Business logica
-│   └── MainActivity.kt
-└── res/                       # Resources (layouts, strings, etc.)
+app/src/main/java/com/example/rentmycar_android_app/
+├── ui/                    # UI componenten en screens (26+ screens)
+│   ├── HomeScreen.kt
+│   ├── LoginScreen.kt
+│   ├── CarDetailScreen.kt
+│   ├── ReservationScreen.kt
+│   ├── MyCarsScreen.kt
+│   ├── AddCarScreen.kt
+│   ├── PaymentScreen.kt
+│   ├── DrivingTrackerScreen.kt
+│   ├── DrivingStatsScreen.kt
+│   └── ...
+├── viewmodels/            # ViewModels voor state management
+├── navigation/            # Navigatie logica (NavGraph)
+├── network/               # API services en DTOs
+│   ├── AuthService.kt
+│   ├── CarService.kt
+│   ├── ReservationService.kt
+│   ├── PaymentService.kt
+│   └── ...
+├── data/                  # Repository implementaties
+├── domain/                # Interfaces en validators
+├── di/                    # Hilt dependency injection modules
+├── model/                 # Data classes
+└── util/                  # Helper functies
+
+app/src/main/res/          # Resources (layouts, strings, etc.)
 ```
 
 ## Probleemoplossing
