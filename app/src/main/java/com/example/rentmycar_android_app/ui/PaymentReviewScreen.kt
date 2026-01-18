@@ -11,10 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import com.example.rentmycar_android_app.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.ui.payment.PaymentReviewUiState
 import java.text.NumberFormat
 import java.text.SimpleDateFormat

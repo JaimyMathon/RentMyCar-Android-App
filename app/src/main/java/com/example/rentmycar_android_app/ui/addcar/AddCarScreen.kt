@@ -25,9 +25,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
@@ -109,7 +109,7 @@ fun AddCarScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.add_car_title), fontWeight = FontWeight.SemiBold) },
+                title = { Text(stringResource(R.string.add_car), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -176,7 +176,7 @@ fun AddCarScreen(
                 ) {
                     Icon(Icons.Default.Menu, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(stringResource(R.string.gallery))
+                    Text(stringResource(R.string.gallery_button))
                 }
 
                 Button(
@@ -196,7 +196,7 @@ fun AddCarScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Car Details Section
-            Text(stringResource(R.string.car_details), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Text(stringResource(R.string.car_details_section), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
@@ -266,7 +266,7 @@ fun AddCarScreen(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    prefix = { Text(stringResource(R.string.euro_symbol)) }
+                    prefix = { Text("€") }
                 )
 
                 OutlinedTextField(
@@ -276,7 +276,7 @@ fun AddCarScreen(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    prefix = { Text(stringResource(R.string.euro_symbol)) }
+                    prefix = { Text("€") }
                 )
             }
 
@@ -297,7 +297,7 @@ fun AddCarScreen(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    prefix = { Text(stringResource(R.string.euro_symbol)) }
+                    prefix = { Text("€") }
                 )
 
                 OutlinedTextField(
@@ -307,7 +307,7 @@ fun AddCarScreen(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    prefix = { Text(stringResource(R.string.euro_symbol)) }
+                    prefix = { Text("€") }
                 )
             }
 
@@ -324,7 +324,7 @@ fun AddCarScreen(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    prefix = { Text(stringResource(R.string.euro_symbol)) }
+                    prefix = { Text("€") }
                 )
 
                 OutlinedTextField(
@@ -334,7 +334,7 @@ fun AddCarScreen(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    prefix = { Text(stringResource(R.string.euro_symbol)) }
+                    prefix = { Text("€") }
                 )
             }
 
@@ -406,14 +406,14 @@ fun AddCarScreen(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text(stringResource(R.string.search_address))
+                    Text(stringResource(R.string.lookup_address))
                 }
             }
 
             if (uiState.latitude != null && uiState.longitude != null) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Locatie gevonden: ${String.format("%.4f", uiState.latitude)}, ${String.format("%.4f", uiState.longitude)}",
+                    text = stringResource(R.string.location_found, String.format("%.4f", uiState.latitude), String.format("%.4f", uiState.longitude)),
                     fontSize = 12.sp,
                     color = Color(0xFF4CAF50)
                 )
@@ -472,7 +472,7 @@ fun AddCarScreen(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text(stringResource(R.string.add_car_title), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(R.string.add_car), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
 

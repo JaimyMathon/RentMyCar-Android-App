@@ -21,9 +21,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.rentmycar_android_app.R
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.ReservationDto
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -39,10 +39,11 @@ fun ReservationsScreen(
 
     var selectedTab by remember { mutableStateOf(0) }
 
-    val upcomingText = stringResource(R.string.upcoming)
-    val completedText = stringResource(R.string.completed)
-    val cancelledText = stringResource(R.string.cancelled)
-    val tabs = listOf(upcomingText, completedText, cancelledText)
+    val tabs = listOf(
+        stringResource(R.string.upcoming),
+        stringResource(R.string.completed),
+        stringResource(R.string.cancelled)
+    )
 
     // Filter reservations by status
     val filteredReservations = remember(uiState.reservations, selectedTab) {
@@ -188,7 +189,7 @@ fun ReservationCard(
                     // Placeholder icon
                     Icon(
                         imageVector = Icons.Default.Home,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.car_photo),
                         modifier = Modifier.size(80.dp),
                         tint = Color(0xFF757575)
                     )
@@ -206,7 +207,7 @@ fun ReservationCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${car?.brand ?: "Unknown"} ${car?.model ?: ""}",
+                    text = "${car?.brand ?: stringResource(R.string.unknown)} ${car?.model ?: ""}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium
                 )
@@ -258,7 +259,7 @@ fun ReservationCard(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = stringResource(R.string.start_date),
+                            text = stringResource(R.string.start),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFF757575)
                         )
@@ -271,7 +272,7 @@ fun ReservationCard(
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = stringResource(R.string.end_date),
+                            text = stringResource(R.string.end),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFF757575)
                         )
@@ -334,7 +335,7 @@ fun ReservationCard(
                     shape = RoundedCornerShape(24.dp)
                 ) {
                     Text(
-                        stringResource(R.string.cancel),
+                        stringResource(R.string.cancel_reservation),
                         color = Color.White,
                         style = MaterialTheme.typography.bodyLarge
                     )

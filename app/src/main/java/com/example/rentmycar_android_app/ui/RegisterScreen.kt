@@ -9,12 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.*
 
@@ -32,6 +32,8 @@ fun RegisterScreen(
 
     val context = LocalContext.current
     val service = ApiClient.instance.create(AuthService::class.java)
+
+    val registrationFailedMessage = stringResource(R.string.registration_failed)
 
     Box(
         modifier = Modifier.fillMaxSize().background(Color(0xFFE3ECFF)),
@@ -90,19 +92,19 @@ fun RegisterScreen(
                                 sharedPrefs.edit().putString("username", authResponse.username).apply()
                                 onRegisterSuccess()
                             } else {
-                                errorMessage = "Registratie mislukt"
+                                errorMessage = registrationFailedMessage
                             }
                         }
                         override fun onFailure(call: retrofit2.Call<AuthResponse>, t: Throwable) {
                             loading = false
-                            errorMessage = "Netwerkfout: ${t.message}"
+                            errorMessage = context.getString(R.string.network_error, t.message ?: "")
                         }
                     })
                 },
                 modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
                 shape = RoundedCornerShape(12.dp),
                 enabled = !loading
-            ) { Text(stringResource(R.string.register_title)) }
+            ) { Text(stringResource(R.string.register_button)) }
 
             TextButton(onClick = onNavigateToLogin) {
                 Text(stringResource(R.string.already_have_account))

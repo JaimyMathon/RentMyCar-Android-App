@@ -13,12 +13,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
 import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.viewmodels.ProfileViewModel
 
@@ -70,7 +70,7 @@ fun ProfileScreen(
         ) {
 
             Text(
-                text = stringResource(R.string.profile_title),
+                text = stringResource(R.string.profile),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -159,8 +159,8 @@ fun ProfileScreen(
                 TextField(
                     value = user?.phone ?: "",
                     onValueChange = viewModel::onPhoneChange,
-                    placeholder = { Text(stringResource(R.string.enter_phone)) },
-                    leadingIcon = { Text(stringResource(R.string.phone_prefix)) },
+                    placeholder = { Text(stringResource(R.string.phone_number)) },
+                    leadingIcon = { Text("+31") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                 )
 
@@ -202,7 +202,7 @@ fun ProfileScreen(
                         )
                     } else {
                         Text(
-                            text = stringResource(R.string.save_data),
+                            text = stringResource(R.string.save_details),
                             color = Color.White,
                             fontSize = 16.sp
                         )
@@ -272,7 +272,7 @@ fun LogoutConfirmationDialog(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.logout_confirmation),
+                    text = stringResource(R.string.logout_confirm),
                     fontSize = 16.sp,
                     color = Color.Gray
                 )

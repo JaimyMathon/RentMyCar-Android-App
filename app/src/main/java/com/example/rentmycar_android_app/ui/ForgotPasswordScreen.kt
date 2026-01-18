@@ -8,11 +8,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.ApiClient
 import com.example.rentmycar_android_app.network.AuthService
@@ -32,6 +33,15 @@ fun ForgotPasswordScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
     val service = ApiClient.instance.create(AuthService::class.java)
+
+    // Pre-fetch string resources for use in callbacks
+    val context = LocalContext.current
+    val fillAllFieldsError = stringResource(R.string.fill_all_fields)
+    val passwordsNotMatchError = stringResource(R.string.passwords_not_match)
+    val resetError = stringResource(R.string.reset_error)
+    val networkErrorFormat: (String) -> String = { message ->
+        context.getString(R.string.network_error, message)
+    }
 
     Box(
         modifier = Modifier
@@ -89,13 +99,13 @@ fun ForgotPasswordScreen(
 
                     if (email.isBlank() || newPassword.isBlank() || confirmPassword.isBlank()) {
                         loading = false
-                        errorMessage = "Vul alle velden in"
+                        errorMessage = fillAllFieldsError
                         return@Button
                     }
 
                     if (newPassword != confirmPassword) {
                         loading = false
-                        errorMessage = "Wachtwoorden komen niet overeen"
+                        errorMessage = passwordsNotMatchError
                         return@Button
                     }
 
@@ -114,13 +124,13 @@ fun ForgotPasswordScreen(
                             if (response.isSuccessful && response.body()?.isSuccess == true) {
                                 successMessage = response.body()?.message
                             } else {
-                                errorMessage = response.body()?.message ?: "Fout bij resetten"
+                                errorMessage = response.body()?.message ?: resetError
                             }
                         }
 
                         override fun onFailure(call: retrofit2.Call<SimpleResponse>, t: Throwable) {
                             loading = false
-                            errorMessage = "Netwerkfout: ${t.message}"
+                            errorMessage = networkErrorFormat(t.message ?: "")
                         }
                     })
                 },
@@ -130,7 +140,7 @@ fun ForgotPasswordScreen(
                 shape = RoundedCornerShape(12.dp),
                 enabled = !loading
             ) {
-                Text(stringResource(R.string.change_password))
+                Text(stringResource(R.string.change_password_button))
             }
 
             TextButton(

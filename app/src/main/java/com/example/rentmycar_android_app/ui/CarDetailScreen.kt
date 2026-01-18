@@ -18,13 +18,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.rentmycar_android_app.R
+import coil.request.ImageRequest
 import com.example.rentmycar_android_app.network.ApiClientWithToken
 import com.example.rentmycar_android_app.network.ApiService
 import com.example.rentmycar_android_app.network.CarDto
@@ -81,7 +81,7 @@ fun CarDetailScreen(
                 }
             }
         } catch (e: Exception) {
-            error = e.message ?: context.getString(R.string.error_fetching_car)
+            error = e.message
         } finally {
             isLoading = false
         }
@@ -92,7 +92,7 @@ fun CarDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        stringResource(R.string.car_details_title),
+                        stringResource(R.string.car_details),
                         fontWeight = FontWeight.SemiBold
                     )
                 },
@@ -130,7 +130,7 @@ fun CarDetailScreen(
                                 color = Color.Gray
                             )
                             Text(
-                                text = stringResource(R.string.price_per_day, (car!!.pricePerTimeSlot ?: 0.0).toInt()),
+                                text = "€${(car!!.pricePerTimeSlot ?: 0.0).toInt()}/dag",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -174,7 +174,7 @@ fun CarDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(error!!, color = Color.Red)
+                        Text(error ?: stringResource(R.string.error_fetching_car), color = Color.Red)
                     }
                 }
                 car != null -> {
@@ -247,7 +247,7 @@ fun CarDetailScreen(
                             Tab(
                                 selected = selectedTabIndex == 1,
                                 onClick = { selectedTabIndex = 1 },
-                                text = { Text(stringResource(R.string.gallery_tab)) }
+                                text = { Text(stringResource(R.string.gallery)) }
                             )
                         }
 
@@ -307,7 +307,7 @@ private fun OverTabContent(car: CarDto, ownerName: String?) {
         // Car Details
         DetailRow(label = stringResource(R.string.brand), value = car.brand ?: "-")
         DetailRow(label = stringResource(R.string.model), value = car.model ?: "-")
-        DetailRow(label = stringResource(R.string.price_per_km_label), value = "€${car.costPerKm ?: 0.0}")
+        DetailRow(label = stringResource(R.string.price_per_km), value = "€${car.costPerKm ?: 0.0}")
         DetailRow(label = stringResource(R.string.tco), value = "€${(car.tco ?: 0.0).toInt()}")
         DetailRow(label = stringResource(R.string.category), value = car.category ?: "-")
     }

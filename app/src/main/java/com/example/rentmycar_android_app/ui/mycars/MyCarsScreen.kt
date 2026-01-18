@@ -19,17 +19,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.rentmycar_android_app.R
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.ApiClientWithToken
 import com.example.rentmycar_android_app.network.CarDto
 import com.example.rentmycar_android_app.network.CarService
@@ -61,7 +61,7 @@ fun MyCarsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.my_cars_title), fontWeight = FontWeight.SemiBold) },
+                title = { Text(stringResource(R.string.my_cars), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -77,7 +77,7 @@ fun MyCarsScreen(
                 onClick = onAddCarClick,
                 containerColor = Color(0xFF4CAF50)
             ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_car), tint = Color.White)
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_car_fab), tint = Color.White)
             }
         },
         containerColor = Color(0xFFF5F5F5)
@@ -103,7 +103,7 @@ fun MyCarsScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = stringResource(R.string.error_with_message, uiState.error ?: ""),
+                            text = "Fout: ${uiState.error}",
                             color = Color.Red
                         )
                     }
@@ -238,12 +238,12 @@ private fun MyCarCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "€${(car.pricePerTimeSlot ?: 0.0).toInt()}/dag",
+                    text = "€${(car.pricePerTimeSlot ?: 0.0).toInt()}${stringResource(R.string.per_day)}",
                     fontWeight = FontWeight.SemiBold
                 )
 
                 Text(
-                    text = car.status ?: "Beschikbaar",
+                    text = car.status ?: stringResource(R.string.available),
                     fontSize = 13.sp,
                     color = if (car.status == "AVAILABLE") Color(0xFF4CAF50) else Color.Gray
                 )

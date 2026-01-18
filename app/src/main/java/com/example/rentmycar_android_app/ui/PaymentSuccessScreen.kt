@@ -12,10 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentmycar_android_app.R
 
 @Composable
 fun PaymentSuccessScreen(
@@ -43,7 +45,7 @@ fun PaymentSuccessScreen(
         ) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Terug",
+                contentDescription = stringResource(R.string.back),
                 tint = Color.Black
             )
         }
@@ -65,7 +67,7 @@ fun PaymentSuccessScreen(
             ) {
                 Icon(
                     Icons.Default.Check,
-                    contentDescription = "Succes",
+                    contentDescription = stringResource(R.string.payment_successful),
                     tint = checkColor,
                     modifier = Modifier.size(60.dp)
                 )
@@ -75,7 +77,7 @@ fun PaymentSuccessScreen(
 
             // Title
             Text(
-                text = "Betaling succesvol",
+                text = stringResource(R.string.payment_successful),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
@@ -85,7 +87,7 @@ fun PaymentSuccessScreen(
 
             // Description
             Text(
-                text = "Je auto is succesvol gereseveerd je kan je reserveren bij alle reserveringen bekijken",
+                text = stringResource(R.string.car_reserved_success),
                 fontSize = 14.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center,
@@ -104,7 +106,7 @@ fun PaymentSuccessScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = buttonBg)
             ) {
                 Text(
-                    text = "Bekijk reserveringen",
+                    text = stringResource(R.string.view_reservations),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White

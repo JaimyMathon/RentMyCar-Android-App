@@ -18,17 +18,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentmycar_android_app.R
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.ApiClientWithToken
 import com.example.rentmycar_android_app.network.CarDto
 import com.example.rentmycar_android_app.network.CarService
@@ -52,8 +52,8 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE) }
-    val unknownText = stringResource(R.string.unknown)
-    val username = sharedPrefs.getString("username", unknownText) ?: unknownText
+    val unknownString = stringResource(R.string.unknown)
+    val username = sharedPrefs.getString("username", unknownString) ?: unknownString
 
     val uiState by viewModel.uiState.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -73,6 +73,7 @@ fun HomeScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val carIdMissingMessage = stringResource(R.string.car_id_missing)
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -198,7 +199,7 @@ fun HomeScreen(
                                     } else {
                                         scope.launch {
                                             snackbarHostState.showSnackbar(
-                                                message = context.getString(R.string.car_id_missing),
+                                                message = carIdMissingMessage,
                                                 withDismissAction = true
                                             )
                                         }
@@ -394,8 +395,8 @@ private fun HomeBottomBar(
         NavigationBarItem(
             selected = true,
             onClick = onHomeClick,
-            icon = { Icon(Icons.Default.Home, contentDescription = stringResource(R.string.nav_home)) },
-            label = { Text(stringResource(R.string.nav_home)) }
+            icon = { Icon(Icons.Default.Home, contentDescription = stringResource(R.string.home)) },
+            label = { Text(stringResource(R.string.home)) }
         )
         NavigationBarItem(
             selected = false,
@@ -412,7 +413,7 @@ private fun HomeBottomBar(
         NavigationBarItem(
             selected = false,
             onClick = onKeysClick,
-            icon = { Icon(Icons.Default.CheckCircle, contentDescription = stringResource(R.string.nav_reservations)) },
+            icon = { Icon(Icons.Default.CheckCircle, contentDescription = stringResource(R.string.nav_reservations)) }, // placeholder
             label = { Text(stringResource(R.string.nav_reservations)) }
         )
         NavigationBarItem(

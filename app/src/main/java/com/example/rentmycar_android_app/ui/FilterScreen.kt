@@ -74,7 +74,7 @@ fun FilterScreen(
             )
 
             FilterChipGroup(
-                options = listOf(stringResource(R.string.all), "ICE", "BEV", "FCEV"),
+                options = listOf("All", "ICE", "BEV", "FCEV"),
                 selectedOptions = filterState.selectedTypes,
                 onSelectionChange = { viewModel.updateSelectedTypes(it) },
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -99,7 +99,7 @@ fun FilterScreen(
 
             // Price per Day Section
             Text(
-                text = stringResource(R.string.price_per_day_filter),
+                text = stringResource(R.string.price_per_day),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)

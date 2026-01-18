@@ -13,11 +13,15 @@ android {
     defaultConfig {
         applicationId = "com.example.rentmycar_android_app"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // ✅ Hilt test runner (anders crasht hiltViewModel() in tests)
+        testInstrumentationRunner = "com.example.rentmycar_android_app.HiltTestRunner"
+
+        // Keep only these locales to ensure proper language switching
+        resourceConfigurations += listOf("nl", "en")
     }
 
     buildTypes {
@@ -29,72 +33,51 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
-
+    // Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // App languages (Android 13+)
+    implementation("androidx.appcompat:appcompat:1.7.0")
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.mockito:mockito-core:5.3.1")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:<compose_version>")
-    debugImplementation ("androidx.compose.ui:ui-test-manifest:<compose_version>")
+    debugImplementation(libs.androidx.ui.tooling)
 
-    androidTestImplementation ("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation ("androidx.test:runner:1.5.2")
+    // Material2 (alleen als je nog androidx.compose.material.* gebruikt)
+    implementation("androidx.compose.material:material:1.6.8")
 
-        // ... bestaande dependencies ...
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.7.0")
 
-        // Unit Testing
-
-
-    // EXTRA: Material 2 voor Scaffold, TopAppBar, Button, OutlinedTextField, etc.
-    // Dit heb je nodig voor de ReservationScreen die androidx.compose.material.* gebruikt.
-    implementation("androidx.compose.material:material")
-
-    // Retrofit + netwerk
+    // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
-    implementation("androidx.navigation:navigation-compose:2.7.0")
-    implementation(libs.androidx.remote.creation.core)
-    testImplementation(libs.junit)
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Unit Testing
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("androidx.arch.core:core-testing:2.2.0")  // <- VOEG DEZE TOE
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.4")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
-    // MapLibre GL Native for Android
+    // Maps / location
     implementation("org.maplibre.gl:android-sdk:11.5.0")
-
-    // Google Play Services for Location
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
     // Hilt
@@ -105,6 +88,24 @@ dependencies {
     // DataStore
     implementation(libs.androidx.datastore.preferences)
 
-    // Coil for image loading
+    // Coil
     implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // Unit tests
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // Android instrumented tests
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    androidTestImplementation("androidx.test:core-ktx:1.5.0")
+
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
+
+    // ✅ Hilt testing
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    kspAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
 }

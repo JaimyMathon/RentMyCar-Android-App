@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.res.stringResource
+import com.example.rentmycar_android_app.R
 import androidx.core.content.ContextCompat
 import com.example.rentmycar_android_app.network.RoutingService
 import com.example.rentmycar_android_app.network.OSRMClient
@@ -79,10 +81,10 @@ fun MapScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Route naar auto") },
+                title = { Text(stringResource(R.string.route_to_car)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Terug")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -107,7 +109,7 @@ fun MapScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Locatie toegang is vereist om de kaart te tonen",
+                        text = stringResource(R.string.location_permission_required),
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -121,7 +123,7 @@ fun MapScreen(
                             )
                         }
                     ) {
-                        Text("Geef Toestemming")
+                        Text(stringResource(R.string.grant_permission))
                     }
                 }
             }
@@ -312,7 +314,7 @@ fun MapLibreMapView(
                     .padding(16.dp),
                 action = {
                     TextButton(onClick = { errorMessage = null }) {
-                        Text("Sluiten")
+                        Text(stringResource(R.string.close))
                     }
                 }
             ) {
