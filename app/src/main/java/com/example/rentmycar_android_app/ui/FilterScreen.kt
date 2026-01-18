@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.rentmycar_android_app.R
+import com.example.rentmycar_android_app.viewmodels.FilterViewModel
 
 data class FilterState(
     val selectedTypes: Set<String> = emptySet(),

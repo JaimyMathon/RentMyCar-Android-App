@@ -1,4 +1,4 @@
-package com.example.rentmycar_android_app.ui
+package com.example.rentmycar_android_app.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

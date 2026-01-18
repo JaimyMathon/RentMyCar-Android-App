@@ -71,7 +71,6 @@ class LoginScreenTest {
         }
 
         composeTestRule.onNodeWithText("Wachtwoord").performTextInput("password123")
-        // Password should be hidden, so we check for the field, not the text
         composeTestRule. onNodeWithText("Wachtwoord").assertExists()
     }
 
@@ -93,7 +92,6 @@ class LoginScreenTest {
         composeTestRule.onNodeWithText("Wachtwoord").performTextInput("password123")
         composeTestRule.onNodeWithText("Inloggen").performClick()
 
-        // Login button should be clickable
         composeTestRule. onNodeWithText("Inloggen").assertExists()
     }
 
@@ -117,7 +115,6 @@ class LoginScreenTest {
         composeTestRule.onNodeWithText("Wachtwoord").performTextInput("wrongpass")
         composeTestRule. onNodeWithText("Inloggen").performClick()
 
-        // Wait for error to appear
         composeTestRule.waitUntil(timeoutMillis = 3000) {
             composeTestRule.onAllNodesWithText("E-mail of wachtwoord onjuist")
                 .fetchSemanticsNodes().isNotEmpty()
@@ -145,7 +142,6 @@ class LoginScreenTest {
         composeTestRule.onNodeWithText("Wachtwoord").performTextInput("password123")
         composeTestRule.onNodeWithText("Inloggen").performClick()
 
-        // Loading indicator should appear
         composeTestRule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
             .assertExists()
     }

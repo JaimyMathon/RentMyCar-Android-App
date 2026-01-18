@@ -1,9 +1,10 @@
-package com.example.rentmycar_android_app.ui
+package com.example.rentmycar_android_app.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rentmycar_android_app.domain.repository.CarRepository
 import com.example.rentmycar_android_app.network.CarDto
+import com.example.rentmycar_android_app.ui.FilterState
 import com.example.rentmycar_android_app.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

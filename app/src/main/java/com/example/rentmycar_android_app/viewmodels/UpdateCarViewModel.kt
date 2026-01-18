@@ -1,4 +1,4 @@
-package com.example.rentmycar_android_app.ui.updatecar
+package com.example.rentmycar_android_app.viewmodels
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

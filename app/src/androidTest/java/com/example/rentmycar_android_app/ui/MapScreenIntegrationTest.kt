@@ -30,7 +30,6 @@ class MapScreenIntegrationTest {
 
     private var backClicked = false
 
-    // Test coordinates (Amsterdam)
     private val testCarLatitude = 52.3676
     private val testCarLongitude = 4.9041
 
@@ -38,8 +37,6 @@ class MapScreenIntegrationTest {
     fun setup() {
         backClicked = false
     }
-
-    // ==================== TopAppBar Tests ====================
 
     @Test
     fun mapScreen_displaysCorrectTitle() {
@@ -82,8 +79,6 @@ class MapScreenIntegrationTest {
         assertTrue(backClicked)
     }
 
-    // ==================== Navigation FAB Tests ====================
-
     @Test
     fun mapScreen_withPermission_displaysFAB() {
         composeTestRule.setContent {
@@ -96,8 +91,6 @@ class MapScreenIntegrationTest {
 
         composeTestRule.waitForIdle()
 
-        // FAB should be visible when permission is granted
-        // Initial state is "navigating" so content description should be "Stop navigatie"
         composeTestRule.onNodeWithContentDescription("Stop navigatie").assertExists()
     }
 

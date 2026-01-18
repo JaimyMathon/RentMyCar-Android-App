@@ -5,6 +5,7 @@ import com.example.rentmycar_android_app.domain.repository.CarRepository
 import com.example.rentmycar_android_app.network.CarDto
 import com.example.rentmycar_android_app.network.PhotoDto
 import com.example.rentmycar_android_app.util.Result
+import com.example.rentmycar_android_app.viewmodels.FilterViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher

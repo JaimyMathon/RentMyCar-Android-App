@@ -42,9 +42,6 @@ class PaymentReviewScreenUiTest {
         }
     }
 
-    // ============================================================
-    // UI TEST 1 (rubric-proof): loading zichtbaar + betalen disabled
-    // ============================================================
     @Test
     fun loading_showsProgress_andPayButtonDisabled() {
         baseArgs(
@@ -61,9 +58,6 @@ class PaymentReviewScreenUiTest {
         composeRule.onNodeWithTag("payment_pay_button").assertIsNotEnabled()
     }
 
-    // ============================================================
-    // UI TEST 2 (rubric-proof): car geladen -> betalen enabled + click
-    // ============================================================
     @Test
     fun carLoaded_enablesPayButton_andClickCallsOnPayClick() {
         var payClicks = 0
@@ -94,9 +88,6 @@ class PaymentReviewScreenUiTest {
         assertEquals(1, payClicks)
     }
 
-    // ============================================================
-    // EXTRA UI TEST 3: processing -> spinner zichtbaar + button disabled
-    // ============================================================
     @Test
     fun processing_showsSpinnerInsideButton_andDisablesButton() {
         val car = CarDto(
@@ -122,9 +113,6 @@ class PaymentReviewScreenUiTest {
         composeRule.onNodeWithTag("payment_pay_button").assertIsNotEnabled()
     }
 
-    // ============================================================
-    // EXTRA UI TEST 4: paymentSuccess triggert onPaymentSuccess
-    // ============================================================
     @Test
     fun paymentSuccess_triggersOnPaymentSuccessCallback() {
         var successCalls = 0
@@ -140,7 +128,6 @@ class PaymentReviewScreenUiTest {
             onPaymentSuccess = { successCalls++ }
         )
 
-        // LaunchedEffect draait async; give Compose een tick
         composeRule.waitForIdle()
 
         assertTrue(successCalls >= 1)

@@ -91,7 +91,6 @@ fun DrivingTrackerScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Status Card
             Card(
                 modifier = Modifier. fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -116,7 +115,6 @@ fun DrivingTrackerScreen(
 
             Spacer(modifier = Modifier. height(16.dp))
 
-            // Stats Row
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatCard(
                     modifier = Modifier.weight(1f),
@@ -146,7 +144,6 @@ fun DrivingTrackerScreen(
                 )
             }
 
-            // Start/Stop Button
             Button(
                 onClick = { if (uiState. isTracking) viewModel.stopAndSave() else viewModel.startTracking() },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -185,7 +182,6 @@ private fun formatDuration(millis: Long): String {
     return String.format("%02d:%02d", minutes, seconds)
 }
 
-// ViewModel (verwijder simulateAcceleration en simulateBraking functies)
 data class DrivingTrackerUiState(
     val hasLocationPermission: Boolean = false,
     val isTracking: Boolean = false,

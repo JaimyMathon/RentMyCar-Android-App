@@ -34,89 +34,68 @@ class ReservationScreenTest {
         loadCarDataUseCase = LoadCarDataUseCase(carService, reservationService)
     }
 
-    // =========================================================================
-    // 1. RESERVATIONSTATE TESTS - Form Validatie
-    // =========================================================================
-
     @Test
     fun `test ReservationState isFormValid - alle velden ingevuld - returns true`() {
-        // Arrange
         val state = ReservationState(
             fromDate = "01-01-2024",
             toDate = "05-01-2024",
             kilometers = "100"
         )
 
-        // Act
         val isValid = state.isFormValid
 
-        // Assert
         assertTrue("Form moet valid zijn met alle velden ingevuld", isValid)
     }
 
     @Test
     fun `test ReservationState isFormValid - fromDate leeg - returns false`() {
-        // Arrange
         val state = ReservationState(
             fromDate = "",
             toDate = "05-01-2024",
             kilometers = "100"
         )
 
-        // Act
         val isValid = state.isFormValid
 
-        // Assert
         assertFalse("Form moet invalid zijn zonder fromDate", isValid)
     }
 
     @Test
     fun `test ReservationState isFormValid - toDate leeg - returns false`() {
-        // Arrange
         val state = ReservationState(
             fromDate = "01-01-2024",
             toDate = "",
             kilometers = "100"
         )
 
-        // Act
+
         val isValid = state.isFormValid
 
-        // Assert
         assertFalse("Form moet invalid zijn zonder toDate", isValid)
     }
 
     @Test
     fun `test ReservationState isFormValid - kilometers leeg - returns false`() {
-        // Arrange
         val state = ReservationState(
             fromDate = "01-01-2024",
             toDate = "05-01-2024",
             kilometers = ""
         )
 
-        // Act
         val isValid = state.isFormValid
 
-        // Assert
         assertFalse("Form moet invalid zijn zonder kilometers", isValid)
     }
 
     @Test
     fun `test ReservationState isFormValid - alle velden leeg - returns false`() {
-        // Arrange
         val state = ReservationState()
 
-        // Act
         val isValid = state.isFormValid
 
-        // Assert
         assertFalse("Form moet invalid zijn met lege state", isValid)
     }
 
-    // =========================================================================
-    // 2. DATEFORMATTER TESTS - Datum parsing
-    // =========================================================================
 
     @Test
     fun `test DateFormatter formatReservationDate - valid ISO date - returns formatted`() {

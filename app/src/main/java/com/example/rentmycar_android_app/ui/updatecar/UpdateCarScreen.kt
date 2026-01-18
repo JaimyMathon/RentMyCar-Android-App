@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.rentmycar_android_app.R
+import com.example.rentmycar_android_app.viewmodels.UpdateCarViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

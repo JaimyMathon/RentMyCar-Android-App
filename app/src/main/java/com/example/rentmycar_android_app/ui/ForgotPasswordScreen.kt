@@ -34,7 +34,6 @@ fun ForgotPasswordScreen(
     var successMessage by remember { mutableStateOf<String?>(null) }
     val service = ApiClient.instance.create(AuthService::class.java)
 
-    // Pre-fetch string resources for use in callbacks
     val context = LocalContext.current
     val fillAllFieldsError = stringResource(R.string.fill_all_fields)
     val passwordsNotMatchError = stringResource(R.string.passwords_not_match)
