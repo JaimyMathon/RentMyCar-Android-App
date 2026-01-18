@@ -15,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.rentmycar_android_app.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -140,7 +142,7 @@ fun ReservationScreen(
                 }
                 .onFailure { error ->
                     state = state.copy(
-                        error = "Kan gegevens niet laden: ${error.message}",
+                        error = error.message ?: "",
                         isLoadingReservations = false
                     )
                 }
@@ -174,14 +176,14 @@ fun ReservationScreen(
                 elevation = 0.dp,
                 title = {
                     Text(
-                        text = "Reserveer auto",
+                        text = stringResource(R.string.reserve_car),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Terug")
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -206,7 +208,7 @@ fun ReservationScreen(
                         contentColor = Color.White
                     )
                 ) {
-                    Text(text = "Doorgaan")
+                    Text(text = stringResource(R.string.continue_text))
                 }
             }
         }
@@ -232,7 +234,7 @@ fun ReservationScreen(
             }
 
             Text(
-                text = "Uw Informatie details",
+                text = stringResource(R.string.your_information_details),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp
             )
@@ -240,7 +242,7 @@ fun ReservationScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Vanaf wanneer tot wanneer wilt u de auto huren?",
+                text = stringResource(R.string.when_rent_car),
                 fontSize = 13.sp
             )
 
@@ -252,12 +254,22 @@ fun ReservationScreen(
                 reservedPeriods = state.reservedPeriods
             )
 
+            // Show error if any
+            if (!state.error.isNullOrBlank()) {
+                Text(
+                    text = stringResource(R.string.cannot_load_data, state.error!!),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colors.error,
+                    textAlign = TextAlign.Start
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             ReservationDropdownField(
-                label = "Reserveer vanaf",
+                label = stringResource(R.string.reserve_from),
                 value = state.fromDate,
-                placeholder = "Datum",
+                placeholder = stringResource(R.string.date),
                 background = fieldBg,
                 onClick = { showDatePicker { date -> state = state.copy(fromDate = date) } }
             )
@@ -265,9 +277,9 @@ fun ReservationScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             ReservationDropdownField(
-                label = "Reserveer tot en met",
+                label = stringResource(R.string.reserve_until),
                 value = state.toDate,
-                placeholder = "Datum",
+                placeholder = stringResource(R.string.date),
                 background = fieldBg,
                 onClick = { showDatePicker { date -> state = state.copy(toDate = date) } }
             )
@@ -275,7 +287,7 @@ fun ReservationScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Aantal Km's",
+                text = stringResource(R.string.number_of_kms),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp
             )
@@ -287,7 +299,7 @@ fun ReservationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
-                placeholder = { Text(text = "Bv: 300", color = Color(0xFFB2AAAA)) },
+                placeholder = { Text(text = stringResource(R.string.kms_example), color = Color(0xFFB2AAAA)) },
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     backgroundColor = fieldBg,
                     focusedBorderColor = Color.Transparent,
@@ -302,7 +314,7 @@ fun ReservationScreen(
 
             if (!state.isFormValid) {
                 Text(
-                    text = "Vul alle velden in om door te gaan.",
+                    text = stringResource(R.string.fill_all_fields_to_continue),
                     fontSize = 12.sp,
                     color = MaterialTheme.colors.error,
                     textAlign = TextAlign.Start
@@ -331,7 +343,7 @@ private fun ReservationStatusSection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Beschikbaarheid laden...",
+                    text = stringResource(R.string.loading_availability),
                     fontSize = 12.sp,
                     color = Color(0xFF6F6A6A)
                 )
@@ -347,12 +359,13 @@ private fun ReservationStatusSection(
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
                     Text(
-                        text = "Let op: Deze auto is al gereserveerd op:",
+                        text = stringResource(R.string.car_already_reserved),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 13.sp,
                         color = Color(0xFF856404)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+                    val untilText = stringResource(R.string.until)
                     reservedPeriods.forEach { reservation ->
                         val startFormatted = DateFormatter.formatReservationDate(reservation.startTime)
                         val endFormatted = DateFormatter.formatReservationDate(reservation.endTime)
@@ -367,7 +380,7 @@ private fun ReservationStatusSection(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "$startFormatted t/m $endFormatted",
+                                text = "$startFormatted $untilText $endFormatted",
                                 fontSize = 12.sp,
                                 color = Color(0xFF856404)
                             )
@@ -418,7 +431,7 @@ private fun ReservationDropdownField(
             ) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Selecteer datum",
+                    contentDescription = stringResource(R.string.select_date),
                     tint = Color(0xFF5A5555)
                 )
             }

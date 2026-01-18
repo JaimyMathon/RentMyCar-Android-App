@@ -5,8 +5,9 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rentmycar_android_app.data.auth.TokenManager
+import com.example.rentmycar_android_app.domain.factory.CarRequestFactory
 import com.example.rentmycar_android_app.domain.repository.CarRepository
-import com.example.rentmycar_android_app.network.AddCarRequest
+import com.example.rentmycar_android_app.domain.validator.InputValidator
 import com.example.rentmycar_android_app.network.ApiService
 import com.example.rentmycar_android_app.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +36,9 @@ class AddCarViewModel @Inject constructor(
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
+    private val _uiState = MutableStateFlow(AddCarUiState())
+    val uiState: StateFlow<AddCarUiState> = _uiState
+
     init {
         loadUserId()
     }
@@ -49,14 +53,10 @@ class AddCarViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(userId = response.body()?.id)
                     }
                 } catch (e: Exception) {
-                    // Ignore, will show error when trying to add car
                 }
             }
         }
     }
-
-    private val _uiState = MutableStateFlow(AddCarUiState())
-    val uiState: StateFlow<AddCarUiState> = _uiState
 
     fun geocodeAddress(street: String, houseNumber: String, postcode: String, country: String) {
         viewModelScope.launch {
@@ -85,6 +85,21 @@ class AddCarViewModel @Inject constructor(
                 is Result.Loading -> {}
             }
         }
+    }
+
+    fun validateAddressInput(street: String, houseNumber: String, postcode: String): List<String> {
+        return InputValidator.validateAddress(street, houseNumber, postcode)
+    }
+
+    fun validatePrices(pricePerDay: Double, pricePerKm: Double): List<String> {
+        val errors = mutableListOf<String>()
+        if (!InputValidator.isValidPricePerDay(pricePerDay)) {
+            errors.add("Prijs per dag moet tussen €${InputValidator.MIN_PRICE} en €${InputValidator.MAX_PRICE_PER_DAY} zijn")
+        }
+        if (!InputValidator.isValidPricePerKm(pricePerKm)) {
+            errors.add("Prijs per km moet tussen €${InputValidator.MIN_PRICE} en €${InputValidator.MAX_PRICE_PER_KM} zijn")
+        }
+        return errors
     }
 
     fun addCar(
@@ -119,10 +134,16 @@ class AddCarViewModel @Inject constructor(
             return
         }
 
+        val priceErrors = validatePrices(pricePerTimeSlot, costPerKm)
+        if (priceErrors.isNotEmpty()) {
+            _uiState.value = _uiState.value.copy(error = priceErrors.joinToString("\n"))
+            return
+        }
+
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
-            val request = AddCarRequest(
+            val validationResult = CarRequestFactory.create(
                 ownerId = userId,
                 brand = brand,
                 model = model,
@@ -138,30 +159,40 @@ class AddCarViewModel @Inject constructor(
                 depreciation = depreciation
             )
 
-            when (val carResult = carRepository.addCar(request)) {
-                is Result.Success -> {
-                    val carId = carResult.data.id
+            when (validationResult) {
+                is CarRequestFactory.ValidationResult.Invalid -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = validationResult.errors.joinToString("\n")
+                    )
+                    return@launch
+                }
+                is CarRequestFactory.ValidationResult.Valid -> {
+                    when (val carResult = carRepository.addCar(validationResult.request)) {
+                        is Result.Success -> {
+                            val carId = carResult.data.id
 
-                    // Upload photo if provided
-                    if (photoUri != null) {
-                        val file = uriToFile(photoUri, context)
-                        if (file != null) {
-                            carRepository.addPhoto(carId, "Auto foto", file)
+                            if (photoUri != null) {
+                                val file = uriToFile(photoUri, context)
+                                if (file != null) {
+                                    carRepository.addPhoto(carId, "Auto foto", file)
+                                }
+                            }
+
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                isSuccess = true
+                            )
                         }
+                        is Result.Error -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                error = carResult.message ?: "Fout bij toevoegen auto"
+                            )
+                        }
+                        is Result.Loading -> {}
                     }
-
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        isSuccess = true
-                    )
                 }
-                is Result.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = carResult.message ?: "Fout bij toevoegen auto"
-                    )
-                }
-                is Result.Loading -> {}
             }
         }
     }

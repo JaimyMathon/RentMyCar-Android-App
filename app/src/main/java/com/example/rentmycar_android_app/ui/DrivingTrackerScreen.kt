@@ -21,6 +21,8 @@ import androidx.compose. ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose. ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.example.rentmycar_android_app.R
 import androidx.core.content.ContextCompat
 import androidx.lifecycle. ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -71,10 +73,10 @@ fun DrivingTrackerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Rijgedrag Tracker", color = Color.White) },
+                title = { Text(stringResource(R.string.driving_tracker), color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, "Terug", tint = Color.White)
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = Color.White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF6200EA))
@@ -102,13 +104,13 @@ fun DrivingTrackerScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        if (uiState.isTracking) "🚗 Aan het rijden..." else "⏸️ Gestopt",
+                        if (uiState.isTracking) "🚗 ${stringResource(R.string.driving)}" else "⏸️ ${stringResource(R.string.stopped)}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
-                    Text("Duur: ${formatDuration(uiState.duration)}", fontSize = 16.sp, color = Color. White)
-                    Text("Afstand: ${String.format("%.2f", uiState. distance / 1000)} km", fontSize = 14.sp, color = Color.White)
+                    Text(stringResource(R.string.duration, formatDuration(uiState.duration)), fontSize = 16.sp, color = Color. White)
+                    Text(stringResource(R.string.distance, String.format("%.2f", uiState. distance / 1000)), fontSize = 14.sp, color = Color.White)
                 }
             }
 
@@ -157,7 +159,7 @@ fun DrivingTrackerScreen(
                 if (uiState.isSaving) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
                 } else {
-                    Text(if (uiState. isTracking) "Stop en Opslaan" else "Start Rit", fontSize = 18.sp, fontWeight = FontWeight. Bold)
+                    Text(if (uiState. isTracking) stringResource(R.string.stop_and_save) else stringResource(R.string.start_trip_button), fontSize = 18.sp, fontWeight = FontWeight. Bold)
                 }
             }
         }

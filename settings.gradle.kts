@@ -11,14 +11,17 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
+
+        // ✅ Voor libs die via GitHub/JitPack komen
+        maven(url = "https://jitpack.io")
     }
 }
 
 rootProject.name = "RentMyCar-Android-App"
 include(":app")
- 

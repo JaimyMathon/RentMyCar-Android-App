@@ -18,7 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.rentmycar_android_app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,8 +85,8 @@ fun UpdateCarScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Auto Verwijderen") },
-            text = { Text("Weet je zeker dat je deze auto wilt verwijderen? Dit kan niet ongedaan worden gemaakt.") },
+            title = { Text(stringResource(R.string.delete_car)) },
+            text = { Text(stringResource(R.string.delete_car_confirm)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -93,12 +95,12 @@ fun UpdateCarScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                 ) {
-                    Text("Verwijderen")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Annuleren")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -107,10 +109,10 @@ fun UpdateCarScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Auto Bewerken", fontWeight = FontWeight.SemiBold) },
+                title = { Text(stringResource(R.string.edit_car), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Terug")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -120,7 +122,7 @@ fun UpdateCarScreen(
                     ) {
                         Icon(
                             Icons.Default.Delete,
-                            contentDescription = "Verwijderen",
+                            contentDescription = stringResource(R.string.delete),
                             tint = Color.Red
                         )
                     }
@@ -166,13 +168,13 @@ fun UpdateCarScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Car Details Section
-                    Text("Auto Gegevens", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    Text(stringResource(R.string.car_details_section), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(8.dp))
 
                     OutlinedTextField(
                         value = brand,
                         onValueChange = { brand = it },
-                        label = { Text("Merk") },
+                        label = { Text(stringResource(R.string.brand)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
                     )
@@ -182,7 +184,7 @@ fun UpdateCarScreen(
                     OutlinedTextField(
                         value = model,
                         onValueChange = { model = it },
-                        label = { Text("Model") },
+                        label = { Text(stringResource(R.string.model)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
                     )
@@ -192,7 +194,7 @@ fun UpdateCarScreen(
                     OutlinedTextField(
                         value = licensePlate,
                         onValueChange = { licensePlate = it.uppercase() },
-                        label = { Text("Kenteken") },
+                        label = { Text(stringResource(R.string.license_plate)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
                     )
@@ -200,7 +202,7 @@ fun UpdateCarScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Category Selection
-                    Text("Categorie", fontSize = 14.sp, color = Color.Gray)
+                    Text(stringResource(R.string.category), fontSize = 14.sp, color = Color.Gray)
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Row(
@@ -222,7 +224,7 @@ fun UpdateCarScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Pricing Section
-                    Text("Prijzen", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    Text(stringResource(R.string.prices), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Row(
@@ -232,7 +234,7 @@ fun UpdateCarScreen(
                         OutlinedTextField(
                             value = pricePerTimeSlot,
                             onValueChange = { pricePerTimeSlot = it },
-                            label = { Text("Prijs/dag") },
+                            label = { Text(stringResource(R.string.price_day)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -242,7 +244,7 @@ fun UpdateCarScreen(
                         OutlinedTextField(
                             value = costPerKm,
                             onValueChange = { costPerKm = it },
-                            label = { Text("Prijs/km") },
+                            label = { Text(stringResource(R.string.price_km)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -253,7 +255,7 @@ fun UpdateCarScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // TCO Section
-                    Text("Kosten (TCO)", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    Text(stringResource(R.string.costs_tco), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Row(
@@ -263,7 +265,7 @@ fun UpdateCarScreen(
                         OutlinedTextField(
                             value = fuelCost,
                             onValueChange = { fuelCost = it },
-                            label = { Text("Brandstof") },
+                            label = { Text(stringResource(R.string.fuel)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -273,7 +275,7 @@ fun UpdateCarScreen(
                         OutlinedTextField(
                             value = maintenance,
                             onValueChange = { maintenance = it },
-                            label = { Text("Onderhoud") },
+                            label = { Text(stringResource(R.string.maintenance)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -290,7 +292,7 @@ fun UpdateCarScreen(
                         OutlinedTextField(
                             value = insurance,
                             onValueChange = { insurance = it },
-                            label = { Text("Verzekering") },
+                            label = { Text(stringResource(R.string.insurance)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -300,7 +302,7 @@ fun UpdateCarScreen(
                         OutlinedTextField(
                             value = depreciation,
                             onValueChange = { depreciation = it },
-                            label = { Text("Afschrijving") },
+                            label = { Text(stringResource(R.string.depreciation)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -311,11 +313,11 @@ fun UpdateCarScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Address Section (optional - for updating location)
-                    Text("Locatie (optioneel wijzigen)", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    Text(stringResource(R.string.location_optional), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "Huidige locatie: ${String.format("%.4f", uiState.car?.latitude ?: 0.0)}, ${String.format("%.4f", uiState.car?.longitude ?: 0.0)}",
+                        text = stringResource(R.string.current_location, String.format("%.4f", uiState.car?.latitude ?: 0.0), String.format("%.4f", uiState.car?.longitude ?: 0.0)),
                         fontSize = 12.sp,
                         color = Color.Gray
                     )
@@ -329,7 +331,7 @@ fun UpdateCarScreen(
                         OutlinedTextField(
                             value = streetName,
                             onValueChange = { streetName = it },
-                            label = { Text("Nieuwe straatnaam") },
+                            label = { Text(stringResource(R.string.new_street_name)) },
                             modifier = Modifier.weight(2f),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -337,7 +339,7 @@ fun UpdateCarScreen(
                         OutlinedTextField(
                             value = houseNumber,
                             onValueChange = { houseNumber = it },
-                            label = { Text("Nr.") },
+                            label = { Text(stringResource(R.string.house_number)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -352,7 +354,7 @@ fun UpdateCarScreen(
                         OutlinedTextField(
                             value = postcode,
                             onValueChange = { postcode = it.uppercase() },
-                            label = { Text("Postcode") },
+                            label = { Text(stringResource(R.string.postcode)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -360,7 +362,7 @@ fun UpdateCarScreen(
                         OutlinedTextField(
                             value = country,
                             onValueChange = { country = it },
-                            label = { Text("Land") },
+                            label = { Text(stringResource(R.string.country)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -384,7 +386,7 @@ fun UpdateCarScreen(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Nieuw Adres Opzoeken")
+                            Text(stringResource(R.string.lookup_new_address))
                         }
                     }
 
@@ -392,7 +394,7 @@ fun UpdateCarScreen(
                         (uiState.newLatitude != uiState.car?.latitude || uiState.newLongitude != uiState.car?.longitude)) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Nieuwe locatie: ${String.format("%.4f", uiState.newLatitude)}, ${String.format("%.4f", uiState.newLongitude)}",
+                            text = stringResource(R.string.new_location, String.format("%.4f", uiState.newLatitude), String.format("%.4f", uiState.newLongitude)),
                             fontSize = 12.sp,
                             color = Color(0xFF4CAF50)
                         )
@@ -449,7 +451,7 @@ fun UpdateCarScreen(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Opslaan", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text(stringResource(R.string.save), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
                     }
 
@@ -474,7 +476,7 @@ fun UpdateCarScreen(
                         } else {
                             Icon(Icons.Default.Delete, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Auto Verwijderen", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text(stringResource(R.string.delete_car), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
                     }
 

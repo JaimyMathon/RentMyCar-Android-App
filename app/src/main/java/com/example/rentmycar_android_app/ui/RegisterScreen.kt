@@ -14,6 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.rentmycar_android_app.R
 import com.example.rentmycar_android_app.network.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +33,8 @@ fun RegisterScreen(
     val context = LocalContext.current
     val service = ApiClient.instance.create(AuthService::class.java)
 
+    val registrationFailedMessage = stringResource(R.string.registration_failed)
+
     Box(
         modifier = Modifier.fillMaxSize().background(Color(0xFFE3ECFF)),
         contentAlignment = Alignment.Center
@@ -40,7 +44,7 @@ fun RegisterScreen(
             modifier = Modifier.padding(30.dp)
         ) {
             Text(
-                "Register",
+                stringResource(R.string.register_title),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 40.dp)
@@ -49,7 +53,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Naam") },
+                label = { Text(stringResource(R.string.name)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -57,7 +61,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("E-mail") },
+                label = { Text(stringResource(R.string.email)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
             )
@@ -65,7 +69,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Wachtwoord") },
+                label = { Text(stringResource(R.string.password)) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
@@ -88,22 +92,22 @@ fun RegisterScreen(
                                 sharedPrefs.edit().putString("username", authResponse.username).apply()
                                 onRegisterSuccess()
                             } else {
-                                errorMessage = "Registratie mislukt"
+                                errorMessage = registrationFailedMessage
                             }
                         }
                         override fun onFailure(call: retrofit2.Call<AuthResponse>, t: Throwable) {
                             loading = false
-                            errorMessage = "Netwerkfout: ${t.message}"
+                            errorMessage = context.getString(R.string.network_error, t.message ?: "")
                         }
                     })
                 },
                 modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
                 shape = RoundedCornerShape(12.dp),
                 enabled = !loading
-            ) { Text("Registreren") }
+            ) { Text(stringResource(R.string.register_button)) }
 
             TextButton(onClick = onNavigateToLogin) {
-                Text("Al een account? Log hier in")
+                Text(stringResource(R.string.already_have_account))
             }
 
             errorMessage?.let { Text(it, color = Color.Red, modifier = Modifier.padding(top = 16.dp)) }

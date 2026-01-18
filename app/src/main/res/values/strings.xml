@@ -1,3 +1,235 @@
 <resources>
-    <string name="app_name">RentMyCar-Android-App</string>
+    <string name="app_name">RentMyCar</string>
+
+    <!-- Common -->
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="continue_text">Continue</string>
+    <string name="reset">Reset</string>
+    <string name="apply">Apply</string>
+    <string name="close">Close</string>
+    <string name="unknown">Unknown</string>
+    <string name="error">Error</string>
+    <string name="loading">Loading…</string>
+    <string name="retry">Retry</string>
+    <string name="per_day">/day</string>
+    <string name="per_km">p/km</string>
+    <string name="date">Date</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Log In</string>
+    <string name="login_welcome">Hello, welcome back, we missed you</string>
+    <string name="email">Email</string>
+    <string name="email_placeholder">example@gmail.com</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot password</string>
+    <string name="no_account">Don\'t have an account? </string>
+    <string name="register_here">Register here</string>
+
+    <!-- Register Screen -->
+    <string name="register_title">Register</string>
+    <string name="name">Name</string>
+    <string name="register_button">Register</string>
+    <string name="already_have_account">Already have an account? Log in here</string>
+    <string name="registration_failed">Registration failed</string>
+    <string name="network_error">Network error: %1$s</string>
+
+    <!-- Forgot Password Screen -->
+    <string name="change_password">Change password</string>
+    <string name="new_password">New password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="change_password_button">Change password</string>
+    <string name="back_to_login">Back to login</string>
+    <string name="fill_all_fields">Please fill in all fields</string>
+    <string name="passwords_not_match">Passwords do not match</string>
+    <string name="reset_error">Error resetting password</string>
+
+    <!-- Home Screen -->
+    <string name="home">Home</string>
+    <string name="welcome_back">Welcome back, %1$s</string>
+    <string name="start_trip">Start Trip</string>
+    <string name="search_cars">Search cars</string>
+    <string name="cars">Cars</string>
+    <string name="error_loading_cars">Error loading cars:\n%1$s</string>
+    <string name="car_id_missing">Car ID missing (backend sends _id)</string>
+    <string name="car_photo">Car photo</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_my_cars">My cars</string>
+    <string name="nav_add">Add</string>
+    <string name="nav_reservations">Reservations</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Profile Screen -->
+    <string name="profile">Profile</string>
+    <string name="profile_subtitle">Adjust your personal details here</string>
+    <string name="your_bonus_points">Your Bonus Points</string>
+    <string name="view_details">View details</string>
+    <string name="your_name">Your name</string>
+    <string name="phone_number">Enter your phone number</string>
+    <string name="your_email">Your email</string>
+    <string name="save_details">Save details</string>
+    <string name="logout">Log out</string>
+    <string name="logout_confirm">Are you sure you want to log out?</string>
+    <string name="yes_logout">Yes, Log out</string>
+
+    <!-- Car Detail Screen -->
+    <string name="car_details">Car details</string>
+    <string name="price">Price</string>
+    <string name="reserve_now">Reserve now</string>
+    <string name="error_fetching_car">Error fetching car</string>
+    <string name="about">About</string>
+    <string name="gallery">Gallery</string>
+    <string name="owner">Owner</string>
+    <string name="brand">Brand</string>
+    <string name="model">Model</string>
+    <string name="price_per_km">Price per KM</string>
+    <string name="tco">TCO</string>
+    <string name="category">Category</string>
+    <string name="no_photos_available">No photos available</string>
+
+    <!-- Filter Screen -->
+    <string name="filter">Filter</string>
+    <string name="types">Types</string>
+    <string name="all">All</string>
+    <string name="price_per_km_filter">Price per Km</string>
+    <string name="price_per_day">Price per day</string>
+    <string name="brands">Brands</string>
+
+    <!-- Reservations Screen -->
+    <string name="my_reservations">My reservations</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="completed">Completed</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="no_reservations_found">No reservations found</string>
+    <string name="start">Start</string>
+    <string name="end">End</string>
+    <string name="car_location">Car location</string>
+    <string name="navigate">Navigate</string>
+    <string name="cancel_reservation">Cancel</string>
+
+    <!-- Reservation Screen -->
+    <string name="reserve_car">Reserve car</string>
+    <string name="your_information_details">Your information details</string>
+    <string name="when_rent_car">From when to when do you want to rent the car?</string>
+    <string name="reserve_from">Reserve from</string>
+    <string name="reserve_until">Reserve until</string>
+    <string name="number_of_kms">Number of km\'s</string>
+    <string name="kms_example">E.g.: 300</string>
+    <string name="fill_all_fields_to_continue">Fill in all fields to continue.</string>
+    <string name="loading_availability">Loading availability…</string>
+    <string name="car_already_reserved">Note: This car is already reserved on:</string>
+    <string name="until">until</string>
+    <string name="cannot_load_data">Cannot load data: %1$s</string>
+    <string name="select_date">Select date</string>
+
+    <!-- Payment Method Screen -->
+    <string name="payment_option">Payment option</string>
+    <string name="payment_options">Payment options</string>
+    <string name="to_payment_overview">To payment overview</string>
+
+    <!-- Payment Review Screen -->
+    <string name="payment_overview">Payment overview</string>
+    <string name="pay">Pay</string>
+    <string name="pickup_date">Pickup date</string>
+    <string name="return_date">Return date</string>
+    <string name="total_hours">Total hours</string>
+    <string name="base_rental_price">Base rental price</string>
+    <string name="tco_costs">TCO costs</string>
+    <string name="distance_costs">Distance costs</string>
+    <string name="total">Total</string>
+
+    <!-- Payment Success Screen -->
+    <string name="payment_successful">Payment successful</string>
+    <string name="car_reserved_success">Your car has been successfully reserved. You can view your reservations in the reservations section.</string>
+    <string name="view_reservations">View reservations</string>
+
+    <!-- Add Car Screen -->
+    <string name="add_car">Add Car</string>
+    <string name="photo">Photo</string>
+    <string name="no_photo_selected">No photo selected</string>
+    <string name="gallery_button">Gallery</string>
+    <string name="camera">Camera</string>
+    <string name="car_details_section">Car Details</string>
+    <string name="license_plate">License plate</string>
+    <string name="prices">Prices</string>
+    <string name="price_day">Price/day</string>
+    <string name="price_km">Price/km</string>
+    <string name="costs_tco">Costs (TCO)</string>
+    <string name="fuel">Fuel</string>
+    <string name="maintenance">Maintenance</string>
+    <string name="insurance">Insurance</string>
+    <string name="depreciation">Depreciation</string>
+    <string name="location">Location</string>
+    <string name="street_name">Street name</string>
+    <string name="house_number">No.</string>
+    <string name="postcode">Postcode</string>
+    <string name="country">Country</string>
+    <string name="netherlands">Netherlands</string>
+    <string name="lookup_address">Look up address</string>
+    <string name="location_found">Location found: %1$s, %2$s</string>
+    <string name="selected_photo">Selected photo</string>
+
+    <!-- My Cars Screen -->
+    <string name="my_cars">My Cars</string>
+    <string name="add_car_fab">Add car</string>
+    <string name="no_cars_added">You haven\'t added any cars yet</string>
+    <string name="click_to_add_car">Click + to add a car</string>
+    <string name="available">Available</string>
+
+    <!-- Update Car Screen -->
+    <string name="edit_car">Edit Car</string>
+    <string name="delete">Delete</string>
+    <string name="delete_car">Delete Car</string>
+    <string name="delete_car_confirm">Are you sure you want to delete this car? This cannot be undone.</string>
+    <string name="location_optional">Location (optional change)</string>
+    <string name="current_location">Current location: %1$s, %2$s</string>
+    <string name="new_street_name">New street name</string>
+    <string name="lookup_new_address">Look up new address</string>
+    <string name="new_location">New location: %1$s, %2$s</string>
+
+    <!-- Driving Tracker Screen -->
+    <string name="driving_tracker">Driving Tracker</string>
+    <string name="driving">Driving…</string>
+    <string name="stopped">Stopped</string>
+    <string name="duration">Duration: %1$s</string>
+    <string name="distance">Distance: %1$s km</string>
+    <string name="acceleration">Acceleration</string>
+    <string name="braking">Braking</string>
+    <string name="max">Max: %1$s</string>
+    <string name="harsh_count">Harsh: %1$dx</string>
+    <string name="stop_and_save">Stop and Save</string>
+    <string name="start_trip_button">Start Trip</string>
+    <string name="trip_too_short">Trip too short</string>
+    <string name="no_token_found">No token found</string>
+    <string name="points_earned">%1$d points!</string>
+
+    <!-- Driving Stats Screen -->
+    <string name="my_trips">My Trips</string>
+    <string name="car_name">Car Name</string>
+    <string name="points">points</string>
+    <string name="rating">Rating</string>
+    <string name="no_data">No data</string>
+    <string name="no_trips_available">No trips available yet.</string>
+    <string name="error_occurred">An error occurred</string>
+    <string name="no_valid_token">No valid token</string>
+
+    <!-- Map Screen -->
+    <string name="route_to_car">Route to car</string>
+    <string name="location_permission_required">Location access is required to show the map</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="stop_navigation">Stop navigation</string>
+    <string name="start_navigation">Start navigation</string>
+    <string name="could_not_get_location">Could not get user location</string>
+    <string name="error_getting_location">Error getting location</string>
+    <string name="map_not_available">Map is not available</string>
+    <string name="map_style_not_loaded">Map style is not loaded</string>
+    <string name="no_route_found">No route found</string>
+    <string name="error_fetching_route">Error fetching route: %1$d</string>
+    <string name="error_drawing_route">Error drawing route</string>
+    <string name="car_location_marker">Car Location</string>
 </resources>

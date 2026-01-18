@@ -17,9 +17,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.rentmycar_android_app.R
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.rentmycar_android_app.network.ReservationDto
@@ -37,7 +39,11 @@ fun ReservationsScreen(
 
     var selectedTab by remember { mutableStateOf(0) }
 
-    val tabs = listOf("Komend", "Afgehandeld", "cancelled")
+    val tabs = listOf(
+        stringResource(R.string.upcoming),
+        stringResource(R.string.completed),
+        stringResource(R.string.cancelled)
+    )
 
     // Filter reservations by status
     val filteredReservations = remember(uiState.reservations, selectedTab) {
@@ -52,10 +58,10 @@ fun ReservationsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mijn reserveringen") },
+                title = { Text(stringResource(R.string.my_reservations)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Terug")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -85,7 +91,7 @@ fun ReservationsScreen(
                 when {
                     uiState.isLoading -> CircularProgressIndicator()
                     uiState.error != null -> Text(uiState.error!!, color = MaterialTheme.colorScheme.error)
-                    filteredReservations.isEmpty() -> Text("Geen reserveringen gevonden")
+                    filteredReservations.isEmpty() -> Text(stringResource(R.string.no_reservations_found))
                     else -> {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
@@ -175,7 +181,7 @@ fun ReservationCard(
                             .data(photoUrl)
                             .crossfade(true)
                             .build(),
-                        contentDescription = "Auto foto",
+                        contentDescription = stringResource(R.string.car_photo),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
@@ -183,7 +189,7 @@ fun ReservationCard(
                     // Placeholder icon
                     Icon(
                         imageVector = Icons.Default.Home,
-                        contentDescription = "Auto",
+                        contentDescription = stringResource(R.string.car_photo),
                         modifier = Modifier.size(80.dp),
                         tint = Color(0xFF757575)
                     )
@@ -201,7 +207,7 @@ fun ReservationCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${car?.brand ?: "Unknown"} ${car?.model ?: ""}",
+                    text = "${car?.brand ?: stringResource(R.string.unknown)} ${car?.model ?: ""}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium
                 )
@@ -253,7 +259,7 @@ fun ReservationCard(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Start",
+                            text = stringResource(R.string.start),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFF757575)
                         )
@@ -266,7 +272,7 @@ fun ReservationCard(
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Eind",
+                            text = stringResource(R.string.end),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFF757575)
                         )
@@ -288,7 +294,7 @@ fun ReservationCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "auto Locatie",
+                    text = stringResource(R.string.car_location),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF757575)
                 )
@@ -307,7 +313,7 @@ fun ReservationCard(
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        "Navigate",
+                        stringResource(R.string.navigate),
                         color = Color.White,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -329,7 +335,7 @@ fun ReservationCard(
                     shape = RoundedCornerShape(24.dp)
                 ) {
                     Text(
-                        "Annuleren",
+                        stringResource(R.string.cancel_reservation),
                         color = Color.White,
                         style = MaterialTheme.typography.bodyLarge
                     )

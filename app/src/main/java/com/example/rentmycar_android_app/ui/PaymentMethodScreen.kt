@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,11 +40,11 @@ fun PaymentMethodScreen(
                 backgroundColor = screenBg,
                 elevation = 0.dp,
                 title = {
-                    Text("Betaal optie", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                    Text(stringResource(R.string.payment_option), fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Terug")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -67,7 +68,7 @@ fun PaymentMethodScreen(
                     shape = RoundedCornerShape(24.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = primaryColor)
                 ) {
-                    Text("naar betaal overzicht", color = Color.White)
+                    Text(stringResource(R.string.to_payment_overview), color = Color.White)
                 }
             }
         }
@@ -79,7 +80,7 @@ fun PaymentMethodScreen(
                 .padding(horizontal = 20.dp)
                 .padding(top = 32.dp)
         ) {
-            Text("Betaal opties", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Text(stringResource(R.string.payment_options), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             Spacer(Modifier.height(12.dp))
 
             PaymentOptionRow(
