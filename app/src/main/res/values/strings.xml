@@ -27,50 +27,50 @@
     <string name="error_with_message">Fout: %1$s</string>
 
     <!-- Login Screen -->
-    <string name="login_title">Log In</string>
-    <string name="login_welcome">Hello, welcome back, we missed you</string>
-    <string name="email">Email</string>
-    <string name="email_placeholder">example@gmail.com</string>
-    <string name="password">Password</string>
-    <string name="forgot_password">Forgot password</string>
+    <string name="login_title">Inloggen</string>
+    <string name="login_welcome">Hallo, welkom terug!</string>
+    <string name="email">E-mail</string>
+    <string name="email_placeholder">voorbeeld@gmail.com</string>
+    <string name="password">Wachtwoord</string>
+    <string name="forgot_password">Wachtwoord vergeten</string>
     <string name="no_account">Nog geen account? </string>
     <string name="no_account_register">Nog geen account? </string>
     <string name="register_here">Registreer hier</string>
 
     <!-- Register Screen -->
-    <string name="register_title">Register</string>
-    <string name="name">Name</string>
-    <string name="register_button">Register</string>
-    <string name="already_have_account">Already have an account? Log in here</string>
-    <string name="registration_failed">Registration failed</string>
-    <string name="network_error">Network error: %1$s</string>
+    <string name="register_title">Registreren</string>
+    <string name="name">Naam</string>
+    <string name="register_button">Registreren</string>
+    <string name="already_have_account">Heb je al een account? Log hier in</string>
+    <string name="registration_failed">Registratie mislukt</string>
+    <string name="network_error">Netwerkfout: %1$s</string>
 
     <!-- Forgot Password Screen -->
-    <string name="change_password">Change password</string>
-    <string name="new_password">New password</string>
-    <string name="confirm_password">Confirm password</string>
-    <string name="change_password_button">Change password</string>
-    <string name="back_to_login">Back to login</string>
-    <string name="fill_all_fields">Please fill in all fields</string>
-    <string name="passwords_not_match">Passwords do not match</string>
-    <string name="reset_error">Error resetting password</string>
+    <string name="change_password">Wachtwoord wijzigen</string>
+    <string name="new_password">Nieuw wachtwoord</string>
+    <string name="confirm_password">Wachtwoord bevestigen</string>
+    <string name="change_password_button">Wachtwoord wijzigen</string>
+    <string name="back_to_login">Terug naar inloggen</string>
+    <string name="fill_all_fields">Vul alle velden in</string>
+    <string name="passwords_not_match">Wachtwoorden komen niet overeen</string>
+    <string name="reset_error">Fout bij het resetten van wachtwoord</string>
 
     <!-- Home Screen -->
     <string name="home">Home</string>
-    <string name="welcome_back">Welcome back, %1$s</string>
-    <string name="start_trip">Start Trip</string>
-    <string name="search_cars">Search cars</string>
-    <string name="cars">Cars</string>
-    <string name="error_loading_cars">Error loading cars:\n%1$s</string>
-    <string name="car_id_missing">Car ID missing (backend sends _id)</string>
-    <string name="car_photo">Car photo</string>
+    <string name="welcome_back">Welkom terug, %1$s</string>
+    <string name="start_trip">Start Rit</string>
+    <string name="search_cars">Auto\'s zoeken</string>
+    <string name="cars">Auto\'s</string>
+    <string name="error_loading_cars">Fout bij laden auto\'s:\n%1$s</string>
+    <string name="car_id_missing">Auto ID ontbreekt</string>
+    <string name="car_photo">Auto foto</string>
 
     <!-- Bottom Navigation -->
     <string name="nav_home">Home</string>
-    <string name="nav_my_cars">My cars</string>
-    <string name="nav_add">Add</string>
-    <string name="nav_reservations">Reservations</string>
-    <string name="nav_profile">Profile</string>
+    <string name="nav_my_cars">Mijn auto\'s</string>
+    <string name="nav_add">Toevoegen</string>
+    <string name="nav_reservations">Reserveringen</string>
+    <string name="nav_profile">Profiel</string>
 
     <!-- Profile Screen -->
     <string name="profile">Profiel</string>
@@ -132,61 +132,64 @@
     <string name="cancel_reservation">Annuleren</string>
 
     <!-- Reservation Screen -->
-    <string name="reserve_car">Reserve car</string>
-    <string name="your_information_details">Your information details</string>
-    <string name="when_rent_car">From when to when do you want to rent the car?</string>
-    <string name="reserve_from">Reserve from</string>
-    <string name="reserve_until">Reserve until</string>
-    <string name="number_of_kms">Number of km\'s</string>
-    <string name="kms_example">E.g.: 300</string>
-    <string name="fill_all_fields_to_continue">Fill in all fields to continue.</string>
-    <string name="loading_availability">Loading availability…</string>
-    <string name="car_already_reserved">Note: This car is already reserved on:</string>
-    <string name="until">until</string>
-    <string name="cannot_load_data">Cannot load data: %1$s</string>
-    <string name="select_date">Select date</string>
+    <string name="reserve_car">Auto reserveren</string>
+    <string name="your_information_details">Jouw gegevens</string>
+    <string name="when_rent_car">Van wanneer tot wanneer wil je de auto huren?</string>
+    <string name="reserve_from">Reserveren vanaf</string>
+    <string name="reserve_until">Reserveren tot</string>
+    <string name="number_of_kms">Aantal kilometers</string>
+    <string name="kms_example">Bijv.: 300</string>
+    <string name="fill_all_fields_to_continue">Vul alle velden in om door te gaan.</string>
+    <string name="loading_availability">Beschikbaarheid laden…</string>
+    <string name="car_already_reserved">Let op: Deze auto is al gereserveerd op:</string>
+    <string name="until">tot</string>
+    <string name="cannot_load_data">Kan gegevens niet laden: %1$s</string>
+    <string name="select_date">Selecteer datum</string>
 
     <!-- Payment Method Screen -->
-    <string name="payment_option">Payment option</string>
-    <string name="payment_options">Payment options</string>
-    <string name="to_payment_overview">To payment overview</string>
+    <string name="payment_option">Betaalmethode</string>
+    <string name="payment_options">Betaalmethodes</string>
+    <string name="to_payment_overview">Naar betalingsoverzicht</string>
+    <string name="paypal">Paypal</string>
+    <string name="apple_pay">Apple Pay</string>
+    <string name="google_pay">Google Pay</string>
 
     <!-- Payment Review Screen -->
-    <string name="payment_overview">Payment overview</string>
-    <string name="pay">Pay</string>
-    <string name="pickup_date">Pickup date</string>
-    <string name="return_date">Return date</string>
-    <string name="total_hours">Total hours</string>
-    <string name="base_rental_price">Base rental price</string>
-    <string name="tco_costs">TCO costs</string>
-    <string name="distance_costs">Distance costs</string>
-    <string name="total">Total</string>
+    <string name="payment_overview">Betalingsoverzicht</string>
+    <string name="pay">Betalen</string>
+    <string name="pickup_date">Ophaaldatum</string>
+    <string name="return_date">Retourdatum</string>
+    <string name="total_hours">Totaal uren</string>
+    <string name="base_rental_price">Basis huurprijs</string>
+    <string name="tco_costs">TCO kosten</string>
+    <string name="distance_costs">Afstandskosten</string>
+    <string name="total">Totaal</string>
 
     <!-- Payment Success Screen -->
-    <string name="payment_successful">Payment successful</string>
-    <string name="car_reserved_success">Your car has been successfully reserved. You can view your reservations in the reservations section.</string>
-    <string name="view_reservations">View reservations</string>
+    <string name="payment_successful">Betaling succesvol</string>
+    <string name="car_reserved_success">Je auto is succesvol gereserveerd. Je kunt je reserveringen bekijken in het reserveringen overzicht.</string>
+    <string name="view_reservations">Reserveringen bekijken</string>
 
     <!-- Add Car Screen -->
     <string name="add_car">Auto toevoegen</string>
     <string name="add_car_title">Auto toevoegen</string>
     <string name="photo">Foto</string>
-    <string name="no_photo_selected">No photo selected</string>
-    <string name="gallery_button">Gallery</string>
+    <string name="no_photo_selected">Geen foto geselecteerd</string>
+    <string name="gallery_button">Galerij</string>
     <string name="camera">Camera</string>
-    <string name="car_details_section">Car Details</string>
-    <string name="license_plate">License plate</string>
-    <string name="prices">Prices</string>
-    <string name="price_day">Price/day</string>
-    <string name="price_km">Price/km</string>
-    <string name="costs_tco">Costs (TCO)</string>
-    <string name="fuel">Fuel</string>
-    <string name="maintenance">Maintenance</string>
-    <string name="insurance">Insurance</string>
-    <string name="depreciation">Depreciation</string>
-    <string name="location">Location</string>
-    <string name="street_name">Street name</string>
-    <string name="house_number">No.</string>
+    <string name="car_details_section">Auto details</string>
+    <string name="license_plate">Kenteken</string>
+    <string name="prices">Prijzen</string>
+    <string name="price_day">Prijs/dag</string>
+    <string name="price_km">Prijs/km</string>
+    <string name="costs_tco">Kosten (TCO)</string>
+    <string name="fuel">Brandstof</string>
+    <string name="maintenance">Onderhoud</string>
+    <string name="insurance">Verzekering</string>
+    <string name="depreciation">Afschrijving</string>
+    <string name="location">Locatie</string>
+    <string name="street_name">Straatnaam</string>
+    <string name="house_number">Nr.</string>
     <string name="postcode">Postcode</string>
     <string name="country">Land</string>
     <string name="netherlands">Nederland</string>
@@ -236,26 +239,32 @@
     <string name="points_earned">%1$d punten!</string>
 
     <!-- Driving Stats Screen -->
-    <string name="my_trips">My Trips</string>
-    <string name="car_name">Autonaam</string>
+    <string name="my_trips">Mijn Ritten</string>
+    <string name="car_name">Auto Naam</string>
     <string name="points">punten</string>
-    <string name="rating">Beoordeling</string>
+    <string name="points_format">%1$d punten</string>
+    <string name="rating">Rating</string>
     <string name="no_trips_available">Nog geen ritten beschikbaar.</string>
-    <string name="error_occurred">An error occurred</string>
-    <string name="no_valid_token">No valid token</string>
+    <string name="error_occurred">Er is een fout opgetreden</string>
+    <string name="no_valid_token">Geen geldige token</string>
+    <string name="distance_label">Afstand</string>
+    <string name="network_error_message">Netwerkfout: %1$s</string>
 
     <!-- Map Screen -->
-    <string name="route_to_car">Route to car</string>
-    <string name="location_permission_required">Location access is required to show the map</string>
-    <string name="grant_permission">Grant Permission</string>
-    <string name="stop_navigation">Stop navigation</string>
-    <string name="start_navigation">Start navigation</string>
-    <string name="could_not_get_location">Could not get user location</string>
-    <string name="error_getting_location">Error getting location</string>
-    <string name="map_not_available">Map is not available</string>
-    <string name="map_style_not_loaded">Map style is not loaded</string>
-    <string name="no_route_found">No route found</string>
-    <string name="error_fetching_route">Error fetching route: %1$d</string>
-    <string name="error_drawing_route">Error drawing route</string>
-    <string name="car_location_marker">Car Location</string>
+    <string name="route_to_car">Route naar auto</string>
+    <string name="location_permission_required">Locatietoegang is vereist om de kaart te tonen</string>
+    <string name="grant_permission">Toestemming geven</string>
+    <string name="stop_navigation">Stop navigatie</string>
+    <string name="start_navigation">Start navigatie</string>
+    <string name="could_not_get_location">Kon gebruikerslocatie niet ophalen</string>
+    <string name="error_getting_location">Fout bij ophalen locatie</string>
+    <string name="map_not_available">Kaart is niet beschikbaar</string>
+    <string name="map_style_not_loaded">Kaartstijl is niet geladen</string>
+    <string name="map_no_longer_available">Kaart is niet meer beschikbaar</string>
+    <string name="no_route_found">Geen route gevonden</string>
+    <string name="error_fetching_route">Fout bij ophalen route: %1$d</string>
+    <string name="error_drawing_route">Fout bij tekenen route</string>
+    <string name="car_location_marker">Auto Locatie</string>
+    <string name="price_per_day_format">%1$s%2$d%3$s</string>
+    <string name="test_car">Test Auto</string>
 </resources>

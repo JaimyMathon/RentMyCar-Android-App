@@ -213,7 +213,7 @@ fun ReservationCard(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "€${car?.pricePerTimeSlot?.toInt() ?: 0}/dag",
+                    text = "${stringResource(R.string.euro_symbol)}${car?.pricePerTimeSlot?.toInt() ?: 0}${stringResource(R.string.per_day)}",
                     style = MaterialTheme.typography.titleMedium,
                     color = Color(0xFF757575)
                 )

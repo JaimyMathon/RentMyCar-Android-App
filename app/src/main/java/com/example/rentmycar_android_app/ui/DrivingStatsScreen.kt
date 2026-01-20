@@ -10,9 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentmycar_android_app.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -48,7 +50,7 @@ fun DrivingStatsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Mijn Ritten",
+                text = stringResource(R.string.my_trips),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -56,7 +58,7 @@ fun DrivingStatsScreen(
                 onClick = onNavigateBack,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
             ) {
-                Text(text = "Terug", color = Color.White)
+                Text(text = stringResource(R.string.back), color = Color.White)
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -74,9 +76,9 @@ fun DrivingStatsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(uiState.error ?: "Er is een fout opgetreden", color = Color.Red, fontWeight = FontWeight.Bold)
+                    Text(uiState.error ?: stringResource(R.string.error_occurred), color = Color.Red, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(16.dp))
-                    Button(onClick = { viewModel.loadStats() }) { Text("Opnieuw Proberen") }
+                    Button(onClick = { viewModel.loadStats() }) { Text(stringResource(R.string.retry)) }
                 }
             }
         } else {
@@ -94,7 +96,7 @@ fun DrivingStatsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                "Nog geen ritten beschikbaar.",
+                                stringResource(R.string.no_trips_available),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -110,6 +112,9 @@ fun DrivingStatsScreen(
 
 @Composable
 fun TripCardStyled(behavior: DrivingBehavior) {
+    val unknownText = stringResource(R.string.unknown)
+    val noDataText = stringResource(R.string.no_data)
+
     Box(
         Modifier
             .fillMaxWidth()
@@ -125,10 +130,10 @@ fun TripCardStyled(behavior: DrivingBehavior) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text("Auto Naam", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray)
-                    Text(behavior.carName ?: "Onbekend", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.car_name), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray)
+                    Text(behavior.carName ?: unknownText, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
-                Text("${behavior.points} punten", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.points_format, behavior.points), fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
             Divider(color = Color.LightGray, thickness = 1.dp)
             Row(
@@ -136,12 +141,12 @@ fun TripCardStyled(behavior: DrivingBehavior) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text("Afstand", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray)
+                    Text(stringResource(R.string.distance_label), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray)
                     Text("${String.format("%.1f", behavior.distance / 1000)} km", fontSize = 16.sp)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("Rating", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray)
-                    Text(behavior.rating ?: "Geen data", fontSize = 16.sp)
+                    Text(stringResource(R.string.rating), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray)
+                    Text(behavior.rating ?: noDataText, fontSize = 16.sp)
                 }
             }
         }
@@ -159,7 +164,7 @@ class DrivingStatsViewModel(private val context: Context) : ViewModel() {
             val token = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getString("jwt_token", "")
                 ?: ""
             if (token.isEmpty()) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = "Geen geldige token")
+                _uiState.value = _uiState.value.copy(isLoading = false, error = context.getString(R.string.no_valid_token))
                 return@launch
             }
             try {
@@ -167,10 +172,10 @@ class DrivingStatsViewModel(private val context: Context) : ViewModel() {
                 if (response.isSuccessful && response.body() != null) {
                     _uiState.value = _uiState.value.copy(isLoading = false, stats = response.body())
                 } else {
-                    _uiState.value = _uiState.value.copy(isLoading = false, error = "Fout: ${response.message()}")
+                    _uiState.value = _uiState.value.copy(isLoading = false, error = context.getString(R.string.error_with_message, response.message()))
                 }
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = "Netwerkfout: ${e.message}")
+                _uiState.value = _uiState.value.copy(isLoading = false, error = context.getString(R.string.network_error_message, e.message ?: ""))
             }
         }
     }

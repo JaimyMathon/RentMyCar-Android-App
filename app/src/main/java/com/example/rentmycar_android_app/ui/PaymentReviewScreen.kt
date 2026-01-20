@@ -201,7 +201,7 @@ fun PaymentReviewScreenContent(
                                         fontWeight = FontWeight.Bold
                                     )
                                     Text(
-                                        text = "${currency.format(pricePerDay)}/dag",
+                                        text = "${currency.format(pricePerDay)}${stringResource(R.string.per_day)}",
                                         color = Color.DarkGray
                                     )
                                 }

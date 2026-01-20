@@ -366,7 +366,7 @@ private fun CarCard(
             Spacer(Modifier.height(4.dp))
 
             Text(
-                text = "€${(car.pricePerTimeSlot ?: 0.0).toInt()}/dag",
+                text = "${stringResource(R.string.euro_symbol)}${(car.pricePerTimeSlot ?: 0.0).toInt()}${stringResource(R.string.per_day)}",
                 fontWeight = FontWeight.SemiBold
             )
 
@@ -374,7 +374,7 @@ private fun CarCard(
 
             if (car.costPerKm != null) {
                 Text(
-                    text = "€${car.costPerKm} p/km",
+                    text = "${stringResource(R.string.euro_symbol)}${car.costPerKm} ${stringResource(R.string.per_km)}",
                     fontSize = 13.sp,
                     color = Color.DarkGray
                 )

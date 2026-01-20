@@ -36,6 +36,7 @@ fun FilterScreen(
 ) {
     val availableBrands by viewModel.availableBrands.collectAsState()
     val filterState by viewModel.filterState.collectAsState()
+    val allText = stringResource(R.string.all)
 
     LaunchedEffect(initialFilterState) {
         viewModel.initializeFilter(initialFilterState)
@@ -75,9 +76,10 @@ fun FilterScreen(
             )
 
             FilterChipGroup(
-                options = listOf("All", "ICE", "BEV", "FCEV"),
+                options = listOf(allText, "ICE", "BEV", "FCEV"),
                 selectedOptions = filterState.selectedTypes,
                 onSelectionChange = { viewModel.updateSelectedTypes(it) },
+                allOptionText = allText,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -124,9 +126,10 @@ fun FilterScreen(
             )
 
             FilterChipGroup(
-                options = listOf("All") + availableBrands,
+                options = listOf(allText) + availableBrands,
                 selectedOptions = filterState.selectedBrands,
                 onSelectionChange = { viewModel.updateSelectedBrands(it) },
+                allOptionText = allText,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
@@ -181,6 +184,7 @@ private fun FilterChipGroup(
     options: List<String>,
     selectedOptions: Set<String>,
     onSelectionChange: (Set<String>) -> Unit,
+    allOptionText: String,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -189,7 +193,7 @@ private fun FilterChipGroup(
     ) {
         options.forEach { option ->
             val isSelected = selectedOptions.contains(option) ||
-                            (option == "All" && selectedOptions.isEmpty())
+                            (option == allOptionText && selectedOptions.isEmpty())
 
             Box(
                 modifier = Modifier
@@ -199,7 +203,7 @@ private fun FilterChipGroup(
                         else Color(0xFFE0E0E0)
                     )
                     .clickable {
-                        if (option == "All") {
+                        if (option == allOptionText) {
                             onSelectionChange(emptySet())
                         } else {
                             val newSelection = if (selectedOptions.contains(option)) {

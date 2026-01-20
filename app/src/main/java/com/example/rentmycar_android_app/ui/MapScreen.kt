@@ -144,6 +144,20 @@ fun MapLibreMapView(
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
+    // Pre-fetch string resources for use in callbacks
+    val couldNotGetLocationStr = stringResource(R.string.could_not_get_location)
+    val errorGettingLocationStr = stringResource(R.string.error_getting_location)
+    val stopNavigationStr = stringResource(R.string.stop_navigation)
+    val startNavigationStr = stringResource(R.string.start_navigation)
+    val mapNotAvailableStr = stringResource(R.string.map_not_available)
+    val mapStyleNotLoadedStr = stringResource(R.string.map_style_not_loaded)
+    val mapNoLongerAvailableStr = stringResource(R.string.map_no_longer_available)
+    val errorDrawingRouteStr = stringResource(R.string.error_drawing_route)
+    val noRouteFoundStr = stringResource(R.string.no_route_found)
+    val carLocationMarkerStr = stringResource(R.string.car_location_marker)
+    val errorFetchingRouteStr = stringResource(R.string.error)
+    val networkErrorStr = stringResource(R.string.network_error_message).substringBefore("%")
+
     DisposableEffect(Unit) {
         onDispose {
             try {
@@ -217,7 +231,7 @@ fun MapLibreMapView(
                             }
 
                             // Add car marker immediately
-                            addCarMarker(style, carLatitude, carLongitude)
+                            addCarMarker(style, carLatitude, carLongitude, carLocationMarkerStr)
 
                             // Get user location and fetch route automatically
                             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(ctx)
@@ -271,15 +285,22 @@ fun MapLibreMapView(
                                 onError = { error ->
                                     isLoading = false
                                     errorMessage = error
-                                }
+                                },
+                                mapNotAvailableMsg = mapNotAvailableStr,
+                                mapStyleNotLoadedMsg = mapStyleNotLoadedStr,
+                                mapNoLongerAvailableMsg = mapNoLongerAvailableStr,
+                                errorDrawingRouteMsg = errorDrawingRouteStr,
+                                noRouteFoundMsg = noRouteFoundStr,
+                                errorFetchingRouteMsg = errorFetchingRouteStr,
+                                networkErrorMsg = networkErrorStr
                             )
                         } ?: run {
                             isLoading = false
-                            errorMessage = "Kon gebruikerslocatie niet ophalen"
+                            errorMessage = couldNotGetLocationStr
                         }
                     }.addOnFailureListener {
                         isLoading = false
-                        errorMessage = "Fout bij ophalen locatie"
+                        errorMessage = errorGettingLocationStr
                     }
                 } else {
                     // Clear route
@@ -293,7 +314,7 @@ fun MapLibreMapView(
         ) {
             Icon(
                 imageVector = Icons.Default.Place,
-                contentDescription = if (isNavigating) "Stop navigatie" else "Start navigatie"
+                contentDescription = if (isNavigating) stopNavigationStr else startNavigationStr
             )
         }
 
@@ -444,15 +465,22 @@ private fun fetchAndDrawRoute(
     carLatitude: Double,
     carLongitude: Double,
     onSuccess: () -> Unit,
-    onError: (String) -> Unit
+    onError: (String) -> Unit,
+    mapNotAvailableMsg: String,
+    mapStyleNotLoadedMsg: String,
+    mapNoLongerAvailableMsg: String,
+    errorDrawingRouteMsg: String,
+    noRouteFoundMsg: String,
+    errorFetchingRouteMsg: String,
+    networkErrorMsg: String
 ) {
     val map = mapLibreMap ?: run {
-        onError("Kaart is niet beschikbaar")
+        onError(mapNotAvailableMsg)
         return
     }
 
     val style = map.style ?: run {
-        onError("Kaartstijl is niet geladen")
+        onError(mapStyleNotLoadedMsg)
         return
     }
 
@@ -468,7 +496,7 @@ private fun fetchAndDrawRoute(
         ) {
             // Check if map is still valid before updating
             if (map.style == null) {
-                onError("Map is niet meer beschikbaar")
+                onError(mapNoLongerAvailableMsg)
                 return
             }
 
@@ -513,15 +541,15 @@ private fun fetchAndDrawRoute(
                         onSuccess()
                     } catch (e: Exception) {
                         Log.e("MapLibre", "Error drawing route", e)
-                        onError("Fout bij tekenen route")
+                        onError(errorDrawingRouteMsg)
                     }
                 } else {
                     Log.e("MapLibre", "No routes found in response")
-                    onError("Geen route gevonden")
+                    onError(noRouteFoundMsg)
                 }
             } else {
                 Log.e("MapLibre", "Route response not successful: ${response.code()}")
-                onError("Fout bij ophalen route: ${response.code()}")
+                onError("$errorFetchingRouteMsg ${response.code()}")
             }
         }
 
@@ -530,7 +558,7 @@ private fun fetchAndDrawRoute(
             t: Throwable
         ) {
             Log.e("MapLibre", "Route fetch failed", t)
-            onError("Netwerkfout: ${t.message}")
+            onError("$networkErrorMsg ${t.message}")
         }
     })
 }
@@ -555,7 +583,8 @@ private fun clearRoute(mapLibreMap: MapLibreMap?) {
 private fun addCarMarker(
     style: Style,
     carLatitude: Double,
-    carLongitude: Double
+    carLongitude: Double,
+    markerTitle: String
 ) {
     // Create a GeoJSON feature for the car marker
     val carFeature = JsonObject().apply {
@@ -571,7 +600,7 @@ private fun addCarMarker(
         add("geometry", geometry)
 
         val properties = JsonObject().apply {
-            addProperty("title", "Auto Locatie")
+            addProperty("title", markerTitle)
         }
         add("properties", properties)
     }

@@ -84,7 +84,7 @@ fun PaymentMethodScreen(
             Spacer(Modifier.height(12.dp))
 
             PaymentOptionRow(
-                label = "Paypal",
+                label = stringResource(R.string.paypal),
                 background = cardBg,
                 selected = selectedMethod == PaymentMethod.Paypal,
                 onClick = { selectedMethod = PaymentMethod.Paypal }
@@ -93,7 +93,7 @@ fun PaymentMethodScreen(
             Spacer(Modifier.height(8.dp))
 
             PaymentOptionRow(
-                label = "Apple Pay",
+                label = stringResource(R.string.apple_pay),
                 background = cardBg,
                 selected = selectedMethod == PaymentMethod.ApplePay,
                 onClick = { selectedMethod = PaymentMethod.ApplePay }
@@ -102,7 +102,7 @@ fun PaymentMethodScreen(
             Spacer(Modifier.height(8.dp))
 
             PaymentOptionRow(
-                label = "Google Pay",
+                label = stringResource(R.string.google_pay),
                 background = cardBg,
                 selected = selectedMethod == PaymentMethod.GooglePay,
                 onClick = { selectedMethod = PaymentMethod.GooglePay }

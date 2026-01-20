@@ -52,7 +52,8 @@ fun UpdateCarScreen(
     var streetName by remember { mutableStateOf("") }
     var houseNumber by remember { mutableStateOf("") }
     var postcode by remember { mutableStateOf("") }
-    var country by remember { mutableStateOf("Nederland") }
+    val defaultCountry = stringResource(R.string.netherlands)
+    var country by remember { mutableStateOf(defaultCountry) }
 
     // Initialize form when car is loaded
     LaunchedEffect(uiState.car) {
@@ -154,7 +155,7 @@ fun UpdateCarScreen(
                         .padding(innerPadding),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "Fout: ${uiState.error}", color = Color.Red)
+                    Text(text = stringResource(R.string.error_with_message, uiState.error ?: ""), color = Color.Red)
                 }
             }
 

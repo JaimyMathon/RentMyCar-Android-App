@@ -130,7 +130,7 @@ fun CarDetailScreen(
                                 color = Color.Gray
                             )
                             Text(
-                                text = "€${(car!!.pricePerTimeSlot ?: 0.0).toInt()}/dag",
+                                text = "${stringResource(R.string.euro_symbol)}${(car!!.pricePerTimeSlot ?: 0.0).toInt()}${stringResource(R.string.per_day)}",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -307,8 +307,8 @@ private fun OverTabContent(car: CarDto, ownerName: String?) {
         // Car Details
         DetailRow(label = stringResource(R.string.brand), value = car.brand ?: "-")
         DetailRow(label = stringResource(R.string.model), value = car.model ?: "-")
-        DetailRow(label = stringResource(R.string.price_per_km), value = "€${car.costPerKm ?: 0.0}")
-        DetailRow(label = stringResource(R.string.tco), value = "€${(car.tco ?: 0.0).toInt()}")
+        DetailRow(label = stringResource(R.string.price_per_km), value = "${stringResource(R.string.euro_symbol)}${car.costPerKm ?: 0.0}")
+        DetailRow(label = stringResource(R.string.tco), value = "${stringResource(R.string.euro_symbol)}${(car.tco ?: 0.0).toInt()}")
         DetailRow(label = stringResource(R.string.category), value = car.category ?: "-")
     }
 }

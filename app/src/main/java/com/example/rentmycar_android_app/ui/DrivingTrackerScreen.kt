@@ -118,17 +118,17 @@ fun DrivingTrackerScreen(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatCard(
                     modifier = Modifier.weight(1f),
-                    title = "Optrek",
-                    value = String. format("%.1f", abs(uiState.currentAcceleration)),
-                    max = String. format("%.1f", uiState.maxAcceleration),
-                    count = uiState. harshAccelerationCount,
+                    title = stringResource(R.string.acceleration),
+                    value = String.format("%.1f", abs(uiState.currentAcceleration)),
+                    max = String.format("%.1f", uiState.maxAcceleration),
+                    count = uiState.harshAccelerationCount,
                     color = Color(0xFF4CAF50)
                 )
                 StatCard(
-                    modifier = Modifier. weight(1f),
-                    title = "Remmen",
+                    modifier = Modifier.weight(1f),
+                    title = stringResource(R.string.braking),
                     value = String.format("%.1f", abs(uiState.currentBraking)),
-                    max = String.format("%.1f", uiState. maxBraking),
+                    max = String.format("%.1f", uiState.maxBraking),
                     count = uiState.harshBrakingCount,
                     color = Color(0xFFF44336)
                 )
@@ -169,9 +169,9 @@ private fun StatCard(modifier: Modifier, title: String, value: String, max: Stri
         Column(modifier = Modifier.padding(12.dp)) {
             Text(title, fontSize = 12.sp, color = Color.Gray)
             Text(value, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = color)
-            Text("m/s²", fontSize = 10.sp, color = Color.Gray)
-            Text("Max: $max", fontSize = 10.sp, color = Color.Gray)
-            Text("Hard: ${count}x", fontSize = 10.sp, color = if (count > 3) Color.Red else Color.Gray)
+            Text(stringResource(R.string.ms_squared), fontSize = 10.sp, color = Color.Gray)
+            Text(stringResource(R.string.max_value, max), fontSize = 10.sp, color = Color.Gray)
+            Text(stringResource(R.string.harsh_count, count), fontSize = 10.sp, color = if (count > 3) Color.Red else Color.Gray)
         }
     }
 }
@@ -307,7 +307,7 @@ class DrivingTrackerViewModel(private val context: Context) : ViewModel() {
         val duration = System.currentTimeMillis() - startTime
 
         if (duration < 5000) {
-            _uiState.value = _uiState.value.copy(isTracking = false, message = "Rit te kort")
+            _uiState.value = _uiState.value.copy(isTracking = false, message = context.getString(R.string.trip_too_short))
             return
         }
 
@@ -317,10 +317,10 @@ class DrivingTrackerViewModel(private val context: Context) : ViewModel() {
             val sharedPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
             val token = sharedPrefs.getString("jwt_token", "") ?: ""
 
-            android.util.Log.d("DrivingTracker", "Token: ${if (token.isEmpty()) "LEEG" else "Gevonden (${token.length} chars)"}")
+            android.util.Log.d("DrivingTracker", "Token: ${if (token.isEmpty()) "EMPTY" else "Found (${token.length} chars)"}")
 
             if (token.isEmpty()) {
-                _uiState.value = _uiState.value.copy(isSaving = false, message = "Geen token gevonden")
+                _uiState.value = _uiState.value.copy(isSaving = false, message = context.getString(R.string.no_token_found))
                 return@launch
             }
 
@@ -336,13 +336,13 @@ class DrivingTrackerViewModel(private val context: Context) : ViewModel() {
                 val request = DrivingDataRequestBuilder()
                     .setMaxAccelerationForce(_uiState.value.maxAcceleration)
                     .setMaxBrakingForce(_uiState.value.maxBraking)
-                    .setAvgSpeed(_uiState.value. avgSpeed)
-                    .setMaxSpeed(_uiState.value. maxSpeed)
+                    .setAvgSpeed(_uiState.value.avgSpeed)
+                    .setMaxSpeed(_uiState.value.maxSpeed)
                     .setDistance(_uiState.value.distance)
                     .setDuration(duration)
                     .setHarshAccelerationCount(_uiState.value.harshAccelerationCount)
                     .setHarshBrakingCount(_uiState.value.harshBrakingCount)
-                    .setCarName("Test Auto")
+                    .setCarName(context.getString(R.string.test_car))
                     .build()
 
                 val response = apiService.saveDrivingBehavior("Bearer $token", request)
@@ -351,12 +351,12 @@ class DrivingTrackerViewModel(private val context: Context) : ViewModel() {
                     val b = response.body()!!
                     _uiState.value = _uiState.value.copy(
                         isSaving = false,
-                        message = "✅ ${b.points} punten!"
+                        message = "✅ ${context.getString(R.string.points_earned, b.points)}"
                     )
                 } else {
-                    _uiState.value = _uiState.value. copy(isSaving = false, message = "❌ Fout:  ${response.message()}")
+                    _uiState.value = _uiState.value.copy(isSaving = false, message = "❌ ${context.getString(R.string.error_with_message, response.message())}")
                 }
-            } catch (e:  Exception) {
+            } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isSaving = false, message = "❌ ${e.message}")
             }
         }

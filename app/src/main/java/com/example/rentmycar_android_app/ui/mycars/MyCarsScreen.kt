@@ -102,7 +102,7 @@ fun MyCarsScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Fout: ${uiState.error}",
+                            text = stringResource(R.string.error_with_message, uiState.error ?: ""),
                             color = Color.Red
                         )
                     }
@@ -237,7 +237,7 @@ private fun MyCarCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "€${(car.pricePerTimeSlot ?: 0.0).toInt()}${stringResource(R.string.per_day)}",
+                    text = "${stringResource(R.string.euro_symbol)}${(car.pricePerTimeSlot ?: 0.0).toInt()}${stringResource(R.string.per_day)}",
                     fontWeight = FontWeight.SemiBold
                 )
 

@@ -61,7 +61,8 @@ fun AddCarScreen(
     var streetName by remember { mutableStateOf("") }
     var houseNumber by remember { mutableStateOf("") }
     var postcode by remember { mutableStateOf("") }
-    var country by remember { mutableStateOf("Nederland") }
+    val defaultCountry = stringResource(R.string.netherlands)
+    var country by remember { mutableStateOf(defaultCountry) }
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var tempPhotoUri by remember { mutableStateOf<Uri?>(null) }
